@@ -1,0 +1,4 @@
+# Cloudflare Workers handles routing via worker.ts
+# This file is kept for reference but not used by Workers
+# VitePress handles routing internally via client-side navigation
+

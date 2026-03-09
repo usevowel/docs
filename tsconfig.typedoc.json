@@ -1,0 +1,24 @@
+{
+  "extends": "../client/tsconfig.json",
+  "include": [
+    "../client/index.ts",
+    "../client/react.ts",
+    "../client/lib/**/*.ts",
+    "../client/lib/**/*.tsx",
+    "../client/platforms/generic.ts",
+    "../client/platforms/shopify.ts"
+  ],
+  "exclude": [
+    "../client/node_modules",
+    "../client/dist",
+    "../client/**/*.test.ts",
+    "../client/**/*.spec.ts",
+    "../client/vite.config.ts",
+    "../client/**/*.config.ts",
+    "../client/**/*.config.js",
+    "../client/examples",
+    "../client/shopify",
+    "../client/testing"
+  ]
+}
+

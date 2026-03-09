@@ -1,0 +1,34 @@
+# Cloudflare Workers Configuration for vowel documentation
+# Static site deployment to Cloudflare Workers using VitePress build output
+
+name = "vowel-docs"
+main = "worker.ts"
+compatibility_date = "2025-11-03"
+compatibility_flags = ["nodejs_compat"]
+
+# Account ID - set via CLOUDFLARE_ACCOUNT_ID environment variable or uncomment below
+# account_id = "your-account-id-here"
+
+# Custom domain configuration
+# Custom domain: docs.vowel.to
+routes = [
+  { pattern = "docs.vowel.to", custom_domain = true }
+]
+
+# Disable default workers.dev domain (optional)
+workers_dev = false
+
+# Static assets configuration
+# The ASSETS binding is automatically created by the [assets] section
+# Points to VitePress build output directory
+[assets]
+directory = ".vitepress/dist"
+binding = "ASSETS"
+
+# Build configuration
+[build]
+command = "bun run docs:build"
+
+# Environment variables (if needed)
+[vars]
+NODE_ENV = "production"

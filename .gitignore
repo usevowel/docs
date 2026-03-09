@@ -1,0 +1,15 @@
+node_modules
+.vitepress/cache
+.vitepress/dist
+api/
+dist/
+*.log
+.DS_Store
+
+# Cloudflare
+.wrangler/
+.dev.vars
+wrangler.toml.local
+
+# Auto-generated voice navigation routes
+.vitepress/theme/routes-manifest.ts

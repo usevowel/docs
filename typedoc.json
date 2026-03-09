@@ -1,0 +1,55 @@
+{
+  "entryPoints": ["../client/index.ts", "../client/react.ts"],
+  "entryPointStrategy": "expand",
+  "out": "./api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "outputFileStrategy": "members",
+  "fileExtension": ".md",
+  "entryFileName": "index.md",
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "readme": "none",
+  "hideGenerator": true,
+  "disableSources": false,
+  "includeVersion": true,
+  "tsconfig": "./tsconfig.typedoc.json",
+  "exclude": [
+    "../client/node_modules/**",
+    "../client/**/*.test.ts",
+    "../client/**/*.spec.ts",
+    "../client/dist/**",
+    "../client/vite.config.ts",
+    "../client/**/*.config.ts",
+    "../client/**/*.config.js",
+    "../client/examples/**",
+    "../client/shopify/**",
+    "../client/testing/**"
+  ],
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Core",
+    "Adapters",
+    "Components",
+    "Hooks",
+    "Managers",
+    "Types",
+    "Utilities",
+    "*"
+  ],
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Class",
+    "Interface",
+    "Function",
+    "TypeAlias",
+    "Variable"
+  ],
+  "useCodeBlocks": true,
+  "expandObjects": true,
+  "parametersFormat": "table",
+  "propertiesFormat": "table",
+  "enumMembersFormat": "table",
+  "typeDeclarationFormat": "table"
+}
+

@@ -1,0 +1,24 @@
+/**
+ * Custom styles for VitePress with Voice Integration
+ */
+
+/* OCR-A Font for branding */
+@font-face {
+  font-family: 'OCR-A';
+  src: url('/OCR-A_Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Ensure voice agent button stays on top */
+#vowel-voice-container {
+  z-index: 10000;
+}
+
+/* Style adjustments for voice agent in docs context */
+:root {
+  --vowel-primary-color: var(--vp-c-brand-1);
+  --vowel-accent-color: var(--vp-c-brand-2);
+}
+
