@@ -17,12 +17,6 @@ Vowel provides pre-built web components that work in any framework or vanilla Ja
 npm install @vowel.to/client
 ```
 
-Or use via CDN:
-
-```html
-<script type="module" src="https://unpkg.com/@vowel.to/client/dist/web-components.js"></script>
-```
-
 ## Quick Start
 
 ### Register Components
@@ -483,4 +477,3 @@ For older browsers, use a polyfill:
 - [React](./react) - React integration
 - [Adapters](./adapters) - Navigation and automation
 - [API Reference](/api/) - Complete API documentation
-

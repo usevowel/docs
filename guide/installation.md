@@ -1,6 +1,6 @@
 # Installation
 
-This guide covers different ways to install and use @vowel.to/client in your project.
+This guide covers how to install `@vowel.to/client` and prepare for either the hosted platform flow or a token-based connection flow.
 
 ## Package Manager Installation
 
@@ -28,48 +28,14 @@ bun add @vowel.to/client
 pnpm add @vowel.to/client
 ```
 
-## CDN Installation
+## Choose Your Connection Model
 
-For quick prototyping or static sites, you can use the CDN version:
+After installation, choose one of these connection patterns:
 
-### Standalone JavaScript Bundle
+- **Hosted platform flow**: configure your client with an `appId`
+- **Token-based flow**: configure your client with `tokenProvider`
 
-```html
-<script src="https://unpkg.com/@vowel.to/client@latest/standalone-js"></script>
-
-<script>
-  const { Vowel } = window.VowelClient;
-  
-  const vowel = new Vowel({
-    appId: 'your-app-id',
-    routes: [
-      { path: '/', description: 'Home page' },
-      { path: '/products', description: 'Products' }
-    ]
-  });
-  
-  vowel.startSession();
-</script>
-```
-
-### Web Component
-
-```html
-<script src="https://unpkg.com/@vowel.to/client@latest/webcomponent"></script>
-
-<vowel-voice-widget 
-  id="widget"
-  app-id="your-app-id">
-</vowel-voice-widget>
-
-<script>
-  const widget = document.getElementById('widget');
-  
-  widget.addEventListener('vowel-ready', () => {
-    console.log('Vowel is ready!');
-  });
-</script>
-```
+See [Connection Models](./connection-models) for the decision guide.
 
 ## TypeScript Support
 
@@ -188,7 +154,7 @@ export const vowel = new Vowel({
 
 ## Environment Variables
 
-Store your App ID in environment variables:
+If you are using the hosted platform flow, store your `appId` in an environment variable:
 
 ### Next.js (.env.local)
 
@@ -258,4 +224,3 @@ Ensure your `tsconfig.json` includes:
 - [Quick Start](./quick-start) - Build your first voice-enabled app
 - [Vowel Client](./vowel-client) - Learn about the core API
 - [Adapters](./adapters) - Understand navigation and automation
-

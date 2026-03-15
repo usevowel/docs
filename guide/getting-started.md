@@ -1,10 +1,10 @@
 # Getting Started
 
-Welcome to @vowel.to/client! This guide will help you add voice-powered AI agents to your web application in minutes.
+Welcome to vowel. This guide helps you add voice-powered interactions to a web application with `@vowel.to/client`.
 
 ## What is Vowel?
 
-Vowel is a framework-agnostic voice agent library that enables real-time voice interaction in web applications. Powered by Google's Gemini Live API, it provides:
+Vowel is a client SDK for voice-powered web experiences. For the initial open-source launch, the primary path is a token-based connection flow backed by the self-hosted stack. Hosted platform flows are coming soon.
 
 - 🎤 **Real-time Voice Interface** - Natural, conversational interactions
 - 🧭 **Smart Navigation** - Voice-controlled routing
@@ -19,7 +19,16 @@ Before you begin, ensure you have:
 - Node.js 18+ or Bun
 - A modern browser with microphone support
 - HTTPS (required for microphone access)
-- A Vowel App ID (get one at [vowel.to](https://vowel.to))
+- A backend or token service that can provide session tokens
+
+## Choose a Connection Model
+
+Before you integrate, choose one of these connection models:
+
+- **Token-based flow**: fetch a short-lived token from your own backend and connect with `tokenProvider`. This is the recommended path today.
+- **Hosted platform flow**: use an `appId` and let vowel manage session setup for you. This is coming soon.
+
+See [Connection Models](./connection-models) for details.
 
 ## Installation
 
@@ -59,7 +68,18 @@ const { navigationAdapter, automationAdapter } = createDirectAdapters({
 
 // Initialize Vowel client
 const vowel = new Vowel({
-  appId: 'your-app-id',
+  tokenProvider: async () => {
+    const response = await fetch('/api/vowel/token', {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch token');
+    }
+
+    return response.json();
+  },
   navigationAdapter,
   automationAdapter
 });
@@ -90,7 +110,18 @@ function App() {
   });
 
   const vowel = new Vowel({
-    appId: 'your-app-id',
+    tokenProvider: async () => {
+      const response = await fetch('/api/vowel/token', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch token');
+      }
+
+      return response.json();
+    },
     navigationAdapter,
     automationAdapter
   });
@@ -110,22 +141,17 @@ Now that you have Vowel installed and running, explore these topics:
 
 - [Installation](./installation) - Detailed installation instructions
 - [Quick Start](./quick-start) - Complete quick start guide
+- [Connection Models](./connection-models) - Choose between token-based setup today and the hosted `appId` flow coming soon
 - [Vowel Client](./vowel-client) - Core client API
 - [Adapters](./adapters) - Navigation and automation adapters
 - [Actions](./actions) - Custom action registration
 
-## Getting Your App ID
+## Source Repository
 
-Visit [vowel.to](https://vowel.to) to:
-
-1. Create a free account
-2. Configure your voice agent
-3. Get your app ID
+The client SDK is open source at [github.com/usevowel/client](https://github.com/usevowel/client).
 
 ## Need Help?
 
 - 📧 Email: support@vowel.to
-- 💬 Discord: [Join our community](https://discord.gg/vowel-life)
+- 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
 - 📚 Docs: [vowel.to/docs](https://vowel.to/docs)
-- 🐛 Issues: [GitHub Issues](https://github.com/vowel-life/client/issues)
-

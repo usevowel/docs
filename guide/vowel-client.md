@@ -145,7 +145,7 @@ vowel.updateContext({
 vowel.updateContext(null);
 ```
 
-When context changes, a `session.update` event is automatically sent to update the system prompt. The context object is stringified with `JSON.stringify()` and wrapped in `<context>` tags before being appended to the base system instructions.
+When context changes, a `session.update` event is automatically sent to update the system prompt. The context object is stringified with `JSON.stringify()` and wrapped in ``<context>`` tags before being appended to the base system instructions.
 
 **With React:**
 
@@ -452,4 +452,3 @@ unsubscribe();
 - [Dynamic Context](../recipes/dynamic-context) - Dynamic context management
 - [Adapters](./adapters) - Navigation and automation
 - [API Reference](/api/index/classes/Vowel) - Complete API documentation
-

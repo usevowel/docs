@@ -1,7 +1,7 @@
 {
   "entryPoints": ["../client/index.ts", "../client/react.ts"],
   "entryPointStrategy": "expand",
-  "out": "./api",
+  "out": "./api/reference",
   "plugin": ["typedoc-plugin-markdown"],
   "outputFileStrategy": "members",
   "fileExtension": ".md",
@@ -52,4 +52,3 @@
   "enumMembersFormat": "table",
   "typeDeclarationFormat": "table"
 }
-

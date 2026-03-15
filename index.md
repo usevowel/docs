@@ -2,127 +2,45 @@
 layout: home
 
 hero:
-  text: "Voice-Powered AI Agents"
-  tagline: Add real-time voice interaction to any web application in minutes
+  text: "Vowel Docs"
+  tagline: Client SDK and self-hosted deployment documentation for the open-source launch, with hosted platform docs marked as coming soon
   actions:
     - theme: brand
-      text: Get Started
+      text: Client Docs
       link: /guide/getting-started
     - theme: alt
-      text: View on GitHub
-      link: https://github.com/vowel-life/client
+      text: Self-Hosted
+      link: /self-hosted/
     - theme: alt
-      text: API Reference
-      link: /api/
+      text: Platform (Coming Soon)
+      link: /platform/
 
 features:
-  - icon: 🎤
-    title: Real-time Voice Interface
-    details: Powered by Google's Gemini Live API for natural, conversational interactions
-  
-  - icon: 🧭
-    title: Smart Navigation
-    details: Voice-controlled routing with automatic route detection and navigation
-  
-  - icon: 🤖
-    title: Page Automation
-    details: Voice-controlled interaction - search, click, type, and more
-  
-  - icon: ⚡
-    title: Custom Actions
-    details: Define business logic and custom voice commands for your application
-  
-  - icon: 📢
-    title: Event Notifications
-    details: Programmatically trigger AI voice responses for app events
-  
-  - icon: 🔌
-    title: Framework Agnostic
-    details: Works with React, Vue, Next.js, vanilla JS, and more
-  
-  - icon: 📦
-    title: Multiple Formats
-    details: React components, web component, or standalone JavaScript
-  
-  - icon: 🎨
-    title: Fully Customizable
-    details: Configure voice, behavior, UI, and integrate with your design system
-  
-  - icon: 🔄
-    title: Dual Adapter Architecture
-    details: Independent navigation and automation adapters for maximum flexibility
+  - icon: 💻
+    title: Client
+    details: Install the SDK, connect with an app ID or token flow, and integrate with React, Web Components, or vanilla JavaScript
+
+  - icon: 🏗️
+    title: Self-Hosted
+    details: Deploy Core and the realtime engine on your own infrastructure with operator-focused guidance
+
+  - icon: ☁️
+    title: Platform
+    details: Hosted platform features are coming soon after the initial self-hosted open-source launch
+
+  - icon: 🧪
+    title: Recipes
+    details: Start from practical patterns for actions, notifications, navigation, automation, and advanced connection setups
+
+  - icon: 📚
+    title: API Reference
+    details: Look up the exact SDK classes, functions, types, and React module exports
 ---
 
-## Quick Example
+## Browse The Docs
 
-```typescript
-import { Vowel, createDirectAdapters } from '@vowel.to/client';
-import { useRouter } from 'next/navigation';
-
-// Create adapters for navigation + page automation
-const router = useRouter();
-const { navigationAdapter, automationAdapter } = createDirectAdapters({
-  navigate: (path) => router.push(path),
-  routes: [
-    { path: '/', description: 'Home page' },
-    { path: '/products', description: 'Product catalog' }
-  ],
-  enableAutomation: true  // Enable voice page interaction
-});
-
-const vowel = new Vowel({
-  appId: 'your-app-id',
-  navigationAdapter,   // Voice navigation
-  automationAdapter    // Voice page interaction
-});
-
-// Register a custom action
-vowel.registerAction('search', {
-  description: 'Search for products',
-  parameters: {
-    query: { type: 'string', description: 'Search query' }
-  }
-}, async ({ query }) => {
-  // Your search logic
-  return { success: true };
-});
-
-// Start voice session
-await vowel.startSession();
-
-// Programmatically notify user of events
-await vowel.notifyEvent('Order placed successfully!', {
-  orderId: '12345',
-  total: 99.99
-});
-```
-
-## Why Vowel?
-
-Building voice interfaces from scratch is complex. Vowel handles the hard parts:
-
-- **Audio Processing** - VAD, echo cancellation, noise suppression
-- **AI Integration** - Gemini Live API connection and management
-- **Navigation** - Automatic route detection and voice-controlled routing
-- **Page Interaction** - DOM manipulation and element interaction
-- **State Management** - Session, audio, and connection state
-- **Error Handling** - Graceful degradation and recovery
-
-You focus on your application logic and custom actions.
-
-## Use Cases
-
-- **E-commerce** - Voice shopping, product search, cart management
-- **SaaS Applications** - Voice-controlled workflows and navigation
-- **Customer Support** - Interactive voice assistance
-- **Accessibility** - Hands-free navigation for users with disabilities
-- **Productivity Tools** - Quick actions via voice commands
-
-## Get Started
-
-<div class="vp-doc">
-
-[Get Started →](/guide/getting-started)
-
-</div>
-
+- [Client](/guide/getting-started): SDK setup, framework integrations, connection models, and client concepts.
+- [Self-Hosted](/self-hosted/): Architecture, deployment, configuration, Core, realtime engine, and troubleshooting.
+- [Platform](/platform/): Coming-soon hosted platform documentation, including app management, billing, `vowelbot`, and hosted realtime features.
+- [Recipes](/recipes/): Task-oriented examples for actions, events, navigation, automation, and advanced flows.
+- [API Reference](/api/): Generated reference for SDK modules, classes, functions, hooks, and types.

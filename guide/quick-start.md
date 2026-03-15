@@ -218,6 +218,6 @@ navigate: (path) => router.push(path)
 ## Need Help?
 
 - 📧 Email: support@vowel.to
-- 💬 Discord: [Join our community](https://discord.gg/vowel-life)
+- 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
 - 📚 API Reference: [/api](/api/)
 

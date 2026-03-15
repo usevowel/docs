@@ -64,7 +64,7 @@ vowel.updateContext(null);
 When you provide `initialContext` in the config:
 1. Context is stored in the client during construction
 2. When `startSession()` is called, the context is automatically included in the initial system instructions
-3. The context is stringified and wrapped in `<context>` tags
+3. The context is stringified and wrapped in ``<context>`` tags
 4. It's sent to the AI as part of the initial connection
 
 ### Dynamic Updates
@@ -72,7 +72,7 @@ When you provide `initialContext` in the config:
 When you call `updateContext()`, the context object is:
 1. Stored in the client
 2. Stringified using `JSON.stringify(context, null, 2)` (pretty-printed)
-3. Wrapped in `<context>` tags
+3. Wrapped in ``<context>`` tags
 4. Appended to the base system instructions
 5. Sent to the AI via `session.update` (if session is active)
 

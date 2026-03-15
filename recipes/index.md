@@ -29,13 +29,14 @@ Recipes are practical, copy-paste examples that solve specific problems. Each re
 
 ## Contributing Recipes
 
-Have a useful pattern to share? We'd love to include it! Submit a PR or reach out on [Discord](https://discord.gg/vowel-life).
+Have a useful pattern to share? We'd love to include it! Submit a PR or reach out on [Discord](https://discord.gg/Kb4zFmmSRr).
 
 ## Need Something Specific?
 
 Can't find what you're looking for? Check out:
 
 - [API Reference](/api/) - Complete API documentation
-- [Guides](/guide/) - In-depth conceptual guides
-- [Examples](https://github.com/vowel-life/examples) - Full example applications
-
+- [Client](/guide/getting-started) - Integration and SDK concepts
+- [Self-Hosted](/self-hosted/) - Deployment and operator documentation
+- [Platform](/platform/) - Hosted product documentation
+- [Examples](https://github.com/usevowel/examples) - Full example applications

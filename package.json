@@ -9,7 +9,7 @@
     "docs:dev": "vitepress dev",
     "docs:build": "npm run docs:generate-api && vitepress build && rm -f .vitepress/dist/_redirects",
     "docs:preview": "vitepress preview",
-    "docs:generate-api": "typedoc",
+    "docs:generate-api": "rm -rf api/reference && typedoc && bun scripts/sanitize-generated-api.mjs",
     "deploy": "bun run docs:build && bunx wrangler deploy",
     "deploy:preview": "bun run docs:build && bunx wrangler deploy --env preview"
   },

@@ -1,4 +1,4 @@
-# Standalone JavaScript Integration
+# Vanilla JavaScript Integration
 
 Learn how to use Vowel with vanilla JavaScript without any framework.
 
@@ -8,7 +8,7 @@ Vowel works perfectly with vanilla JavaScript, providing a simple API for voice-
 
 ## Installation
 
-### Via NPM
+### Install the SDK
 
 ```bash
 npm install @vowel.to/client
@@ -16,14 +16,6 @@ npm install @vowel.to/client
 
 ```javascript
 import { Vowel, createDirectAdapters } from '@vowel.to/client';
-```
-
-### Via CDN
-
-```html
-<script type="module">
-  import { Vowel, createDirectAdapters } from 'https://unpkg.com/@vowel.to/client/dist/index.js';
-</script>
 ```
 
 ## Quick Start
@@ -550,4 +542,3 @@ if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
 - [React](./react) - React integration
 - [Adapters](./adapters) - Navigation and automation
 - [API Reference](/api/) - Complete API documentation
-

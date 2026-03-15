@@ -177,6 +177,6 @@ When contributing to documentation:
 ## Support
 
 - 📧 Email: support@vowel.to
-- 💬 Discord: [Join our community](https://discord.gg/vowel-life)
-- 🐛 Issues: [GitHub Issues](https://github.com/vowel-life/client/issues)
+- 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
+- 🐛 Issues: [GitHub Issues](https://github.com/usevowel/client/issues)
 
