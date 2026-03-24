@@ -72,11 +72,79 @@ Typical examples:
 - automated testing or scripted interactions
 - server-managed tools that should not run in the browser
 
-### Design Notes
+### How It Works
 
-- never expose long-lived credentials in browser code
-- prefer short-lived tokens wherever possible
-- log session startup and upstream failures clearly
+The trusted server pattern lets your backend connect directly to the realtime engine without a browser client in the loop. Your backend mints a short-lived token, opens a WebSocket, and manages the voice session programmatically.
+
+Key concepts:
+
+- **serviceId** - a unique identifier for your backend service. The engine uses it for logging, analytics, and tool routing.
+- **serverTools** - tool definitions your backend registers at token-issuance time. The engine forwards tool calls to your backend instead of executing them client-side.
+- **Scope gating** - only API keys with the `mint_trusted_session` scope can mint trusted-server tokens. This prevents accidental use by keys intended for browser flows.
+
+### Flow
+
+1. Your backend authenticates with a fixed API key that carries the `mint_trusted_session` scope.
+2. Your backend requests a token, passing `connectionType: 'trusted_server'`, a `serviceId`, and optional `serverTools`.
+3. Core validates the scope and forwards the request to the realtime engine.
+4. The engine returns a short-lived ephemeral token.
+5. Your backend opens a WebSocket to the engine using that token.
+6. When the LLM calls a server tool, the engine forwards the call to your backend over the same WebSocket and waits for the result.
+
+### Token Request Example
+
+```ts
+const response = await fetch('https://your-core-host/v1/realtime/sessions', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    connectionType: 'trusted_server',
+    config: {
+      serviceId: 'order-service',
+      provider: 'vowel-prime',
+      voiceConfig: {
+        model: 'openai/gpt-oss-120b',
+        voice: 'Ashley',
+      },
+      serverTools: [
+        {
+          name: 'lookupOrder',
+          description: 'Look up an order by ID',
+          parameters: {
+            type: 'object',
+            properties: {
+              orderId: { type: 'string', description: 'Order ID' },
+            },
+            required: ['orderId'],
+          },
+        },
+      ],
+    },
+  }),
+});
+```
+
+### Security Boundaries
+
+- **API key scope** - the `mint_trusted_session` scope is separate from `mint_ephemeral`. A key meant for browser token minting cannot accidentally create trusted-server sessions.
+- **Short-lived tokens** - ephemeral tokens expire after five minutes by default. Your backend should mint a fresh token for each session.
+- **No browser exposure** - trusted-server tokens should never reach a browser. Keep them server-side.
+- **Tool isolation** - server tools are registered at token-issuance time. The engine will only forward calls for tools declared in the token.
+
+### Good Fit
+
+- backend automation that drives voice sessions
+- server-side tool execution (database lookups, order management, etc.)
+- scripted testing or CI pipelines that exercise the voice stack
+- multi-service architectures where a backend orchestrates the conversation
+
+### See Also
+
+- [Trusted Server Recipe](/recipes/trusted-server) for a full walkthrough
+- [Self-Hosted Stack](/self-hosted/) for deployment details
 
 ## Common Pitfalls
 
