@@ -24,6 +24,10 @@ features:
     title: Self-Hosted
     details: Deploy Core and the realtime engine on your own infrastructure with operator-focused guidance
 
+  - icon: 🤖
+    title: vowelbot
+    details: Add vowel to a GitHub repository through a guided onboarding flow at add.vowel.to
+
   - icon: ☁️
     title: Platform
     details: Hosted platform features are coming soon after the initial self-hosted open-source launch
@@ -37,10 +41,13 @@ features:
     details: Look up the exact SDK classes, functions, types, and React module exports
 ---
 
+> **⚠️ Beta Release** — The vowel open-source release is in beta. You may encounter rough edges, incomplete features, or breaking changes. We are actively reviewing and merging community PRs, but please expect some instability as we iterate toward a stable release. Your feedback and contributions are welcome.
+
 ## Browse The Docs
 
 - [Client](/guide/getting-started): SDK setup, framework integrations, connection models, and client concepts.
 - [Self-Hosted](/self-hosted/): Architecture, deployment, configuration, Core, realtime engine, and troubleshooting.
-- [Platform](/platform/): Coming-soon hosted platform documentation, including app management, billing, `vowelbot`, and hosted realtime features.
+- [Platform](/platform/): Hosted platform documentation, including app management, billing, and hosted realtime features.
+- [vowelbot](/vowelbot/): Guided onboarding for adding vowel to a GitHub repository at [add.vowel.to](https://add.vowel.to).
 - [Recipes](/recipes/): Task-oriented examples for actions, events, navigation, automation, and advanced flows.
 - [API Reference](/api/): Generated reference for SDK modules, classes, functions, hooks, and types.
