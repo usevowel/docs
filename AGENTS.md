@@ -35,11 +35,12 @@ When editing docs, optimize for these goals:
 
 ## Top-Level Structure
 
-The published site currently has five top-level sections:
+The published site currently has six top-level sections:
 
 - `Home`
 - `Client`
 - `Self-Hosted`
+- `vowelbot`
 - `Platform`
 - `Recipes`
 - `API Reference`
@@ -90,12 +91,25 @@ Use this section for:
 - coming-soon hosted platform overview
 - coming-soon apps and management
 - coming-soon billing and organizations
-- coming-soon `vowelbot`
 - hosted realtime API status
 
 Audience:
 
 - developers using or evaluating the hosted product
+
+#### vowelbot
+
+Use this section for:
+
+- GitHub-based onboarding for adding vowel to a repository
+- setup flow at `add.vowel.to`
+- supported project types
+- onboarding PR contents
+- post-setup `/vowelbot` usage
+
+Audience:
+
+- developers integrating vowel into an existing GitHub repository
 
 #### Recipes
 

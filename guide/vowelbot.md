@@ -1,8 +1,7 @@
-# Vowelbot
+# vowelbot
 
-`vowelbot` documentation now lives in the dedicated [Platform](/platform/) section.
+`vowelbot` documentation now lives in the dedicated [vowelbot](/vowelbot/) section.
 
 Start with:
 
-- [Platform Overview](/platform/)
-- [Vowelbot](/platform/vowelbot)
+- [vowelbot Overview](/vowelbot/)

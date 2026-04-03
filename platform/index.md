@@ -19,12 +19,10 @@ The hosted platform will cover:
 - testing and debugging in a managed control plane
 - hosted billing and organization workflows
 - `appId`-based setup
-- `vowelbot`
 - hosted realtime API features
 
 ## What You Can Explore Here
 
 - [Apps & Management](./apps-and-management)
 - [Billing & Organizations](./billing-and-organizations)
-- [Vowelbot](./vowelbot)
 - [Hosted Realtime API](./hosted-realtime-api)

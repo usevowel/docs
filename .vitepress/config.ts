@@ -36,6 +36,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Client', link: '/guide/getting-started' },
       { text: 'Self-Hosted', link: '/self-hosted/' },
+      { text: 'vowelbot', link: '/vowelbot/' },
       { text: 'Platform', link: '/platform/' },
       { text: 'Recipes', link: '/recipes/' },
       { text: 'API Reference', link: '/api/' }
@@ -121,8 +122,15 @@ export default defineConfig({
         {
           text: 'Automation',
           items: [
-            { text: 'Vowelbot', link: '/platform/vowelbot' },
             { text: 'Hosted Realtime API', link: '/platform/hosted-realtime-api' }
+          ]
+        }
+      ],
+      '/vowelbot/': [
+        {
+          text: 'vowelbot',
+          items: [
+            { text: 'Overview', link: '/vowelbot/' }
           ]
         }
       ],

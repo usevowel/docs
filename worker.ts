@@ -44,9 +44,8 @@ export default {
     // Exclude known file extensions and API paths
     const pathname = url.pathname;
     const hasFileExtension = /\.[a-zA-Z0-9]+$/.test(pathname);
-    const isApiPath = pathname.startsWith('/api/');
     
-    if (!hasFileExtension && !isApiPath && pathname !== '/index.html') {
+    if (!hasFileExtension && pathname !== '/index.html') {
       // Try to fetch index.html for SPA routing
       const indexRequest = new Request(new URL('/index.html', request.url), request);
       response = await env.ASSETS.fetch(indexRequest);

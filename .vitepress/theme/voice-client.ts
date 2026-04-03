@@ -48,12 +48,10 @@ export async function initVoiceAgent(router: any) {
     return
   }
 
-  // TODO: Get app ID dynamically from user's login
-  // For now, using hardcoded test app ID
-  const appId = 'jh7894bm8xjpczdszj79x3jk9d7s7tb3'
+  const appId = import.meta.env.VITE_VOWEL_APP_ID
   
   if (!appId) {
-    console.warn('⚠️ App ID not set - voice functionality disabled')
+    console.warn('⚠️ VITE_VOWEL_APP_ID not set - voice functionality disabled')
     return
   }
 
