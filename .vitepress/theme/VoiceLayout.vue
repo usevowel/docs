@@ -19,7 +19,7 @@
         class="voice-config-btn"
         @click="openConfigModal"
         :class="{ 'has-config': hasStoredConfig, 'voice-active': voiceEnabled }"
-        :title="voiceEnabled ? 'Voice active - Click to configure' : (hasStoredConfig ? 'Voice configured - Click to edit' : 'Configure voice agent')"
+        title="Speak to these docs!"
       >
         <!-- Microphone icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -186,44 +186,100 @@ onUnmounted(() => {
   background: transparent;
   border: 1px solid var(--vp-c-divider);
   border-radius: 6px;
-  color: var(--vp-c-text-2);
+  color: white;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   margin-left: 0.75rem;
+  position: relative;
+  animation: subtleGlowPulse 3s ease-in-out infinite;
+}
+
+@keyframes subtleGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.3),
+                0 0 8px rgba(59, 130, 246, 0.2),
+                0 0 12px rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5),
+                0 0 16px rgba(59, 130, 246, 0.35),
+                0 0 24px rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+  }
 }
 
 .voice-config-btn:hover {
-  color: var(--vp-c-text-1);
-  border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-bg-soft);
+  color: white;
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.15);
+  animation: subtleGlowPulseHover 2s ease-in-out infinite;
+}
+
+@keyframes subtleGlowPulseHover {
+  0%, 100% {
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.4),
+                0 0 12px rgba(59, 130, 246, 0.25),
+                0 0 18px rgba(59, 130, 246, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6),
+                0 0 20px rgba(59, 130, 246, 0.4),
+                0 0 30px rgba(59, 130, 246, 0.25);
+  }
 }
 
 .voice-config-btn.has-config {
-  color: var(--vp-c-brand-1);
-  border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
+  color: white;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  animation: none;
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.3);
 }
 
 .voice-config-btn.has-config:hover {
-  background: var(--vp-c-brand-1);
+  background: rgba(34, 197, 94, 0.25);
   color: white;
+  border-color: #4ade80;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
 }
 
 .voice-config-btn.voice-active {
-  color: var(--vp-c-brand-1);
-  border-color: var(--vp-c-brand-1);
-  background: var(--vp-c-brand-soft);
+  color: white;
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.25);
+  animation: subtleGlowPulseActive 2s ease-in-out infinite;
 }
 
 .voice-config-btn.voice-active:hover {
-  background: var(--vp-c-brand-1);
+  background: rgba(59, 130, 246, 0.4);
   color: white;
+}
+
+@keyframes subtleGlowPulseActive {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.35),
+                0 0 8px rgba(59, 130, 246, 0.2),
+                0 0 12px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.55),
+                0 0 16px rgba(59, 130, 246, 0.35),
+                0 0 24px rgba(59, 130, 246, 0.2);
+  }
 }
 
 .btn-text {
   display: inline;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 0 4px rgba(59, 130, 246, 0.5);
+}
+
+.voice-config-btn.has-config .btn-text {
+  text-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
 }
 
 /* Vowel brand styling with OCR-A font */
