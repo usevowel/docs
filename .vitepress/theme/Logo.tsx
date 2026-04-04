@@ -1,10 +1,35 @@
 /**
  * Logo component for VitePress docs
- * Uses the VowelLogo from the branding package
+ * Self-contained implementation to avoid external monorepo dependencies
  */
 
 import React from 'react'
-import { VowelLogo } from '../../../branding/src/VowelLogo'
+
+/**
+ * VowelLogo - Branded logo component using OCR-A font
+ * Inline implementation to avoid leaking internal repository structure
+ */
+const VowelLogo: React.FC<{
+  className?: string
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+}> = ({ className = '', size = 'lg' }) => {
+  const sizeClasses = {
+    xs: 'text-lg',
+    sm: 'text-xl',
+    md: 'text-2xl',
+    lg: 'text-2xl',
+    xl: 'text-3xl',
+  }
+
+  return (
+    <span
+      className={`${sizeClasses[size]} font-normal tracking-tight leading-none ${className}`}
+      style={{ fontFamily: 'OCR-A, monospace' }}
+    >
+      vowel
+    </span>
+  )
+}
 
 export function Logo() {
   return (

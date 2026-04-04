@@ -13,54 +13,206 @@
       <!-- Add voice agent at the bottom of every page -->
       <VoiceAgent v-if="voiceEnabled" />
     </template>
+    <template #nav-bar-content-after>
+      <!-- Voice configuration button in navbar -->
+      <button
+        class="voice-config-btn"
+        @click="openConfigModal"
+        :class="{ 'has-config': hasStoredConfig }"
+        :title="hasStoredConfig ? 'Voice configured - Click to edit' : 'Configure voice agent'"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" x2="12" y1="19" y2="22"/>
+        </svg>
+        <span class="btn-text">{{ hasStoredConfig ? 'Voice On' : 'Voice' }}</span>
+      </button>
+    </template>
   </Layout>
+
+  <!-- Voice Configuration Modal -->
+  <VoiceConfigModal
+    v-model="showConfigModal"
+    @configured="onVoiceConfigured"
+    @cleared="onVoiceCleared"
+    ref="configModalRef"
+  />
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import VoiceAgent from './VoiceAgent.vue'
 import LogoWrapper from './LogoWrapper.vue'
 import HomeHero from './HomeHero.vue'
+import VoiceConfigModal from './VoiceConfigModal.vue'
+import {
+  initVoiceAgent,
+  cleanupVoiceAgent,
+  hasVoiceConfig,
+  getVoiceConfig,
+  type StoredCredentials
+} from './voice-client'
 
 const { Layout } = DefaultTheme
 
 // Get VitePress router in Vue setup context
 const router = useRouter()
 
-// Voice agent is only enabled when VITE_VOWEL_APP_ID is set at build time
-const voiceEnabled = !!import.meta.env.VITE_VOWEL_APP_ID
+// Modal state
+const showConfigModal = ref(false)
+const configModalRef = ref<InstanceType<typeof VoiceConfigModal> | null>(null)
 
-onMounted(() => {
-  if (!voiceEnabled) return
-  // Initialize voice agent after the page loads (client-side only)
-  if (typeof window !== 'undefined') {
-    import('./voice-client').then(({ initVoiceAgent }) => {
-      // Pass the router instance to the voice client
-      initVoiceAgent(router)
-    })
+// Track if voice is configured
+const hasStoredConfig = ref(false)
+const voiceEnabled = ref(false)
+
+/**
+ * Check if voice configuration exists
+ */
+function checkVoiceConfig() {
+  const hasConfig = hasVoiceConfig()
+  hasStoredConfig.value = hasConfig
+  return hasConfig
+}
+
+/**
+ * Open the configuration modal
+ */
+function openConfigModal() {
+  showConfigModal.value = true
+}
+
+/**
+ * Handle voice configuration saved
+ */
+async function onVoiceConfigured(credentials: StoredCredentials) {
+  hasStoredConfig.value = true
+
+  // Initialize voice agent with the new configuration
+  const success = await initVoiceAgent(router, credentials)
+  voiceEnabled.value = success
+
+  if (success) {
+    console.log('🎤 Voice agent enabled with new configuration')
+  } else {
+    console.error('❌ Failed to enable voice agent with new configuration')
   }
+}
+
+/**
+ * Handle voice configuration cleared
+ */
+function onVoiceCleared() {
+  hasStoredConfig.value = false
+  voiceEnabled.value = false
+  cleanupVoiceAgent()
+  console.log('🎤 Voice configuration cleared')
+}
+
+/**
+ * Initialize voice on mount if configuration exists
+ */
+onMounted(async () => {
+  if (typeof window === 'undefined') return
+
+  // Check for existing configuration
+  const hasConfig = checkVoiceConfig()
+
+  if (hasConfig) {
+    // Initialize voice agent with stored configuration
+    const success = await initVoiceAgent(router)
+    voiceEnabled.value = success
+
+    if (success) {
+      console.log('🎤 Voice agent initialized from stored configuration')
+    }
+  }
+
+  // Listen for storage changes (e.g., from other tabs)
+  window.addEventListener('storage', handleStorageChange)
 })
 
-onUnmounted(() => {
-  if (!voiceEnabled) return
-  // Clean up when navigating away
-  if (typeof window !== 'undefined') {
-    import('./voice-client').then(({ cleanupVoiceAgent }) => {
+/**
+ * Handle localStorage changes from other tabs
+ */
+function handleStorageChange(event: StorageEvent) {
+  if (event.key === 'voweldoc-config') {
+    const newConfig = event.newValue
+    const oldConfig = event.oldValue
+
+    if (newConfig && !oldConfig) {
+      // Config was added
+      hasStoredConfig.value = true
+      initVoiceAgent(router).then((success) => {
+        voiceEnabled.value = success
+      })
+    } else if (!newConfig && oldConfig) {
+      // Config was removed
+      hasStoredConfig.value = false
+      voiceEnabled.value = false
       cleanupVoiceAgent()
-    })
+    }
   }
+}
+
+/**
+ * Clean up on unmount
+ */
+onUnmounted(() => {
+  cleanupVoiceAgent()
+  window.removeEventListener('storage', handleStorageChange)
 })
 </script>
 
 <style scoped>
-#vowel-voice-container {
-  /* Container for the voice agent */
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  z-index: 9999;
+.voice-config-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: transparent;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  color: var(--vp-c-text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 0.75rem;
+}
+
+.voice-config-btn:hover {
+  color: var(--vp-c-text-1);
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+}
+
+.voice-config-btn.has-config {
+  color: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+}
+
+.voice-config-btn.has-config:hover {
+  background: var(--vp-c-brand-1);
+  color: white;
+}
+
+.btn-text {
+  display: inline;
+}
+
+/* Hide text on smaller screens */
+@media (max-width: 768px) {
+  .btn-text {
+    display: none;
+  }
+
+  .voice-config-btn {
+    padding: 0.375rem;
+  }
 }
 </style>
-

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "vowel-webcomponent": {
+      "source": "usevowel/skills",
+      "sourceType": "github",
+      "computedHash": "f82757e4181352478ed4c7759a18e28d6338211a7d9c03495067bd5eb85a5776"
+    }
+  }
+}

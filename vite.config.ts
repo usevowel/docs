@@ -9,14 +9,19 @@
  * - VitePress uses its own config in .vitepress/config.ts and shouldn't pick this up
  */
 import { defineConfig } from 'vite'
-import { cloudflare } from '@cloudflare/vite-plugin'
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(async ({ command, mode }) => {
   // Only enable Cloudflare plugin when wrangler is running
   // Check for WRANGLER environment variable or when building worker specifically
   const isWranglerBuild = process.env.WRANGLER || (command === 'build' && process.argv.includes('worker.ts'))
   
+  const plugins = []
+  if (isWranglerBuild) {
+    const { cloudflare } = await import('@cloudflare/vite-plugin')
+    plugins.push(cloudflare())
+  }
+  
   return {
-    plugins: isWranglerBuild ? [cloudflare()] : [],
+    plugins,
   }
 })

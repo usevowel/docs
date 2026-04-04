@@ -14,7 +14,7 @@
     "deploy:preview": "bun run docs:build && bunx wrangler deploy --env preview"
   },
   "dependencies": {
-    "@vowel.to/client": "workspace:*",
+    "@vowel.to/client": "^0.1.2-beta.564",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

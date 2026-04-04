@@ -23,7 +23,11 @@ export default defineConfig({
     ],
     define: {
       // Define env variables for voice agent
-      'import.meta.env.VITE_VOWEL_APP_ID': JSON.stringify(process.env.VITE_VOWEL_APP_ID || '')
+      'import.meta.env.VITE_VOWEL_APP_ID': JSON.stringify(process.env.VITE_VOWEL_APP_ID || ''),
+      'import.meta.env.VITE_VOWEL_JWT_TOKEN': JSON.stringify(process.env.VITE_VOWEL_JWT_TOKEN || ''),
+      'import.meta.env.VITE_VOWEL_URL': JSON.stringify(process.env.VITE_VOWEL_URL || ''),
+      'import.meta.env.VITE_VOWEL_USE_JWT': JSON.stringify(process.env.VITE_VOWEL_USE_JWT || 'false'),
+      'import.meta.env.VITE_VOWEL_HOSTED_URL': JSON.stringify('wss://realtime.vowel.to/v1')
     }
   },
   

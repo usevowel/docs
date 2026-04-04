@@ -20,5 +20,24 @@
 :root {
   --vowel-primary-color: var(--vp-c-brand-1);
   --vowel-accent-color: var(--vp-c-brand-2);
+  --vowel-success-1: #10b981;
+  --vowel-success-soft: rgba(16, 185, 129, 0.14);
+  --vowel-danger-1: #ef4444;
+  --vowel-danger-soft: rgba(239, 68, 68, 0.14);
+}
+
+/* Map success/danger colors to VitePress vars for modal compatibility */
+:root {
+  --vp-c-success-1: var(--vowel-success-1);
+  --vp-c-success-soft: var(--vowel-success-soft);
+  --vp-c-danger-1: var(--vowel-danger-1);
+  --vp-c-danger-soft: var(--vowel-danger-soft);
+}
+
+/* Voice config button in navbar */
+.VPNavBar .voice-config-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
