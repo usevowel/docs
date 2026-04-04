@@ -4,7 +4,7 @@
       <div v-if="isOpen" class="vowel-config-modal-overlay" @click.self="closeModal">
         <div class="vowel-config-modal">
           <div class="modal-header">
-            <h2>Configure <span class="vowel-brand">vowel</span></h2>
+            <h2>Configure <span class="vowel-brand">voweldocs</span></h2>
             <button class="close-btn" @click="closeModal" aria-label="Close">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -72,7 +72,15 @@
 
               <div class="form-actions">
                 <button type="submit" class="btn-primary" :disabled="!isHostedValid">
-                  Save & Enable Voice
+                  Save & Enable voweldocs
+                </button>
+                <button
+                  v-if="hasStoredConfig && mode === 'hosted'"
+                  type="button"
+                  class="btn-danger"
+                  @click="confirmRemoveModeConfig('hosted')"
+                >
+                  Remove
                 </button>
               </div>
             </form>
@@ -150,7 +158,15 @@
 
               <div class="form-actions">
                 <button type="submit" class="btn-primary" :disabled="!isSelfHostedValid">
-                  Save & Enable Voice
+                  Save & Enable voweldocs
+                </button>
+                <button
+                  v-if="hasStoredConfig && mode === 'selfhosted'"
+                  type="button"
+                  class="btn-danger"
+                  @click="confirmRemoveModeConfig('selfhosted')"
+                >
+                  Remove
                 </button>
               </div>
             </form>
@@ -163,6 +179,22 @@
             <!-- Success Message -->
             <div v-if="successMessage" class="success-message">
               {{ successMessage }}
+            </div>
+          </div>
+
+          <!-- Confirmation Dialog -->
+          <div v-if="showConfirmDialog" class="confirm-dialog-overlay" @click.self="cancelConfirm">
+            <div class="confirm-dialog">
+              <h3 class="confirm-title">{{ confirmTitle }}</h3>
+              <p class="confirm-message">{{ confirmMessage }}</p>
+              <div class="confirm-actions">
+                <button class="btn-secondary" @click="cancelConfirm">
+                  Cancel
+                </button>
+                <button class="btn-danger" @click="executeConfirmedAction">
+                  {{ confirmButtonText }}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -245,6 +277,13 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const hasStoredConfig = ref(false)
 const envJwtAvailable = ref(false)
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false)
+const confirmTitle = ref('')
+const confirmMessage = ref('')
+const confirmButtonText = ref('')
+const pendingConfirmAction = ref<(() => void) | null>(null)
 
 // Visibility toggles for password fields
 const showHostedAppId = ref(false)
@@ -436,7 +475,76 @@ function saveToStorage(credentials: StoredCredentials) {
 }
 
 /**
- * Clear stored configuration
+ * Show confirmation dialog for removing mode-specific configuration
+ */
+function confirmRemoveModeConfig(modeToRemove: ConfigMode) {
+  confirmTitle.value = 'Remove Configuration'
+  confirmMessage.value = `Are you sure you want to remove your saved ${modeToRemove === 'hosted' ? 'Hosted (SaaS)' : 'Self-Hosted'} configuration? This will clear the stored credentials from local storage.`
+  confirmButtonText.value = 'Remove'
+  pendingConfirmAction.value = () => removeModeConfig(modeToRemove)
+  showConfirmDialog.value = true
+}
+
+/**
+ * Cancel the confirmation dialog
+ */
+function cancelConfirm() {
+  showConfirmDialog.value = false
+  pendingConfirmAction.value = null
+}
+
+/**
+ * Execute the confirmed action
+ */
+function executeConfirmedAction() {
+  if (pendingConfirmAction.value) {
+    pendingConfirmAction.value()
+  }
+  showConfirmDialog.value = false
+  pendingConfirmAction.value = null
+}
+
+/**
+ * Remove configuration for a specific mode only
+ */
+function removeModeConfig(modeToRemove: ConfigMode) {
+  try {
+    // Get current stored config
+    const stored = localStorage.getItem('voweldoc-config')
+    if (!stored) return
+
+    const parsed: StoredCredentials = JSON.parse(stored)
+
+    // If stored mode matches the mode being removed, clear everything
+    if (parsed.mode === modeToRemove) {
+      localStorage.removeItem('voweldoc-config')
+      hasStoredConfig.value = false
+      successMessage.value = 'Configuration removed. Voice agent disabled.'
+      emit('cleared')
+    } else {
+      // Stored mode is different from the one being removed
+      // Just clear the form fields for current mode
+      successMessage.value = `${modeToRemove === 'hosted' ? 'Hosted' : 'Self-Hosted'} form cleared.`
+    }
+
+    // Clear form fields for the removed mode
+    if (modeToRemove === 'hosted') {
+      hostedConfig.value = { appId: '' }
+    } else {
+      selfHostedConfig.value = { appId: '', url: '', jwt: '' }
+    }
+
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 2000)
+  } catch (error) {
+    errorMessage.value = 'Failed to remove configuration.'
+    console.error('Error removing mode config:', error)
+  }
+}
+
+/**
+ * Clear stored configuration (all modes)
  */
 function clearConfig() {
   try {
@@ -446,7 +554,7 @@ function clearConfig() {
     selfHostedConfig.value = { appId: '', url: '', jwt: '' }
     successMessage.value = 'Configuration cleared. Voice agent disabled.'
     emit('cleared')
-    
+
     setTimeout(() => {
       closeModal()
     }, 1500)
@@ -693,20 +801,25 @@ defineExpose({
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--vp-c-brand-2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:active:not(:disabled) {
   transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary:disabled {
-  opacity: 0.5;
+  background: var(--vp-c-brand-3);
+  opacity: 0.6;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .error-message {
@@ -805,5 +918,116 @@ defineExpose({
   padding: 0;
   font-size: inherit;
   color: inherit;
+}
+
+/* Danger/Remove button */
+.btn-danger {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--vp-c-danger-1);
+  border: 1px solid var(--vp-c-danger-1);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  background: var(--vp-c-danger-soft);
+}
+
+.btn-danger:active {
+  transform: translateY(1px);
+}
+
+/* Form actions with multiple buttons */
+.form-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-danger {
+  flex: 1;
+}
+
+/* Confirmation Dialog */
+.confirm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.confirm-dialog {
+  background: var(--vp-c-bg);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 400px;
+  padding: 1.5rem;
+  border: 1px solid var(--vp-c-divider);
+  animation: scaleIn 0.2s ease;
+}
+
+.confirm-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.confirm-message {
+  margin: 0 0 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.confirm-actions .btn-secondary {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+}
+
+.confirm-actions .btn-danger {
+  width: auto;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Dark mode adjustments */
+:root.dark .confirm-dialog {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 </style>
