@@ -13,7 +13,7 @@
       <!-- Add voice agent at the bottom of every page -->
       <VoiceAgent v-if="voiceEnabled" />
     </template>
-    <template #nav-bar-content-after>
+    <template #nav-bar-content-before>
       <!-- Voice configuration button in navbar -->
       <button
         class="voice-config-btn"

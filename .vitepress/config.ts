@@ -43,7 +43,7 @@ export default defineConfig({
       { text: 'vowelbot', link: '/vowelbot/' },
       { text: 'Platform', link: '/platform/' },
       { text: 'Recipes', link: '/recipes/' },
-      { text: 'API Reference', link: '/api/' }
+      { text: 'API', link: '/api/' }
     ],
 
     sidebar: {
