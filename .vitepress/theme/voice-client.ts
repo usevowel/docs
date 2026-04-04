@@ -201,7 +201,7 @@ async function buildVowelConfig(
     voiceConfig: {
       provider: 'vowel-prime',
       model: 'moonshotai/kimi-k2-instruct-0905',
-      voice: 'Ashley', // Professional and clear voice for documentation
+      voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
       language: 'en-US',
     },
 

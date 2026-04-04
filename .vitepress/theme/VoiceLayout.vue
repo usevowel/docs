@@ -21,12 +21,18 @@
         :class="{ 'has-config': hasStoredConfig }"
         :title="hasStoredConfig ? 'Voice configured - Click to edit' : 'Configure voice agent'"
       >
+        <!-- Microphone icon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
           <line x1="12" x2="12" y1="19" y2="22"/>
         </svg>
-        <span class="btn-text">{{ hasStoredConfig ? 'Voice On' : 'Voice' }}</span>
+        <!-- Settings icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="settings-icon">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span class="btn-text"><span class="vowel-brand">vowel</span></span>
       </button>
     </template>
   </Layout>
@@ -205,6 +211,22 @@ onUnmounted(() => {
   display: inline;
 }
 
+/* Vowel brand styling with OCR-A font */
+.vowel-brand {
+  font-family: 'OCR-A', 'Courier New', monospace;
+  letter-spacing: 0.05em;
+}
+
+/* Settings icon styling - positioned to right of microphone */
+.settings-icon {
+  margin-left: -0.25rem;
+  opacity: 0.8;
+}
+
+.voice-config-btn:hover .settings-icon {
+  opacity: 1;
+}
+
 /* Hide text on smaller screens */
 @media (max-width: 768px) {
   .btn-text {
@@ -213,6 +235,10 @@ onUnmounted(() => {
 
   .voice-config-btn {
     padding: 0.375rem;
+  }
+
+  .settings-icon {
+    display: none;
   }
 }
 </style>

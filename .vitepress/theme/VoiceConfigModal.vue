@@ -4,7 +4,7 @@
       <div v-if="isOpen" class="vowel-config-modal-overlay" @click.self="closeModal">
         <div class="vowel-config-modal">
           <div class="modal-header">
-            <h2>Configure Voice Agent</h2>
+            <h2>Configure <span class="vowel-brand">vowel</span></h2>
             <button class="close-btn" @click="closeModal" aria-label="Close">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -41,13 +41,32 @@
             <form v-if="mode === 'hosted'" @submit.prevent="saveHostedConfig">
               <div class="form-group">
                 <label for="app-id">App ID</label>
-                <input
-                  id="app-id"
-                  v-model="hostedConfig.appId"
-                  type="text"
-                  placeholder="your-app-id"
-                  required
-                />
+                <div class="password-input-wrapper">
+                  <input
+                    id="app-id"
+                    v-model="hostedConfig.appId"
+                    :type="showHostedAppId ? 'text' : 'password'"
+                    placeholder="your-app-id"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="toggle-visibility-btn"
+                    @click="showHostedAppId = !showHostedAppId"
+                    :aria-label="showHostedAppId ? 'Hide App ID' : 'Show App ID'"
+                  >
+                    <svg v-if="showHostedAppId" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                      <line x1="2" x2="22" y1="2" y2="22"></line>
+                    </svg>
+                  </button>
+                </div>
                 <span class="hint">Your vowel application ID from <a href="https://vowel.to" target="_blank" rel="noopener">vowel.to</a></span>
               </div>
 
@@ -87,13 +106,32 @@
               <template v-else>
                 <div class="form-group">
                   <label for="selfhosted-app-id">App ID</label>
-                  <input
-                    id="selfhosted-app-id"
-                    v-model="selfHostedConfig.appId"
-                    type="text"
-                    placeholder="your-app-id"
-                    required
-                  />
+                  <div class="password-input-wrapper">
+                    <input
+                      id="selfhosted-app-id"
+                      v-model="selfHostedConfig.appId"
+                      :type="showSelfHostedAppId ? 'text' : 'password'"
+                      placeholder="your-app-id"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="toggle-visibility-btn"
+                      @click="showSelfHostedAppId = !showSelfHostedAppId"
+                      :aria-label="showSelfHostedAppId ? 'Hide App ID' : 'Show App ID'"
+                    >
+                      <svg v-if="showSelfHostedAppId" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                        <line x1="2" x2="22" y1="2" y2="22"></line>
+                      </svg>
+                    </button>
+                  </div>
                   <span class="hint">Your self-hosted application ID</span>
                 </div>
 
@@ -207,6 +245,10 @@ const errorMessage = ref('')
 const successMessage = ref('')
 const hasStoredConfig = ref(false)
 const envJwtAvailable = ref(false)
+
+// Visibility toggles for password fields
+const showHostedAppId = ref(false)
+const showSelfHostedAppId = ref(false)
 
 const hostedConfig = ref<HostedConfig>({
   appId: ''
@@ -477,6 +519,12 @@ defineExpose({
   color: var(--vp-c-text-1);
 }
 
+.vowel-brand {
+  font-family: 'OCR-A', 'Courier New', monospace;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+
 .close-btn {
   background: none;
   border: none;
@@ -591,6 +639,44 @@ defineExpose({
   margin-top: 0.375rem;
   font-size: 0.75rem;
   color: var(--vp-c-text-3);
+}
+
+/* Password input with eye toggle */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 2.75rem;
+}
+
+.toggle-visibility-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0.375rem;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.toggle-visibility-btn:hover {
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg-soft);
+}
+
+.toggle-visibility-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--vp-c-brand-soft);
 }
 
 .form-actions {
