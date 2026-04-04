@@ -57,3 +57,17 @@
   gap: 6px;
 }
 
+/* Ensure border glow starts hidden - VitePress may override the .hidden class
+ * The glow element starts with .hidden class but VP styles might affect opacity
+ */
+#vowel-border-glow.vowel-border-glow.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s;
+}
+
+#vowel-border-glow.vowel-border-glow:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+

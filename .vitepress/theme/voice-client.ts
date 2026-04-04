@@ -200,9 +200,37 @@ async function buildVowelConfig(
     // Voice configuration
     voiceConfig: {
       provider: 'vowel-prime',
-      model: 'moonshotai/kimi-k2-instruct-0905',
+      llmProvider: 'groq',
+      model: 'openai/gpt-oss-20b',
+      // model: 'moonshotai/kimi-k2-instruct-0905',
       voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
       language: 'en-US',
+      // Server-side VAD configuration for more accurate speech detection
+      turnDetection: {
+        mode: 'server_vad',
+      },
+    },
+
+    // Enable captions display for transcription visibility
+    _caption: {
+      enabled: true,
+      position: 'bottom-center',
+      showRole: true,
+      showStreaming: true,
+    },
+
+    // Disable floating cursor
+    floatingCursor: {
+      enabled: false,
+    },
+
+    // Enable page border glow with vowel docs button color (blue-500)
+    borderGlow: {
+      enabled: true,
+      color: '#3b82f6',
+      intensity: 20,
+      width: 4,
+      pulse: true,
     },
 
     // System instruction override for docs context
