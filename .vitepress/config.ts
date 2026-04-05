@@ -93,7 +93,8 @@ export default defineConfig({
           text: 'Components',
           items: [
             { text: 'Core', link: '/self-hosted/core' },
-            { text: 'Realtime Engine', link: '/self-hosted/engine' }
+            { text: 'Realtime Engine', link: '/self-hosted/engine' },
+            { text: 'Self-Hosted Speech (Echoline)', link: '/self-hosted/echoline' }
           ]
         },
         {

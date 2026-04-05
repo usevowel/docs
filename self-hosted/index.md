@@ -47,6 +47,12 @@ The self-hosted stack has two primary services:
 | **Core** | http://localhost:3000 | Token issuance, app management, Web UI |
 | **Realtime Engine** | ws://localhost:8787/v1/realtime | Voice AI WebSocket (OpenAI-compatible) |
 
+**Optional:**
+
+| Service | Default URL | Purpose |
+|---------|-------------|---------|
+| **Echoline** | http://localhost:8000 | Self-hosted STT/TTS (no external APIs) |
+
 Your application typically talks to Core or your own backend to get a token, then connects to the realtime engine with that token.
 
 ## Command Reference
@@ -84,12 +90,23 @@ Before deploying, obtain API keys from:
 | **Deepgram** | Speech-to-text and text-to-speech | [deepgram.com](https://deepgram.com) |
 | **Groq** or **OpenRouter** | LLM for AI responses | [groq.com](https://groq.com) or [openrouter.ai](https://openrouter.ai) |
 
+### Fully Self-Hosted (No External Speech APIs)
+
+If you run Echoline for self-hosted STT/TTS, you can eliminate the Deepgram dependency:
+
+```bash
+docker compose --profile echoline up
+```
+
+Echoline requires a GPU for real-time performance. See [Self-Hosted Speech](./echoline) for setup instructions.
+
 ## Documentation
 
 - **[Deployment](./deployment)** - Docker Compose setup, prerequisites, production deployment
 - **[Configuration](./configuration)** - Complete environment variable reference
 - **[Core](./core)** - Token service API, bootstrap process, Web UI
 - **[Realtime Engine](./engine)** - WebSocket API, events, runtime config
+- **[Self-Hosted Speech (Echoline)](./echoline)** - Run local STT/TTS without external APIs
 - **[Architecture](./architecture)** - How components fit together
 - **[Troubleshooting](./troubleshooting)** - Debug common issues, logs, health checks
 
