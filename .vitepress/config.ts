@@ -1,6 +1,11 @@
 import { defineConfig } from 'vitepress'
 import react from '@vitejs/plugin-react'
 import { generateRoutesPlugin } from './theme/generate-routes-plugin'
+import { config } from 'dotenv'
+import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid'
+
+// Load environment variables from .env file
+config()
 
 export default defineConfig({
   title: 'vowel Docs',
@@ -10,7 +15,28 @@ export default defineConfig({
   
   // Logo configuration
   head: [
-    ['link', { rel: 'icon', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/images/favicon-32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/images/favicon-192.png' }],
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/images/favicon-180.png' }],
+    // Respect user's stored theme preference, default to dark only for new visitors
+    ['script', { id: 'theme-preference' }, `
+      (function() {
+        const key = 'vitepress-theme-appearance';
+        const stored = localStorage.getItem(key);
+        // If no preference stored, or if 'auto', default to dark
+        if (!stored || stored === 'auto') {
+          localStorage.setItem(key, 'dark');
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        } else if (stored === 'dark') {
+          // Respect stored dark preference
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.colorScheme = 'dark';
+        }
+        // If stored === 'light', don't add dark class - let it stay light
+      })();
+    `],
   ],
   
   // Exclude repo-only docs from the published site
@@ -19,27 +45,63 @@ export default defineConfig({
   vite: {
     plugins: [
       react(),
-      generateRoutesPlugin() // Auto-generate routes for voice navigation
+      generateRoutesPlugin(), // Auto-generate routes for voice navigation
+      MermaidPlugin() // Enable Mermaid diagrams
     ],
     define: {
       // Define env variables for voice agent
-      'import.meta.env.VITE_VOWEL_APP_ID': JSON.stringify(process.env.VITE_VOWEL_APP_ID || '')
+      'import.meta.env.VITE_VOWEL_APP_ID': JSON.stringify(process.env.VITE_VOWEL_APP_ID || ''),
+      'import.meta.env.VITE_VOWEL_JWT_TOKEN': JSON.stringify(process.env.VITE_VOWEL_JWT_TOKEN || ''),
+      'import.meta.env.VITE_VOWEL_URL': JSON.stringify(process.env.VITE_VOWEL_URL || ''),
+      'import.meta.env.VITE_VOWEL_USE_JWT': JSON.stringify(process.env.VITE_VOWEL_USE_JWT || 'false'),
+      'import.meta.env.VITE_VOWEL_HOSTED_URL': JSON.stringify('wss://realtime.vowel.to/v1'),
+      // RAG debug tool - set VITE_VOWEL_DEBUG_RAG=true to enable
+      'import.meta.env.VITE_VOWEL_DEBUG_RAG': JSON.stringify(process.env.VITE_VOWEL_DEBUG_RAG || 'false')
+    },
+    resolve: {
+      alias: {
+        // @wllama/wllama@2.3.7 publishes a broken package entrypoint;
+        // Haven's optional WllamaProvider can still load the real ESM build.
+        '@wllama/wllama': '@wllama/wllama/esm/index.js',
+      },
+      // Ensure .ts extensions are resolved properly for theme imports
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    },
+    optimizeDeps: {
+      include: ['js-yaml', 'mermaid'],
+      exclude: ['haven', '@wllama/wllama'],
+      esbuildOptions: {
+        target: 'es2022'
+      }
+    },
+    esbuild: {
+      target: 'es2022'
+    },
+    build: {
+      commonjsOptions: {
+        transformMixedEsModules: true
+      }
     }
   },
   
   themeConfig: {
+    // Dark mode default with toggle - VitePress will read localStorage set by our script above
+    // @ts-ignore - appearance is a valid VitePress themeConfig property
+    appearance: true,
+
     // Logo displayed in the navigation bar
     // logo: '/logo.svg',
     siteTitle: false, // Hide default site title to use custom logo
-    
+
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Client', link: '/guide/getting-started' },
-      { text: 'Self-Hosted', link: '/self-hosted/' },
-      { text: 'vowelbot', link: '/vowelbot/' },
-      { text: 'Platform', link: '/platform/' },
-      { text: 'Recipes', link: '/recipes/' },
-      { text: 'API Reference', link: '/api/' }
+      { text: 'Home', link: '/', activeMatch: '^/$' },
+      { text: 'Client', link: '/guide/getting-started', activeMatch: '^/guide/' },
+      { text: 'Self-Hosted', link: '/self-hosted/', activeMatch: '^/self-hosted/' },
+      { text: 'vowelbot', link: '/vowelbot/', activeMatch: '^/vowelbot/' },
+      { text: 'Platform', link: '/platform/', activeMatch: '^/platform/' },
+      { text: 'Recipes', link: '/recipes/', activeMatch: '^/recipes/' },
+      { text: 'voweldocs', link: '/voweldocs/', activeMatch: '^/voweldocs/' },
+      { text: 'API', link: '/api/', activeMatch: '^/api/' }
     ],
 
     sidebar: {
@@ -86,6 +148,7 @@ export default defineConfig({
           text: 'Overview',
           items: [
             { text: 'Overview', link: '/self-hosted/' },
+            { text: 'Quickstart', link: '/self-hosted/quickstart' },
             { text: 'Architecture', link: '/self-hosted/architecture' }
           ]
         },
@@ -102,6 +165,7 @@ export default defineConfig({
           items: [
             { text: 'Configuration', link: '/self-hosted/configuration' },
             { text: 'Deployment', link: '/self-hosted/deployment' },
+            { text: 'Testing', link: '/self-hosted/testing' },
             { text: 'Troubleshooting', link: '/self-hosted/troubleshooting' }
           ]
         }
@@ -150,6 +214,19 @@ export default defineConfig({
           ]
         }
       ],
+      '/voweldocs/': [
+        {
+          text: 'voweldocs',
+          items: [
+            { text: 'Overview', link: '/voweldocs/' },
+            { text: 'Architecture', link: '/voweldocs/architecture' },
+            { text: 'Configuration', link: '/voweldocs/configuration' },
+            { text: 'RAG', link: '/voweldocs/rag' },
+            { text: 'Integration', link: '/voweldocs/integration' },
+            { text: 'Troubleshooting', link: '/voweldocs/troubleshooting' }
+          ]
+        }
+      ],
       '/api/': [
         {
           text: 'API Reference',
@@ -188,6 +265,9 @@ export default defineConfig({
     theme: {
       light: 'github-light',
       dark: 'github-dark'
+    },
+    config: (md) => {
+      MermaidMarkdown(md)
     }
   }
 })

@@ -2,32 +2,9 @@
 
 Self-hosted deployment lets you run vowel on infrastructure you control.
 
-## Quick Start
-
-Get the self-hosted stack running in minutes:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/usevowel/stack.git
-cd stack
-
-# 2. Copy and configure environment
-cp stack/stack.env.example stack.env
-# Edit stack.env and add your API keys
-
-# 3. Start the stack
-bun run stack:up
-
-# 4. Verify with smoke test
-bun run stack:test
-
-# 5. View logs
-bun run stack:logs
-```
-
-Services will be available at:
-- **Core**: http://localhost:3000 (token service, Web UI)
-- **Engine**: ws://localhost:8787/v1/realtime (WebSocket for voice)
+::: warning Beta Release
+This open-source release is in beta. You may encounter rough edges, incomplete features, or breaking changes. We are actively reviewing and merging community PRs, but please expect some instability as we iterate toward a stable release. Your feedback and contributions are welcome.
+:::
 
 ## Who This Is For
 
@@ -37,15 +14,26 @@ Choose self-hosted when you want:
 - Your own token issuance path
 - Custom networking, auth, or backend policy
 - Operator control over runtime configuration
+- Data privacy with fully offline operation (optional)
+
+<a href="https://youtu.be/Iv-ek5vXbhQ" style="display: block; position: relative; width: 50%; margin: 0 auto;">
+  <img src="/images/self-host.png" alt="Self-Hosted Stack Overview" style="width: 100%; display: block; border-radius: 8px;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+    <svg viewBox="0 0 24 24" width="40" height="40" fill="white" style="margin-left: 4px;">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+  </div>
+</a>
 
 ## What The Self-Hosted Stack Includes
 
-The self-hosted stack has two primary services:
+The self-hosted stack includes these services:
 
 | Service | Default URL | Purpose |
 |---------|-------------|---------|
 | **Core** | http://localhost:3000 | Token issuance, app management, Web UI |
 | **Realtime Engine** | ws://localhost:8787/v1/realtime | Voice AI WebSocket (OpenAI-compatible) |
+| **Echoline** (optional) | http://localhost:8000 | Self-hosted STT/TTS with faster-whisper + Kokoro |
 
 **Optional:**
 
@@ -55,13 +43,39 @@ The self-hosted stack has two primary services:
 
 Your application typically talks to Core or your own backend to get a token, then connects to the realtime engine with that token.
 
+## Deployment Options
+
+### Option 1: Deepgram-Powered (Default - Recommended)
+Uses hosted STT/TTS from Deepgram. Works on all machines (no GPU required).
+
+- **Pros**: Fast setup, professional-grade quality, no model downloads
+- **Cons**: Requires Deepgram API key, ongoing API costs
+- **Requirements**: Deepgram API key + LLM provider key (Groq or OpenRouter)
+- **Command**: `bun run stack:up`
+
+### Option 2: Fully Self-Hosted with Echoline
+Local speech processing with faster-whisper + Kokoro. Requires NVIDIA GPU.
+
+- **Pros**: No external APIs, data privacy, works offline, no API costs
+- **Cons**: Requires GPU, ~5GB disk space, slower initial startup
+- **Requirements**: NVIDIA GPU with 8GB+ VRAM
+- **Command**: `bun run stack:up:full`
+
+### Option 3: GPU-Accelerated (NVIDIA GPU Only)
+Uses GPU for lower VAD latency with Deepgram quality.
+
+- **Requirements**: NVIDIA GPU + Container Toolkit
+- **Command**: `bun run stack:up:gpu`
+
 ## Command Reference
 
 Common stack management commands:
 
 | Command | Description |
 |---------|-------------|
-| `bun run stack:up` | Start all services |
+| `bun run stack:up` | Start CPU stack (default) |
+| `bun run stack:up:gpu` | Start with GPU acceleration |
+| `bun run stack:up:full` | Start with Echoline (self-hosted STT/TTS) |
 | `bun run stack:down` | Stop and remove containers |
 | `bun run stack:logs` | View service logs |
 | `bun run stack:build` | Rebuild container images |
@@ -100,6 +114,23 @@ docker compose --profile echoline up
 
 Echoline requires a GPU for real-time performance. See [Self-Hosted Speech](./echoline) for setup instructions.
 
+Echoline (self-hosted STT/TTS option) does not require external API keys.
+
+## Testing
+
+The stack includes multiple testing capabilities:
+
+**Smoke Test** (`bun run stack:test`)
+A quick health check that verifies the Core and Engine services are running, validates token generation works, and confirms WebSocket connections can be established.
+
+**Test Harness Framework**
+An LLM-powered automated testing system in the Engine that simulates human users conducting conversations with your voice agent. It validates that the agent correctly uses tools, handles multi-turn conversations, and maintains context across interactions. The framework includes built-in test scenarios for weather lookups, calculations, multi-tool conversations, and context retention.
+
+**Custom Test Scenarios**
+Create your own test cases by defining conversation objectives, expected tool calls with validation logic, and mock return data. Tests can be run against different LLM providers and generate detailed Markdown logs of each run.
+
+See the **[Testing](./testing)** page for detailed documentation on the Test Harness, creating custom scenarios, and CI/CD integration.
+
 ## Documentation
 
 - **[Deployment](./deployment)** - Docker Compose setup, prerequisites, production deployment
@@ -108,6 +139,7 @@ Echoline requires a GPU for real-time performance. See [Self-Hosted Speech](./ec
 - **[Realtime Engine](./engine)** - WebSocket API, events, runtime config
 - **[Self-Hosted Speech (Echoline)](./echoline)** - Run local STT/TTS without external APIs
 - **[Architecture](./architecture)** - How components fit together
+- **[Testing](./testing)** - Smoke tests, Test Harness framework, custom scenarios
 - **[Troubleshooting](./troubleshooting)** - Debug common issues, logs, health checks
 
 ## Source Repository

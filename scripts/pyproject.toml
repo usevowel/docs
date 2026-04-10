@@ -1,0 +1,17 @@
+[project]
+name = "rag-prebuild"
+version = "1.0.0"
+description = "Pre-build RAG embeddings for VowelDocs documentation using llama.cpp Vulkan"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "requests>=2.31.0",
+    "tqdm>=4.66.0",
+    "pyyaml>=6.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "ruff>=0.1.0",
+]

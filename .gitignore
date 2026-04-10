@@ -9,7 +9,14 @@ dist/
 # Cloudflare
 .wrangler/
 .dev.vars
+.env
 wrangler.toml.local
 
 # Auto-generated voice navigation routes
 .vitepress/theme/routes-manifest.ts
+
+# RAG build artifacts - llama.cpp binaries and build state
+scripts/llama-*/
+scripts/.rag-build-state.yml
+scripts/uv.lock
+scripts/*.gguf

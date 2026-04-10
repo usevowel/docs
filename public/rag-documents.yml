@@ -1,0 +1,7048 @@
+version: 1.0.0
+generated_at: '2026-04-08T21:51:03Z'
+document_count: 50
+documents:
+  index:
+    title: Index
+    description: null
+    category: Getting Started
+    url_path: /
+    content: '> **⚠️ Beta Release** — The vowel open-source release is in beta. You
+      may encounter rough edges, incomplete features, or breaking changes. We are
+      actively reviewing and merging community PRs, but please expect some instability
+      as we iterate toward a stable release. Your feedback and contributions are welcome.
+
+
+      ## Browse The Docs
+
+
+      - [Client](/guide/getting-started): SDK setup, framework integrations, connection
+      models, and client concepts.
+
+      - [Self-Hosted](/self-hosted/): Architecture, deployment, configuration, Core,
+      realtime engine, and troubleshooting.
+
+      - [Platform](/platform/): Hosted platform documentation, including app management,
+      billing, and hosted realtime features.
+
+      - [vowelbot](/vowelbot/): Guided onboarding for adding vowel to a GitHub repository
+      at [add.vowel.to](https://add.vowel.to).
+
+      - [Recipes](/recipes/): Task-oriented examples for actions, events, navigation,
+      automation, and advanced flows.
+
+      - [API Reference](/api/): Generated reference for SDK modules, classes, functions,
+      hooks, and types.'
+    word_count: 124
+    char_count: 1019
+  guide/actions:
+    title: Actions
+    description: null
+    category: Guide
+    url_path: /guide/actions/
+    content: '# Actions
+
+
+      Actions are custom voice commands that you define for your application. They
+      allow the AI to perform business logic specific to your app.
+
+
+      ## ⚠️ CRITICAL: Action Registration Timing
+
+
+      **All custom actions MUST be registered BEFORE starting the voice session!**
+
+
+      [code example]
+
+
+      **Why?** Tool definitions are sent to the server during session initialization.
+      Actions registered after startSession() are not sent to the AI and will never
+      be called.
+
+
+      **Best Practice:** Always register all actions immediately after creating the
+      Vowel client and before calling startSession().
+
+
+      ## Overview
+
+
+      When you register an action, the AI can:
+
+      - Understand when to call it based on user voice input
+
+      - Extract parameters from natural language
+
+      - Execute your handler function
+
+      - Return results to continue the conversation
+
+
+      ## Basic Action Registration
+
+
+      [code example]
+
+
+      ## Action Definition
+
+
+      ### VowelAction Interface
+
+
+      [code example]
+
+
+      ### Parameter Types
+
+
+      Actions support multiple parameter types:
+
+
+      [code example]
+
+
+      ## Action Handler
+
+
+      The action handler receives parameters and returns a result:
+
+
+      [code example]
+
+
+      ### Basic Handler
+
+
+      [code example]
+
+
+      ### Error Handling
+
+
+      [code example]
+
+
+      ## Common Action Patterns
+
+
+      ### Search Action
+
+
+      [code example]
+
+
+      ### CRUD Operations
+
+
+      [code example]
+
+
+      ### Cart Management
+
+
+      [code example]
+
+
+      ### Form Submission
+
+
+      [code example]
+
+
+      ## Built-in Actions
+
+
+      Vowel automatically registers actions when you provide adapters:
+
+
+      ### From NavigationAdapter
+
+
+      - navigate_to_page - Navigate to any route
+
+
+      ### From AutomationAdapter
+
+
+      - search_page_elements - Search for elements
+
+      - get_page_snapshot - Get page structure
+
+      - click_element - Click any element
+
+      - type_into_element - Type into inputs
+
+      - focus_element - Focus an element
+
+      - scroll_to_element - Scroll to element
+
+      - press_key - Press keyboard keys
+
+
+      You don''t need to register these manually - they work automatically!
+
+
+      ## Action Context
+
+
+      Handlers receive an optional context parameter:
+
+
+      [code example]
+
+
+      ## TypeScript Support
+
+
+      Use generics for type-safe parameters:
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Clear Descriptions** - Write clear, concise descriptions for actions and
+      parameters
+
+      2. **Validate Input** - Always validate parameters in your handler
+
+      3. **Handle Errors** - Return proper error messages for failures
+
+      4. **Return Useful Data** - Include relevant data in the response
+
+      5. **Keep Handlers Fast** - Avoid long-running operations
+
+      6. **Use TypeScript** - Leverage type safety for parameters
+
+      7. **Test Actions** - Test action handlers independently
+
+      8. **Document Parameters** - Provide detailed parameter descriptions
+
+
+      ## Testing Actions
+
+
+      Test action handlers independently:
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [Vowel Client](./vowel-client) - Core client API
+
+      - [Adapters](./adapters) - Built-in actions from adapters
+
+      - [Custom Actions Recipe](../recipes/custom-actions) - Advanced patterns
+
+      - [API Reference](/api/index/classes/Vowel#registeraction) - Complete API'
+    word_count: 412
+    char_count: 2930
+  guide/adapters:
+    title: Adapters
+    description: null
+    category: Guide
+    url_path: /guide/adapters/
+    content: '# Adapters
+
+
+      Learn about Vowel''s dual adapter architecture for navigation and page automation.
+
+
+      ## Overview
+
+
+      Vowel uses two independent, optional adapters:
+
+
+      1. **Navigation Adapter** - Controls WHERE to go (routing)
+
+      2. **Automation Adapter** - Controls WHAT to do (page interaction)
+
+
+      This separation allows you to use just navigation, just automation, or both
+      together.
+
+
+      ## Navigation Adapter
+
+
+      The Navigation Adapter handles voice-controlled routing in your application.
+
+
+      ### Direct Navigation (SPAs)
+
+
+      For Single Page Applications that don''t reload the page:
+
+
+      [code example]
+
+
+      ### Controlled Navigation (Traditional Sites)
+
+
+      For traditional sites with page reloads (Shopify, WordPress, etc.):
+
+
+      [code example]
+
+
+      ## Automation Adapter
+
+
+      The Automation Adapter handles voice-controlled page interaction.
+
+
+      ### Direct Automation (SPAs)
+
+
+      For same-tab DOM manipulation:
+
+
+      [code example]
+
+
+      ### Controlled Automation (Traditional Sites)
+
+
+      For cross-tab DOM manipulation:
+
+
+      [code example]
+
+
+      ## Helper Functions
+
+
+      Vowel provides helper functions for common setups:
+
+
+      ### createDirectAdapters
+
+
+      For SPAs (React, Vue, Next.js, etc.):
+
+
+      [code example]
+
+
+      ### createNextJSAdapters
+
+
+      For Next.js applications:
+
+
+      [code example]
+
+
+      ### createReactRouterAdapters
+
+
+      For React Router applications:
+
+
+      [code example]
+
+
+      ### createVueRouterAdapters
+
+
+      For Vue Router applications:
+
+
+      [code example]
+
+
+      ### createTanStackAdapters
+
+
+      For TanStack Router (auto-detects routes):
+
+
+      [code example]
+
+
+      ### createControlledAdapters
+
+
+      For traditional sites (Shopify, WordPress):
+
+
+      [code example]
+
+
+      ## Built-in Actions
+
+
+      When you provide adapters, Vowel automatically registers these actions:
+
+
+      ### From NavigationAdapter
+
+
+      - navigate_to_page - Navigate to any route
+
+
+      ### From AutomationAdapter
+
+
+      - search_page_elements - Search for elements on the page
+
+      - get_page_snapshot - Get page structure snapshot
+
+      - click_element - Click any element
+
+      - type_into_element - Type into inputs
+
+      - focus_element - Focus an element
+
+      - scroll_to_element - Scroll to an element
+
+      - press_key - Press keyboard keys
+
+
+      These work automatically - no configuration needed!
+
+
+      ## Adapter Interface
+
+
+      ### NavigationAdapter Interface
+
+
+      [code example]
+
+
+      ### AutomationAdapter Interface
+
+
+      [code example]
+
+
+      ## Custom Adapters
+
+
+      You can create custom adapters by implementing these interfaces:
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [Vowel Client](./vowel-client) - Core client API
+
+      - [Actions](./actions) - Custom action registration
+
+      - [Navigation Recipe](../recipes/navigation) - Navigation patterns
+
+      - [Page Automation Recipe](../recipes/page-automation) - Automation patterns'
+    word_count: 322
+    char_count: 2549
+  guide/connection-models:
+    title: Connection Models
+    description: null
+    category: Guide
+    url_path: /guide/connection-models/
+    content: '# Connection Models
+
+
+      Use this page to choose how your application connects to vowel.
+
+
+      ## Overview
+
+
+      There are two primary ways to connect a client application:
+
+
+      - **Token-based flow**: your app fetches a short-lived token from your own backend
+      or token service and connects with that token. This is the recommended path
+      for the current open-source launch.
+
+      - **Hosted platform flow**: your app uses an appId, and the hosted platform
+      manages session setup for you. This is coming soon.
+
+
+      Both approaches use the same client SDK. The difference is where session credentials
+      come from and who operates the token service.
+
+
+      ## Token-Based Flow
+
+
+      Use a token-based flow when you want your own backend to mint or broker session
+      access.
+
+
+      How it works:
+
+
+      1. Your client requests a short-lived token from your backend.
+
+      2. Your backend checks auth, policy, or session context.
+
+      3. Your backend returns a token response to the client.
+
+      4. The client uses tokenProvider to connect.
+
+
+      This is the right choice for:
+
+
+      - self-hosted deployments
+
+      - the current open-source launch
+
+      - custom auth and backend policies
+
+      - advanced session orchestration
+
+      - server-assisted integrations
+
+
+      [code example]
+
+
+      ## Hosted Platform Flow
+
+
+      Hosted platform setup is coming soon.
+
+
+      Use the hosted platform flow when you want the simplest path to integration.
+
+
+      How it works:
+
+
+      1. Create an app in the hosted platform.
+
+      2. Add the app''s appId to your client configuration.
+
+      3. Connect with @vowel.to/client.
+
+
+      This will be the default choice for:
+
+
+      - hosted deployments
+
+      - teams that want managed app configuration
+
+      - projects that do not need their own token service
+
+
+      [code example]
+
+
+      ## Which One Should You Choose?
+
+
+      Choose the token-based flow if:
+
+
+      - you are integrating today
+
+      - you are self-hosting
+
+      - you need backend-issued tokens
+
+      - you need custom security, routing, or session rules
+
+
+      Choose the hosted platform flow later if:
+
+
+      - you want the fastest setup
+
+      - you want app management handled for you
+
+      - you plan to configure your agent through the hosted platform
+
+
+      ## Related Docs
+
+
+      - [Getting Started](./getting-started)
+
+      - [Self-Hosted](/self-hosted/)
+
+      - [Platform](/platform/)
+
+      - [Connection Paradigms](../recipes/connection-paradigms)'
+    word_count: 342
+    char_count: 2179
+  guide/event-notifications:
+    title: Event Notifications
+    description: null
+    category: Guide
+    url_path: /guide/event-notifications/
+    content: '# Event Notifications
+
+
+      Event notifications allow you to programmatically trigger AI voice responses
+      for application events, without requiring user voice input.
+
+
+      ## Overview
+
+
+      Use event notifications to make the AI speak about:
+
+      - Order confirmations
+
+      - Timer expiry
+
+      - New messages
+
+      - System alerts
+
+      - Status updates
+
+      - Form submissions
+
+      - Any application event
+
+
+      ## Basic Usage
+
+
+      [code example]
+
+
+      ## API
+
+
+      ### notifyEvent Method
+
+
+      [code example]
+
+
+      **Parameters:**
+
+      - message - The message for the AI to speak about
+
+      - context - Optional context object with additional information
+
+
+      The AI will use both the message and context to generate a natural response.
+
+
+      ## Common Patterns
+
+
+      ### Order Confirmation
+
+
+      [code example]
+
+
+      ### Timer Expiry
+
+
+      [code example]
+
+
+      ### New Message Notification
+
+
+      [code example]
+
+
+      ### Shopping Cart Updates
+
+
+      [code example]
+
+
+      ### Form Submission
+
+
+      [code example]
+
+
+      ### System Alerts
+
+
+      [code example]
+
+
+      ## Advanced Patterns
+
+
+      ### Debounced Notifications
+
+
+      Prevent notification spam:
+
+
+      [code example]
+
+
+      ### Conditional Notifications
+
+
+      Only notify based on user preferences:
+
+
+      [code example]
+
+
+      ### Priority Notifications
+
+
+      Handle urgent vs. non-urgent notifications:
+
+
+      [code example]
+
+
+      ### Queued Notifications
+
+
+      Queue notifications to prevent overlapping speech:
+
+
+      [code example]
+
+
+      ## React Integration
+
+
+      ### Hook for Event Notifications
+
+
+      [code example]
+
+
+      ### Component-Based Notifications
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      Always handle errors when sending notifications:
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Keep Messages Concise** - Voice notifications should be brief and clear
+
+      2. **Provide Context** - Include relevant data in the context object
+
+      3. **Don''t Spam** - Use debouncing for frequent events
+
+      4. **Check Connection** - Verify session is active before notifying
+
+      5. **Handle Errors** - Always have a fallback for failed notifications
+
+      6. **Respect Preferences** - Allow users to disable voice notifications
+
+      7. **Test Notifications** - Test with actual voice output
+
+      8. **Consider Timing** - Don''t interrupt important user actions
+
+
+      ## When to Use Event Notifications
+
+
+      **Good Use Cases:**
+
+      - ✅ Order confirmations
+
+      - ✅ Timer/alarm expiry
+
+      - ✅ Important system alerts
+
+      - ✅ New message arrivals
+
+      - ✅ Task completions
+
+      - ✅ Status changes
+
+
+      **Avoid:**
+
+      - ❌ Every button click
+
+      - ❌ Frequent updates (use debouncing)
+
+      - ❌ Non-critical information
+
+      - ❌ During user speech input
+
+
+      ## Related
+
+
+      - [Vowel Client](./vowel-client) - Core client API
+
+      - [Event Notifications Recipe](../recipes/event-notifications) - Advanced patterns
+
+      - [Speaking State Recipe](../recipes/speaking-state) - Track when AI is speaking
+
+      - [API Reference](/api/index/classes/Vowel#notifyevent) - Complete API'
+    word_count: 378
+    char_count: 2651
+  guide/getting-started:
+    title: Getting Started
+    description: null
+    category: Guide
+    url_path: /guide/getting-started/
+    content: '# Getting Started
+
+
+      Welcome to vowel. This guide helps you add voice-powered interactions to a web
+      application with @vowel.to/client.
+
+
+      ## What is Vowel?
+
+
+      Vowel is a client SDK for voice-powered web experiences. For the initial open-source
+      launch, the primary path is a token-based connection flow backed by the self-hosted
+      stack. Hosted platform flows are coming soon.
+
+
+      - 🎤 **Real-time Voice Interface** - Natural, conversational interactions
+
+      - 🧭 **Smart Navigation** - Voice-controlled routing
+
+      - 🤖 **Page Automation** - Voice-controlled interaction (click, type, search)
+
+      - ⚡ **Custom Actions** - Define business logic for voice commands
+
+      - 📢 **Event Notifications** - Programmatic AI voice responses
+
+
+      ## Prerequisites
+
+
+      Before you begin, ensure you have:
+
+
+      - Node.js 18+ or Bun
+
+      - A modern browser with microphone support
+
+      - HTTPS (required for microphone access)
+
+      - A backend or token service that can provide session tokens
+
+
+      ## Choose a Connection Model
+
+
+      Before you integrate, choose one of these connection models:
+
+
+      - **Token-based flow**: fetch a short-lived token from your own backend and
+      connect with tokenProvider. This is the recommended path today.
+
+      - **Hosted platform flow**: use an appId and let vowel manage session setup
+      for you. This is coming soon.
+
+
+      See [Connection Models](./connection-models) for details.
+
+
+      ## Installation
+
+
+      Install the package using your preferred package manager:
+
+
+      [code example]
+
+
+      ## Quick Start
+
+
+      Here''s a minimal example to get you started:
+
+
+      [code example]
+
+
+      ## With React
+
+
+      If you''re using React, use the provided components:
+
+
+      [code example]
+
+
+      ## Next Steps
+
+
+      Now that you have Vowel installed and running, explore these topics:
+
+
+      - [Installation](./installation) - Detailed installation instructions
+
+      - [Quick Start](./quick-start) - Complete quick start guide
+
+      - [Connection Models](./connection-models) - Choose between token-based setup
+      today and the hosted appId flow coming soon
+
+      - [Vowel Client](./vowel-client) - Core client API
+
+      - [Adapters](./adapters) - Navigation and automation adapters
+
+      - [Actions](./actions) - Custom action registration
+
+
+      ## Source Repository
+
+
+      The client SDK is open source at [github.com/usevowel/client](https://github.com/usevowel/client).
+
+
+      ## Need Help?
+
+
+      - 📧 Email: support@vowel.to
+
+      - 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
+
+      - 📚 Docs: [vowel.to/docs](https://vowel.to/docs)'
+    word_count: 328
+    char_count: 2354
+  guide/hosted-realtime-api:
+    title: Hosted Realtime Api
+    description: null
+    category: Guide
+    url_path: /guide/hosted-realtime-api/
+    content: '# Hosted Realtime API
+
+
+      Hosted realtime API documentation now lives in the dedicated [Platform](/platform/)
+      section.
+
+
+      Start with:
+
+
+      - [Platform Overview](/platform/)
+
+      - [Hosted Realtime API](/platform/hosted-realtime-api)'
+    word_count: 24
+    char_count: 218
+  guide/installation:
+    title: Installation
+    description: null
+    category: Guide
+    url_path: /guide/installation/
+    content: '# Installation
+
+
+      This guide covers how to install @vowel.to/client and prepare for either the
+      hosted platform flow or a token-based connection flow.
+
+
+      ## Package Manager Installation
+
+
+      ### npm
+
+
+      [code example]
+
+
+      ### Yarn
+
+
+      [code example]
+
+
+      ### Bun
+
+
+      [code example]
+
+
+      ### pnpm
+
+
+      [code example]
+
+
+      ## Choose Your Connection Model
+
+
+      After installation, choose one of these connection patterns:
+
+
+      - **Hosted platform flow**: configure your client with an appId
+
+      - **Token-based flow**: configure your client with tokenProvider
+
+
+      See [Connection Models](./connection-models) for the decision guide.
+
+
+      ## TypeScript Support
+
+
+      @vowel.to/client is written in TypeScript and includes full type definitions.
+      No additional @types package is needed.
+
+
+      [code example]
+
+
+      ## Framework-Specific Setup
+
+
+      ### Next.js
+
+
+      [code example]
+
+
+      ### React with React Router
+
+
+      [code example]
+
+
+      ### Vue with Vue Router
+
+
+      [code example]
+
+
+      ### TanStack Router
+
+
+      [code example]
+
+
+      ## Environment Variables
+
+
+      If you are using the hosted platform flow, store your appId in an environment
+      variable:
+
+
+      ### Next.js (.env.local)
+
+
+      [code example]
+
+
+      ### Vite (.env)
+
+
+      [code example]
+
+
+      ### Create React App (.env)
+
+
+      [code example]
+
+
+      ## Browser Requirements
+
+
+      Vowel requires a modern browser with:
+
+
+      - WebRTC support
+
+      - Microphone access
+
+      - HTTPS (for microphone permissions)
+
+
+      ### Supported Browsers
+
+
+      - ✅ Chrome/Edge 89+ (Recommended)
+
+      - ✅ Firefox 88+
+
+      - ✅ Safari 14.1+
+
+      - ⚠️ Mobile browsers (limited support)
+
+
+      ## Troubleshooting
+
+
+      ### Microphone Permission Denied
+
+
+      Ensure your site is served over HTTPS. Browsers block microphone access on HTTP
+      (except localhost).
+
+
+      ### Module Not Found
+
+
+      If you see module resolution errors:
+
+
+      [code example]
+
+
+      ### TypeScript Errors
+
+
+      Ensure your tsconfig.json includes:
+
+
+      [code example]
+
+
+      ## Next Steps
+
+
+      - [Quick Start](./quick-start) - Build your first voice-enabled app
+
+      - [Vowel Client](./vowel-client) - Learn about the core API
+
+      - [Adapters](./adapters) - Understand navigation and automation'
+    word_count: 274
+    char_count: 1936
+  guide/nextjs:
+    title: Nextjs
+    description: null
+    category: Guide
+    url_path: /guide/nextjs/
+    content: '# Next.js Integration
+
+
+      Learn how to integrate Vowel with Next.js for voice-controlled navigation and
+      page interaction.
+
+
+      ## Overview
+
+
+      Vowel provides dedicated helpers for Next.js:
+
+
+      - **createNextJSAdapters** - Creates navigation and automation adapters for
+      Next.js
+
+      - Support for both App Router and Pages Router
+
+      - Automatic route detection
+
+      - Server and client component compatibility
+
+
+      ## Installation
+
+
+      [code example]
+
+
+      ## App Router (Next.js 13+)
+
+
+      ### Quick Start
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ### Configuration
+
+
+      [code example]
+
+
+      ### Route Definitions
+
+
+      [code example]
+
+
+      ## Pages Router (Next.js 12 and below)
+
+
+      ### Quick Start
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## Dynamic Routes
+
+
+      Handle Next.js dynamic routes:
+
+
+      [code example]
+
+
+      ## Search Parameters
+
+
+      Handle query parameters:
+
+
+      [code example]
+
+
+      ## Server Components
+
+
+      Vowel works with Next.js server components by using client components for voice
+      functionality:
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## API Routes Integration
+
+
+      Trigger voice notifications from API routes:
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Middleware Integration
+
+
+      Use Next.js middleware with Vowel:
+
+
+      [code example]
+
+
+      ## Environment Variables
+
+
+      Store your Vowel app ID securely:
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Use Client Components** - Vowel requires client-side JavaScript
+
+      2. **Environment Variables** - Store app ID in environment variables
+
+      3. **Route Descriptions** - Provide clear descriptions for all routes
+
+      4. **Dynamic Routes** - Register actions for dynamic route navigation
+
+      5. **Server Components** - Keep voice logic in client components
+
+      6. **Error Boundaries** - Wrap Vowel components in error boundaries
+
+      7. **Loading States** - Handle loading states during navigation
+
+
+      ## Troubleshooting
+
+
+      ### "useRouter must be used in a Client Component"
+
+
+      Make sure your Vowel setup is in a client component:
+
+
+      [code example]
+
+
+      ### Hydration Errors
+
+
+      Avoid using Vowel state during SSR:
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [React](./react) - React integration guide
+
+      - [React Router](./react-router) - React Router integration
+
+      - [Adapters](./adapters) - Navigation adapter details
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 302
+    char_count: 2173
+  guide/quick-start:
+    title: Quick Start
+    description: null
+    category: Guide
+    url_path: /guide/quick-start/
+    content: '# Quick Start
+
+
+      This guide will walk you through building your first voice-enabled web application
+      with Vowel.
+
+
+      ## Step 1: Install Vowel
+
+
+      [code example]
+
+
+      ## Step 2: Get Your App ID
+
+
+      1. Visit [vowel.to](https://vowel.to)
+
+      2. Create a free account
+
+      3. Create a new app
+
+      4. Copy your App ID
+
+
+      ## Step 3: Create a Vowel Client
+
+
+      Create a file to initialize your Vowel client:
+
+
+      [code example]
+
+
+      ## Step 4: Start a Voice Session
+
+
+      [code example]
+
+
+      ## Step 5: Register Custom Actions
+
+
+      Add business logic that the AI can execute:
+
+
+      [code example]
+
+
+      ## Step 6: Test Voice Commands
+
+
+      Start your voice session and try these commands:
+
+
+      - "Navigate to products"
+
+      - "Search for wireless headphones"
+
+      - "Add product 123 to cart"
+
+      - "Go to checkout"
+
+
+      ## React Integration
+
+
+      If you''re using React, here''s a complete example:
+
+
+      [code example]
+
+
+      ## What''s Next?
+
+
+      Now that you have a basic voice-enabled application, explore these topics:
+
+
+      - [Vowel Client](./vowel-client) - Learn about all client methods
+
+      - [Adapters](./adapters) - Deep dive into navigation and automation
+
+      - [Actions](./actions) - Advanced action registration
+
+      - [Event Notifications](./event-notifications) - Programmatic AI responses
+
+      - [Recipes](../recipes/) - Common use cases and patterns
+
+
+      ## Common Issues
+
+
+      ### Microphone Not Working
+
+
+      Ensure you''re running on HTTPS. Browsers block microphone access on HTTP (except
+      localhost).
+
+
+      ### Voice Commands Not Working
+
+
+      1. Check that your App ID is correct
+
+      2. Ensure routes are properly configured
+
+      3. Verify actions are registered before starting the session
+
+      4. Check browser console for errors
+
+
+      ### Navigation Not Working
+
+
+      Make sure your navigate function is correctly wired to your router:
+
+
+      [code example]
+
+
+      ## Need Help?
+
+
+      - 📧 Email: support@vowel.to
+
+      - 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
+
+      - 📚 API Reference: [/api](/api/)'
+    word_count: 279
+    char_count: 1824
+  guide/react-router:
+    title: React Router
+    description: null
+    category: Guide
+    url_path: /guide/react-router/
+    content: '# React Router Integration
+
+
+      Learn how to integrate Vowel with React Router for voice-controlled navigation
+      in your React applications.
+
+
+      ## Overview
+
+
+      Vowel provides dedicated helpers for React Router integration:
+
+
+      - **createReactRouterAdapters** - Creates navigation and automation adapters
+
+      - **ReactRouterNavigationAdapter** - Direct navigation adapter for React Router
+
+      - Automatic route detection from React Router
+
+
+      ## Installation
+
+
+      [code example]
+
+
+      ## Quick Start
+
+
+      [code example]
+
+
+      ## Configuration
+
+
+      ### createReactRouterAdapters
+
+
+      [code example]
+
+
+      ### Route Definitions
+
+
+      Define routes with descriptions for voice navigation:
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## Dynamic Routes
+
+
+      Handle dynamic route parameters:
+
+
+      [code example]
+
+
+      ## Search Parameters
+
+
+      Handle query parameters:
+
+
+      [code example]
+
+
+      ## Navigation with State
+
+
+      Pass state during navigation:
+
+
+      [code example]
+
+
+      ## Programmatic Navigation
+
+
+      Trigger navigation from voice events:
+
+
+      [code example]
+
+
+      ## Protected Routes
+
+
+      Handle authentication with voice navigation:
+
+
+      [code example]
+
+
+      ## Route Change Notifications
+
+
+      Notify users of navigation:
+
+
+      [code example]
+
+
+      ## Nested Routes
+
+
+      Handle nested route structures:
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Clear Route Descriptions** - Use descriptive route names for better voice
+      recognition
+
+      2. **Handle Parameters** - Register actions for dynamic routes
+
+      3. **State Management** - Pass state during navigation when needed
+
+      4. **Error Handling** - Handle navigation errors gracefully
+
+      5. **Route Notifications** - Optionally notify users of navigation changes
+
+      6. **Protected Routes** - Integrate with authentication
+
+      7. **Nested Routes** - Organize routes hierarchically
+
+
+      ## Related
+
+
+      - [React](./react) - React integration guide
+
+      - [Next.js](./nextjs) - Next.js integration
+
+      - [Adapters](./adapters) - Navigation adapter details
+
+      - [Navigation Recipe](../recipes/navigation) - Advanced navigation patterns'
+    word_count: 244
+    char_count: 1909
+  guide/react:
+    title: React
+    description: null
+    category: Guide
+    url_path: /guide/react/
+    content: '# React Integration
+
+
+      Learn how to integrate Vowel into your React applications using the provided
+      React components and hooks.
+
+
+      ## Overview
+
+
+      Vowel provides React-specific exports for seamless integration:
+
+
+      - **VowelProvider** - Context provider for the Vowel client
+
+      - **useVowel** - Hook to access the Vowel client
+
+      - **useSyncContext** - Hook to automatically sync context with the AI
+
+      - **VowelAgent** - Pre-built voice agent UI component
+
+      - **VowelMicrophone** - Standalone microphone button component
+
+
+      ## Installation
+
+
+      [code example]
+
+
+      ## Basic Setup
+
+
+      ### 1. Create Vowel Client
+
+
+      First, create and configure your Vowel client:
+
+
+      [code example]
+
+
+      ### 2. Wrap App with VowelProvider
+
+
+      [code example]
+
+
+      ### 3. Use the Hook
+
+
+      Access the Vowel client anywhere in your component tree:
+
+
+      [code example]
+
+
+      ## Components
+
+
+      ### VowelProvider
+
+
+      Context provider that makes the Vowel client available to all child components.
+
+
+      [code example]
+
+
+      **Props:**
+
+      - client - The Vowel client instance (required)
+
+      - children - React children
+
+
+      ### VowelAgent
+
+
+      Pre-built voice agent UI with microphone button and visual feedback.
+
+
+      [code example]
+
+
+      **Props:**
+
+      - position - ''bottom-right'' | ''bottom-left'' | ''top-right'' | ''top-left''
+      (default: ''bottom-right'')
+
+      - showTranscript - Show live transcript (default: true)
+
+      - autoStart - Auto-start session on mount (default: false)
+
+      - className - Additional CSS classes
+
+      - style - Inline styles
+
+
+      ### VowelMicrophone
+
+
+      Standalone microphone button component.
+
+
+      [code example]
+
+
+      **Props:**
+
+      - size - ''small'' | ''medium'' | ''large'' (default: ''medium'')
+
+      - variant - ''floating'' | ''inline'' (default: ''floating'')
+
+      - className - Additional CSS classes
+
+      - style - Inline styles
+
+
+      ## Hooks
+
+
+      ### useVowel
+
+
+      Access the Vowel client and state:
+
+
+      [code example]
+
+
+      **Returns:**
+
+      [code example]
+
+
+      ### useSyncContext
+
+
+      Automatically sync context with the Vowel client. This hook updates the AI''s
+      context whenever the provided value changes, making it easy to keep the AI aware
+      of dynamic application state.
+
+
+      [code example]
+
+
+      **Parameters:**
+
+      - context - Context object to sync (Record | null). Use null to clear context.
+
+
+      **Features:**
+
+      - Automatically updates context when the value changes
+
+      - Clears context on component unmount
+
+      - Uses deep comparison to avoid unnecessary updates
+
+      - Works seamlessly with React state and props
+
+
+      **Example: Conditional Context**
+
+
+      [code example]
+
+
+      **Example: Page Context**
+
+
+      [code example]
+
+
+      See the [Dynamic Context recipe](../recipes/dynamic-context) for more examples
+      and patterns.
+
+
+      ## Common Patterns
+
+
+      ### Auto-Start Session
+
+
+      [code example]
+
+
+      ### Conditional Rendering Based on State
+
+
+      [code example]
+
+
+      ### Event Notification on Action
+
+
+      [code example]
+
+
+      ### Custom Voice Action Hook
+
+
+      [code example]
+
+
+      ### Voice Notification Hook
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## TypeScript Support
+
+
+      Full TypeScript support with type definitions:
+
+
+      [code example]
+
+
+      ## Styling
+
+
+      ### Custom Styles
+
+
+      [code example]
+
+
+      ### CSS Classes
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [React Router](./react-router) - React Router integration
+
+      - [Next.js](./nextjs) - Next.js integration
+
+      - [Adapters](./adapters) - Navigation and automation adapters
+
+      - [API Reference](/api/react/) - React API documentation'
+    word_count: 452
+    char_count: 3193
+  guide/self-hosted-stack:
+    title: Self Hosted Stack
+    description: null
+    category: Guide
+    url_path: /guide/self-hosted-stack/
+    content: '# Self-Hosted Stack
+
+
+      Self-hosted documentation now lives in the dedicated [Self-Hosted](/self-hosted/)
+      section.
+
+
+      Start with:
+
+
+      - [Self-Hosted Overview](/self-hosted/)
+
+      - [Self-Hosted Core](/self-hosted/core)
+
+      - [Self-Hosted Realtime Engine](/self-hosted/engine)'
+    word_count: 24
+    char_count: 258
+  guide/standalone-js:
+    title: Standalone Js
+    description: null
+    category: Guide
+    url_path: /guide/standalone-js/
+    content: '# Vanilla JavaScript Integration
+
+
+      Learn how to use Vowel with vanilla JavaScript without any framework.
+
+
+      ## Overview
+
+
+      Vowel works perfectly with vanilla JavaScript, providing a simple API for voice-powered
+      interactions in any web application.
+
+
+      ## Installation
+
+
+      ### Install the SDK
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Quick Start
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## Navigation
+
+
+      ### History API
+
+
+      Use the History API for SPA-style navigation:
+
+
+      [code example]
+
+
+      ### Hash Routing
+
+
+      Use hash-based routing:
+
+
+      [code example]
+
+
+      ## Event Notifications
+
+
+      [code example]
+
+
+      ## State Management
+
+
+      [code example]
+
+
+      ## Form Integration
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Cleanup** - Always stop session and unsubscribe on page unload
+
+      2. **Error Handling** - Handle errors gracefully with user-friendly messages
+
+      3. **State Management** - Subscribe to state changes for UI updates
+
+      4. **Navigation** - Use History API or hash routing for SPAs
+
+      5. **Event Notifications** - Provide feedback for user actions
+
+      6. **Permissions** - Request microphone permissions early
+
+      7. **Progressive Enhancement** - Ensure app works without voice
+
+
+      ## Browser Support
+
+
+      Vowel requires:
+
+      - Modern browser with Web Audio API
+
+      - Microphone access
+
+      - HTTPS (required for microphone)
+
+
+      Check for support:
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [Web Component](./web-component) - Web component integration
+
+      - [React](./react) - React integration
+
+      - [Adapters](./adapters) - Navigation and automation
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 219
+    char_count: 1548
+  guide/tanstack-router:
+    title: Tanstack Router
+    description: null
+    category: Guide
+    url_path: /guide/tanstack-router/
+    content: '# TanStack Router Integration
+
+
+      Learn how to integrate Vowel with TanStack Router for automatic route detection
+      and voice-controlled navigation.
+
+
+      ## Overview
+
+
+      Vowel provides first-class support for TanStack Router with automatic route
+      discovery. The createTanStackAdapters helper automatically extracts routes from
+      your router configuration.
+
+
+      ## Installation
+
+
+      [code example]
+
+
+      ## Basic Setup
+
+
+      ### 1. Create Your Router
+
+
+      [code example]
+
+
+      ### 2. Configure Vowel Client
+
+
+      [code example]
+
+
+      ### 3. Wrap App with VowelProvider
+
+
+      [code example]
+
+
+      ## Automatic Route Detection
+
+
+      TanStack Router integration automatically detects routes from your router configuration:
+
+
+      [code example]
+
+
+      ### Route Descriptions
+
+
+      Routes are automatically described based on their paths. You can enhance descriptions
+      by using descriptive path names:
+
+
+      [code example]
+
+
+      ## Dynamic Routes
+
+
+      TanStack Router''s dynamic routes are fully supported:
+
+
+      [code example]
+
+
+      ## Search Parameters
+
+
+      Handle search parameters with custom actions:
+
+
+      [code example]
+
+
+      ## Page Automation
+
+
+      With enableAutomation: true, users can interact with your pages using voice:
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Voice Commands
+
+
+      With this setup, users can:
+
+
+      - **Navigate**: "Go to products", "Show me the cart", "Navigate to home"
+
+      - **Search**: "Search for wireless headphones"
+
+      - **Actions**: "Add product 123 to cart", "View product details for item 456"
+
+      - **Automation**: "Click the buy now button", "Type ''laptop'' in search"
+
+
+      ## Advanced Configuration
+
+
+      ### Custom Voice Settings
+
+
+      [code example]
+
+
+      ### Speaking State Tracking
+
+
+      [code example]
+
+
+      ## TypeScript Support
+
+
+      Full TypeScript support with type inference:
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [React Integration](./react) - React components and hooks
+
+      - [React Router](./react-router) - React Router integration
+
+      - [Custom Actions](../recipes/custom-actions) - Creating custom voice commands
+
+      - [Page Automation](../recipes/page-automation) - Voice-controlled page interaction
+
+      - [API Reference](/api/index/functions/createTanStackAdapters) - TanStack Router
+      adapter API'
+    word_count: 271
+    char_count: 2077
+  guide/vowel-client:
+    title: Vowel Client
+    description: null
+    category: Guide
+    url_path: /guide/vowel-client/
+    content: '# Vowel Client
+
+
+      The Vowel client is the core of the library. It manages voice sessions, actions,
+      state, and coordinates between navigation and automation adapters.
+
+
+      ## Overview
+
+
+      The Vowel class provides:
+
+
+      - 🎤 **Session Management** - Start/stop voice sessions
+
+      - 🔧 **Action Registration** - Define custom voice commands
+
+      - 📢 **Event Notifications** - Programmatically trigger AI speech
+
+      - 📊 **State Management** - Track connection, audio, and session state
+
+      - 🧭 **Navigation Integration** - Voice-controlled routing
+
+      - 🤖 **Automation Integration** - Voice-controlled page interaction
+
+
+      ## Basic Setup
+
+
+      [code example]
+
+
+      ## Configuration
+
+
+      ### VowelClientConfig
+
+
+      The Vowel constructor accepts a configuration object:
+
+
+      [code example]
+
+
+      ### Voice Configuration
+
+
+      Customize the AI voice:
+
+
+      [code example]
+
+
+      ### System Instructions
+
+
+      Override the default system instructions:
+
+
+      [code example]
+
+
+      ### Dynamic Context
+
+
+      Update the AI''s context dynamically during a session. Context is stringified
+      and appended to the system prompt, allowing the AI to stay aware of current
+      application state.
+
+
+      #### Initial Context
+
+
+      Set initial context when creating the client. This context is automatically
+      included when the session starts:
+
+
+      [code example]
+
+
+      #### Updating Context
+
+
+      Update context dynamically during a session:
+
+
+      [code example]
+
+
+      When context changes, a session.update event is automatically sent to update
+      the system prompt. The context object is stringified with JSON.stringify() and
+      wrapped in `<context> tags before being appended to the base system instructions.
+
+
+      **With React:**
+
+
+      [code example]
+
+
+      See [Dynamic Context Recipe](../recipes/dynamic-context) for detailed patterns
+      and examples.
+
+
+      ## Session Management
+
+
+      ### Starting a Session
+
+
+      [code example]
+
+
+      ### Stopping a Session
+
+
+      [code example]
+
+
+      ### Checking Session State
+
+
+      [code example]
+
+
+      ### State Helpers
+
+
+      [code example]
+
+
+      ## Action Registration
+
+
+      Register custom voice commands:
+
+
+      [code example]
+
+
+      See [Actions Guide](./actions) for detailed information.
+
+
+      ## Event Notifications
+
+
+      Programmatically trigger AI speech:
+
+
+      [code example]
+
+
+      See [Event Notifications Guide](./event-notifications) for detailed patterns.
+
+
+      ## State Subscription
+
+
+      Listen to state changes:
+
+
+      [code example]
+
+
+      ## Adapters
+
+
+      ### Navigation Adapter
+
+
+      Provides voice-controlled routing:
+
+
+      [code example]
+
+
+      When provided, automatically registers the navigate_to_page action.
+
+
+      ### Automation Adapter
+
+
+      Provides voice-controlled page interaction:
+
+
+      [code example]
+
+
+      When provided, automatically registers these actions:
+
+      - search_page_elements
+
+      - get_page_snapshot
+
+      - click_element
+
+      - type_into_element
+
+      - focus_element
+
+      - scroll_to_element
+
+      - press_key`
+
+
+      See [Adapters Guide](./adapters) for detailed information.
+
+
+      ## Floating Cursor
+
+
+      Enable visual feedback for automation:
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      Handle errors gracefully:
+
+
+      [code example]
+
+
+      ## Cleanup
+
+
+      Always cleanup when done:
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## Related
+
+
+      - [Actions](./actions) - Custom action registration
+
+      - [Event Notifications](./event-notifications) - Programmatic AI speech
+
+      - [Dynamic Context](../recipes/dynamic-context) - Dynamic context management
+
+      - [Adapters](./adapters) - Navigation and automation
+
+      - [API Reference](/api/index/classes/Vowel) - Complete API documentation'
+    word_count: 413
+    char_count: 3256
+  guide/vowelbot:
+    title: Vowelbot
+    description: null
+    category: Guide
+    url_path: /guide/vowelbot/
+    content: '# vowelbot
+
+
+      vowelbot documentation now lives in the dedicated [vowelbot](/vowelbot/) section.
+
+
+      Start with:
+
+
+      - [vowelbot Overview](/vowelbot/)'
+    word_count: 16
+    char_count: 141
+  guide/vue-router:
+    title: Vue Router
+    description: null
+    category: Guide
+    url_path: /guide/vue-router/
+    content: '# Vue Router Integration
+
+
+      Learn how to integrate Vowel with Vue Router for voice-controlled navigation
+      in your Vue applications.
+
+
+      ## Overview
+
+
+      Vowel provides dedicated helpers for Vue Router:
+
+
+      - **createVueRouterAdapters** - Creates navigation and automation adapters for
+      Vue Router
+
+      - Automatic route detection from Vue Router
+
+      - Support for Vue 3 Composition API
+
+
+      ## Installation
+
+
+      [code example]
+
+
+      ## Quick Start
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Configuration
+
+
+      [code example]
+
+
+      ## Route Definitions
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Composable
+
+
+      Create a composable for easy access:
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Dynamic Routes
+
+
+      Handle Vue Router dynamic routes:
+
+
+      [code example]
+
+
+      ## Query Parameters
+
+
+      Handle query parameters:
+
+
+      [code example]
+
+
+      ## Navigation Guards
+
+
+      Integrate with Vue Router navigation guards:
+
+
+      [code example]
+
+
+      ## State Management (Pinia)
+
+
+      Integrate with Pinia for state management:
+
+
+      [code example]
+
+
+      ## Route Change Notifications
+
+
+      Notify users of navigation:
+
+
+      [code example]
+
+
+      ## TypeScript Support
+
+
+      Full TypeScript support:
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Provide/Inject Pattern** - Use Vue''s provide/inject for global access
+
+      2. **Composables** - Create composables for reusable voice logic
+
+      3. **Route Descriptions** - Provide clear descriptions for all routes
+
+      4. **Navigation Guards** - Integrate with Vue Router guards
+
+      5. **State Management** - Integrate with Pinia or Vuex
+
+      6. **Cleanup** - Always cleanup on unmount
+
+      7. **TypeScript** - Use TypeScript for type safety
+
+
+      ## Related
+
+
+      - [React](./react) - React integration guide
+
+      - [Adapters](./adapters) - Navigation adapter details
+
+      - [Navigation Recipe](../recipes/navigation) - Advanced navigation patterns
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 244
+    char_count: 1781
+  guide/web-component:
+    title: Web Component
+    description: null
+    category: Guide
+    url_path: /guide/web-component/
+    content: "# Web Component Integration\n\nLearn how to use Vowel as a web component\
+      \ for framework-agnostic integration.\n\n## Overview\n\nVowel provides pre-built\
+      \ web components that work in any framework or vanilla JavaScript:\n\n- **`**\
+      \ - Complete voice agent UI\n- **<vowel-microphone>** - Standalone microphone\
+      \ button\n- **<vowel-floating-cursor>** - Visual automation feedback\n- **<controlled-by-vowel-frame>**\
+      \ - Banner for controlled sites\n\n## Installation\n\n[code example]\n\n## Quick\
+      \ Start\n\n### Register Components\n\n[code example]\n\nOr register individually:\n\
+      \n[code example]\n\n### Use in HTML\n\n[code example]\n\n## Web Components\n\
+      \n### \n\nFloating microphone button for voice interaction.\n\n[code example]\n\
+      \n**Attributes:**\n- position - bottom-right | bottom-left | top-right | top-left\
+      \ (default: bottom-right)\n- size - small | medium | large (default: medium)\n\
+      - auto-start - Auto-start session on load (default: false)\n\n**JavaScript API:**\n\
+      \n[code example]\n\n### <vowel-floating-cursor>\n\nVisual feedback for page\
+      \ automation.\n\n[code example]\n\n**JavaScript API:**\n\n[code example]\n\n\
+      ### <controlled-by-vowel-frame>\n\nBanner for controlled/cross-tab sites (Shopify,\
+      \ WordPress).\n\n[code example]\n\n**Attributes:**\n- channel-name - BroadcastChannel\
+      \ name (default: vowel-automation`)\n\n## Framework Integration\n\n### Vanilla\
+      \ JavaScript\n\n[code example]\n\n### React\n\n[code example]\n\n### Vue\n\n\
+      [code example]\n\n### Angular\n\n[code example]\n\n### Svelte\n\n[code example]\n\
+      \n## Controlled Sites (Shopify, WordPress)\n\nFor traditional sites with page\
+      \ reloads:\n\n### Voice Agent Tab\n\n[code example]\n\n### Content Tab\n\n[code\
+      \ example]\n\n## Styling\n\n### CSS Custom Properties\n\n[code example]\n\n\
+      ### Custom Styling\n\n[code example]\n\n## Events\n\nListen to custom events:\n\
+      \n[code example]\n\n## TypeScript Support\n\n[code example]\n\n## Best Practices\n\
+      \n1. **Register Once** - Register web components once at app initialization\n\
+      2. **Custom Elements** - Enable custom elements schema in your framework\n3.\
+      \ **Event Listeners** - Use event listeners for state changes\n4. **Styling**\
+      \ - Use CSS custom properties for theming\n5. **Cleanup** - Remove event listeners\
+      \ when components unmount\n6. **TypeScript** - Use type definitions for better\
+      \ DX\n\n## Browser Support\n\nWeb components require:\n- Chrome/Edge 67+\n-\
+      \ Firefox 63+\n- Safari 10.1+\n\nFor older browsers, use a polyfill:\n\n[code\
+      \ example]\n\n## Related\n\n- [Standalone JS](./standalone-js) - Vanilla JavaScript\
+      \ integration\n- [React](./react) - React integration\n- [Adapters](./adapters)\
+      \ - Navigation and automation\n- [API Reference](/api/) - Complete API documentation"
+    word_count: 343
+    char_count: 2535
+  platform/apps-and-management:
+    title: Apps And Management
+    description: null
+    category: Platform
+    url_path: /platform/apps-and-management/
+    content: '# Apps And Management
+
+
+      Hosted apps and management are coming soon.
+
+
+      ## Current Status
+
+
+      The initial public release is focused on self-hosted deployment, so the hosted
+      app-management experience is not available yet.
+
+
+      ## What This Page Will Cover Later
+
+
+      When the hosted platform launches, this page will cover:
+
+
+      - app creation
+
+      - routes, actions, and behavior configuration
+
+      - voice and instruction settings
+
+      - testing and debugging in the hosted control plane
+
+      - how hosted app configuration connects to appId usage in the client SDK
+
+
+      ## Related Docs
+
+
+      - [Client Getting Started](/guide/getting-started)
+
+      - [Connection Models](/guide/connection-models)
+
+      - [Self-Hosted](/self-hosted/)
+
+      - [Billing & Organizations](./billing-and-organizations)'
+    word_count: 100
+    char_count: 732
+  platform/billing-and-organizations:
+    title: Billing And Organizations
+    description: null
+    category: Platform
+    url_path: /platform/billing-and-organizations/
+    content: '# Billing And Organizations
+
+
+      Billing and organization features are coming soon as part of the hosted platform.
+
+
+      ## Current Status
+
+
+      The initial open-source launch does not include the hosted billing and organization
+      surface.
+
+
+      ## What This Page Will Cover Later
+
+
+      When the hosted platform launches, this page will cover:
+
+
+      - organizations and team structure
+
+      - app ownership and collaboration
+
+      - subscription tiers and billing flows
+
+      - hosted usage visibility
+
+
+      If you are self-hosting, see [Self-Hosted](/self-hosted/) instead.'
+    word_count: 76
+    char_count: 520
+  platform/hosted-realtime-api:
+    title: Hosted Realtime Api
+    description: null
+    category: Platform
+    url_path: /platform/hosted-realtime-api/
+    content: '# Hosted Realtime API
+
+
+      Hosted realtime API support is coming soon.
+
+
+      ## What To Use Today
+
+
+      Until the hosted realtime API is available, the recommended paths are:
+
+
+      - the self-hosted stack
+
+      - token-based client integrations backed by your own backend
+
+      - the hosted platform flow with appId, once that launches
+
+
+      ## Related Docs
+
+
+      - [Connection Models](/guide/connection-models)
+
+      - [Self-Hosted](/self-hosted/)
+
+      - [Platform](/platform/)'
+    word_count: 60
+    char_count: 426
+  platform/index:
+    title: Platform
+    description: null
+    category: Getting Started
+    url_path: /platform/
+    content: '# Platform
+
+
+      The hosted platform is coming soon.
+
+
+      ## Current Launch Status
+
+
+      The initial open-source launch is focused on the self-hosted stack.
+
+
+      Today, use:
+
+
+      - [Client](/guide/getting-started) for SDK integration
+
+      - [Self-Hosted](/self-hosted/) for deployment and operations
+
+
+      ## What Is Coming Later
+
+
+      The hosted platform will cover:
+
+
+      - hosted app creation and configuration
+
+      - testing and debugging in a managed control plane
+
+      - hosted billing and organization workflows
+
+      - appId-based setup
+
+      - hosted realtime API features
+
+
+      ## What You Can Explore Here
+
+
+      - [Apps & Management](./apps-and-management)
+
+      - [Billing & Organizations](./billing-and-organizations)
+
+      - [Hosted Realtime API](./hosted-realtime-api)'
+    word_count: 92
+    char_count: 697
+  platform/vowelbot:
+    title: Vowelbot
+    description: null
+    category: Platform
+    url_path: /platform/vowelbot/
+    content: '# vowelbot
+
+
+      vowelbot has moved to the dedicated [vowelbot](/vowelbot/) section.
+
+
+      Start here:
+
+
+      - [vowelbot Overview](/vowelbot/)'
+    word_count: 15
+    char_count: 127
+  recipes/connection-paradigms:
+    title: Connection Paradigms
+    description: null
+    category: Recipes
+    url_path: /recipes/connection-paradigms/
+    content: '# Connection Paradigms
+
+
+      Use this recipe when the standard hosted appId flow is not enough and you need
+      a more advanced connection pattern.
+
+
+      ## Before You Start
+
+
+      For the conceptual overview, start with [Connection Models](/guide/connection-models).
+
+
+      This page focuses on advanced implementation patterns rather than first-time
+      setup.
+
+
+      ## Pattern 1: Server-Issued Tokens
+
+
+      Use this pattern when your backend should decide whether a browser session can
+      start.
+
+
+      ### Flow
+
+
+      1. The client requests a token from your backend.
+
+      2. Your backend checks auth, session context, or product rules.
+
+      3. Your backend returns a short-lived token response.
+
+      4. The client connects with tokenProvider.
+
+
+      ### Example
+
+
+      [code example]
+
+
+      ### Good Fit
+
+
+      - custom auth requirements
+
+      - backend-controlled session policy
+
+      - self-hosted deployments
+
+
+      ## Pattern 2: Sidecar Sessions
+
+
+      Use this pattern when a browser client and a backend service need to participate
+      in the same session lifecycle.
+
+
+      Typical examples:
+
+
+      - server-assisted tool execution
+
+      - session monitoring
+
+      - multi-client coordination
+
+
+      ### Design Notes
+
+
+      - keep session identifiers stable for the lifetime of the shared session
+
+      - make one system the source of truth for token issuance
+
+      - ensure each participant has the minimum permissions it needs
+
+
+      ## Pattern 3: Trusted Server Connections
+
+
+      Use this pattern when a trusted backend service needs a realtime connection
+      for automation or orchestration.
+
+
+      Typical examples:
+
+
+      - backend-to-backend voice workflows
+
+      - automated testing or scripted interactions
+
+      - server-managed tools that should not run in the browser
+
+
+      ### How It Works
+
+
+      The trusted server pattern lets your backend connect directly to the realtime
+      engine without a browser client in the loop. Your backend mints a short-lived
+      token, opens a WebSocket, and manages the voice session programmatically.
+
+
+      Key concepts:
+
+
+      - **serviceId** - a unique identifier for your backend service. The engine uses
+      it for logging, analytics, and tool routing.
+
+      - **serverTools** - tool definitions your backend registers at token-issuance
+      time. The engine forwards tool calls to your backend instead of executing them
+      client-side.
+
+      - **Scope gating** - only API keys with the mint_trusted_session scope can mint
+      trusted-server tokens. This prevents accidental use by keys intended for browser
+      flows.
+
+
+      ### Flow
+
+
+      1. Your backend authenticates with a fixed API key that carries the mint_trusted_session
+      scope.
+
+      2. Your backend requests a token, passing connectionType: ''trusted_server'',
+      a serviceId, and optional serverTools.
+
+      3. Core validates the scope and forwards the request to the realtime engine.
+
+      4. The engine returns a short-lived ephemeral token.
+
+      5. Your backend opens a WebSocket to the engine using that token.
+
+      6. When the LLM calls a server tool, the engine forwards the call to your backend
+      over the same WebSocket and waits for the result.
+
+
+      ### Token Request Example
+
+
+      [code example]
+
+
+      ### Security Boundaries
+
+
+      - **API key scope** - the mint_trusted_session scope is separate from mint_ephemeral.
+      A key meant for browser token minting cannot accidentally create trusted-server
+      sessions.
+
+      - **Short-lived tokens** - ephemeral tokens expire after five minutes by default.
+      Your backend should mint a fresh token for each session.
+
+      - **No browser exposure** - trusted-server tokens should never reach a browser.
+      Keep them server-side.
+
+      - **Tool isolation** - server tools are registered at token-issuance time. The
+      engine will only forward calls for tools declared in the token.
+
+
+      ### Good Fit
+
+
+      - backend automation that drives voice sessions
+
+      - server-side tool execution (database lookups, order management, etc.)
+
+      - scripted testing or CI pipelines that exercise the voice stack
+
+      - multi-service architectures where a backend orchestrates the conversation
+
+
+      ### See Also
+
+
+      - [Trusted Server Recipe](/recipes/trusted-server) for a full walkthrough
+
+      - [Self-Hosted Stack](/self-hosted/) for deployment details
+
+
+      ## Common Pitfalls
+
+
+      - token responses that do not match the SDK''s expected shape
+
+      - expired tokens reused across reconnects
+
+      - mismatched client and backend assumptions about session ownership
+
+      - exposing trusted credentials in client bundles
+
+
+      ## Related Docs
+
+
+      - [Connection Models](/guide/connection-models)
+
+      - [Self-Hosted](/self-hosted/)'
+    word_count: 625
+    char_count: 4252
+  recipes/custom-actions:
+    title: Custom Actions
+    description: null
+    category: Recipes
+    url_path: /recipes/custom-actions/
+    content: '# Custom Actions Recipe
+
+
+      Advanced patterns and best practices for creating custom voice actions.
+
+
+      ## ⚠️ CRITICAL: Action Registration Timing
+
+
+      **All custom actions MUST be registered BEFORE starting the voice session!**
+
+
+      [code example]
+
+
+      **Why?** Tool definitions are sent to the server during session initialization.
+      Actions registered after startSession() are not sent to the AI and will never
+      be called.
+
+
+      **Best Practice:** Always register all actions immediately after creating the
+      Vowel client and before calling startSession().
+
+
+      ## Overview
+
+
+      Custom actions extend your voice agent with business-specific functionality.
+      This recipe covers advanced patterns for building robust, user-friendly voice
+      commands.
+
+
+      ## Action Design Patterns
+
+
+      ### Command Pattern
+
+
+      Simple, imperative actions:
+
+
+      [code example]
+
+
+      ### Query Pattern
+
+
+      Actions that retrieve information:
+
+
+      [code example]
+
+
+      ### Wizard Pattern
+
+
+      Multi-step actions with state:
+
+
+      [code example]
+
+
+      ## Parameter Validation
+
+
+      ### Required Parameters
+
+
+      [code example]
+
+
+      ### Enum Parameters
+
+
+      [code example]
+
+
+      ### Range Validation
+
+
+      [code example]
+
+
+      ## Context-Aware Actions
+
+
+      ### User Context
+
+
+      [code example]
+
+
+      ### Location Context
+
+
+      [code example]
+
+
+      ### Page Context
+
+
+      [code example]
+
+
+      ## Async Operations
+
+
+      ### Loading States
+
+
+      [code example]
+
+
+      ### Progress Updates
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      ### Graceful Degradation
+
+
+      [code example]
+
+
+      ### User-Friendly Errors
+
+
+      [code example]
+
+
+      ## Action Composition
+
+
+      ### Chaining Actions
+
+
+      [code example]
+
+
+      ### Conditional Actions
+
+
+      [code example]
+
+
+      ## Testing Actions
+
+
+      ### Unit Testing
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Clear Descriptions** - Write clear, concise action and parameter descriptions
+
+      2. **Validate Input** - Always validate parameters before processing
+
+      3. **Handle Errors** - Return user-friendly error messages
+
+      4. **Provide Feedback** - Use notifyEvent for progress updates
+
+      5. **Keep Actions Focused** - One action should do one thing well
+
+      6. **Use TypeScript** - Leverage type safety
+
+      7. **Test Thoroughly** - Write unit tests for action handlers
+
+      8. **Document Parameters** - Provide detailed parameter descriptions
+
+      9. **Consider Context** - Use user, location, and page context
+
+      10. **Graceful Degradation** - Handle failures gracefully
+
+
+      ## Related
+
+
+      - [Actions Guide](../guide/actions) - Core action concepts
+
+      - [Event Notifications](./event-notifications) - Programmatic voice responses
+
+      - [API Reference](/api/index/classes/Vowel#registeraction) - Complete API'
+    word_count: 326
+    char_count: 2450
+  recipes/dynamic-context:
+    title: Dynamic Context
+    description: null
+    category: Recipes
+    url_path: /recipes/dynamic-context/
+    content: "# Dynamic Context\n\nLearn how to dynamically update the AI's context\
+      \ during a voice session to keep it aware of current application state.\n\n\
+      ## Overview\n\nDynamic context allows you to update the AI's understanding of\
+      \ the current application state in real-time. The context object is stringified\
+      \ and appended to the system prompt, enabling the AI to provide more relevant\
+      \ and contextual responses.\n\n**Key Features:**\n- Set initial context when\
+      \ creating the client\n- Update context anytime during a session\n- Context\
+      \ is automatically sent via session.update when changed\n- Context persists\
+      \ across session reconnections\n- Works seamlessly with React hooks\n\n## Basic\
+      \ Usage\n\n### Initial Context\n\nSet context when creating the client. This\
+      \ context is automatically included when the session starts:\n\n[code example]\n\
+      \n### Updating Context\n\nUpdate context dynamically during a session:\n\n[code\
+      \ example]\n\n## How It Works\n\n### Initial Context\n\nWhen you provide initialContext\
+      \ in the config:\n1. Context is stored in the client during construction\n2.\
+      \ When startSession() is called, the context is automatically included in the\
+      \ initial system instructions\n3. The context is stringified and wrapped in\
+      \ [code example]\n<context>\n\n[code example]typescript\n// Product page\nfunction\
+      \ showProductPage(productId: string) {\n  const product = getProduct(productId);\n\
+      \  \n  vowel.updateContext();\n}\n\n// Checkout page\nfunction showCheckoutPage(cart:\
+      \ Cart) {\n  vowel.updateContext();\n}\n\n// Home page\nfunction showHomePage()\
+      \ \n[code example]typescript\nasync function loginUser(user: User) {\n  await\
+      \ authenticate(user);\n  \n  vowel.updateContext({\n    user: \n  });\n}\n\n\
+      async function logoutUser() \n[code example]typescript\nclass CartManager {\n\
+      \  private cart: Cart;\n  \n  addItem(product: Product, quantity: number) \n\
+      \  \n  removeItem(productId: string) \n  \n  updateQuantity(productId: string,\
+      \ quantity: number) \n  \n  private updateContext() {\n    vowel.updateContext({\n\
+      \      cart: {\n        items: this.cart.items.map(item => ()),\n        total:\
+      \ this.cart.getTotal(),\n        itemCount: this.cart.items.length\n      }\n\
+      \    });\n  }\n}\n[code example]typescript\nfunction handleFormChange(formData:\
+      \ FormData) {\n  vowel.updateContext({\n    form: {\n      type: 'contact',\n\
+      \      fields: ,\n      isValid: validateForm(formData),\n      progress: calculateProgress(formData)\n\
+      \    }\n  });\n}\n\nfunction handleFormSubmit() \n[code example]typescript\n\
+      function performSearch(query: string, filters: SearchFilters) {\n  const results\
+      \ = search(query, filters);\n  \n  vowel.updateContext({\n    search: {\n  \
+      \    query,\n      filters,\n      resultCount: results.length,\n      results:\
+      \ results.slice(0, 5).map(r => ())\n    }\n  });\n}\n\nfunction clearSearch()\
+      \ \n[code example]tsx\n\nfunction ProductPage(: ) {\n  const product = useProduct(productId);\n\
+      \  \n  // Automatically sync product context - updates on change, clears on\
+      \ unmount\n  useSyncContext(\n    product ?  : null\n  );\n  \n  return ;\n\
+      }\n[code example]tsx\n\nfunction ProductPage(: ) {\n  const  = useVowel();\n\
+      \  const product = useProduct(productId);\n  \n  useEffect(() => {\n    if (product)\
+      \ {\n      updateContext();\n    }\n    \n    // Clear context when component\
+      \ unmounts\n    return () => ;\n  }, [product, updateContext]);\n  \n  return\
+      \ ;\n}\n[code example]tsx\n\nfunction usePageContext(context: Record | null)\
+      \ {\n  const  = useVowel();\n  const previousContext = useRef<Record<string,\
+      \ unknown> | null>(null);\n  \n  useEffect(() => {\n    // Only update if context\
+      \ actually changed\n    if (JSON.stringify(context) !== JSON.stringify(previousContext.current))\
+      \ \n    \n    return () => ;\n  }, [context, updateContext]);\n}\n\n// Usage\n\
+      function ProductPage() {\n  usePageContext();\n  \n  return <div>;\n}\n[code\
+      \ example]tsx\n\ninterface AppContext \n\nconst AppContextContext = createContext<AppContext\
+      \ | null>(null);\n\n  const  = useVowel();\n  const [appContext, setAppContext]\
+      \ = useState<AppContext>();\n  \n  // Sync app context to Vowel context\n  useEffect(()\
+      \ => {\n    const vowelContext: Record<string, unknown> = ;\n    \n    if (appContext.user)\
+      \ {\n      vowelContext.user = ;\n    }\n    \n    if (appContext.currentPage)\
+      \ \n    \n    if (appContext.cart) {\n      vowelContext.cart = ;\n    }\n \
+      \   \n    updateContext(Object.keys(vowelContext).length > 0 ? vowelContext\
+      \ : null);\n  }, [appContext, updateContext]);\n  \n  return (\n    <AppContextContext.Provider\
+      \ value=>\n      \n    </AppContextContext.Provider>\n  );\n}\n\n  const context\
+      \ = useContext(AppContextContext);\n  if (!context) \n  return context;\n}\n\
+      [code example]typescript\n\nconst updateContextDebounced = debounce((context:\
+      \ Record<string, unknown> | null) => , 300);\n\n// Usage\nfunction handleCartChange(cart:\
+      \ Cart) {\n  updateContextDebounced({\n    cart: \n  });\n}\n[code example]typescript\n\
+      function mergeContext(updates: Record<string, unknown>) {\n  const current =\
+      \ vowel.getContext();\n  const merged = {\n    ...(current || ),\n    ...updates\n\
+      \  };\n  vowel.updateContext(merged);\n}\n\n// Usage\nmergeContext(); // Adds/updates\
+      \ page\nmergeContext(); // Adds productId, keeps page\n[code example]typescript\n\
+      class ContextManager {\n  private history: Array<> = [];\n  \n  updateContext(context:\
+      \ Record<string, unknown> | null) {\n    this.history.push({\n      timestamp:\
+      \ Date.now(),\n      context: context ?  : null\n    });\n    \n    // Keep\
+      \ only last 50 entries\n    if (this.history.length > 50) \n    \n    vowel.updateContext(context);\n\
+      \  }\n  \n  getHistory() \n  \n  rollback(steps: number = 1) {\n    if (this.history.length\
+      \ > steps) \n  }\n}\n\nconst contextManager = new ContextManager();\n[code example]typescript\n\
+      function safeUpdateContext(context: Record<string, unknown> | null) {\n  if\
+      \ (vowel.state.isConnected)  else \n}\n[code example]typescript\nfunction safeUpdateContext(context:\
+      \ Record<string, unknown> | null) {\n  try  catch (error) \n}\n```\n\n## Related\n\
+      \n- [Vowel Client Guide](../guide/vowel-client) - Core client documentation\n\
+      - [Event Notifications](./event-notifications) - Programmatic AI speech\n- [Speaking\
+      \ State Tracking](./speaking-state) - Track AI speaking state\n- [API Reference](/api/index/classes/Vowel)\
+      \ - Complete API documentation"
+    word_count: 680
+    char_count: 6029
+  recipes/ecommerce:
+    title: Ecommerce
+    description: null
+    category: Recipes
+    url_path: /recipes/ecommerce/
+    content: '# E-commerce Integration Recipe
+
+
+      Complete patterns for building voice-powered e-commerce experiences.
+
+
+      ## Overview
+
+
+      This recipe provides a comprehensive guide for integrating Vowel into e-commerce
+      applications, covering product browsing, cart management, checkout, and more.
+
+
+      ## Product Browsing
+
+
+      ### Search Products
+
+
+      [code example]
+
+
+      ### Browse by Category
+
+
+      [code example]
+
+
+      ### View Product Details
+
+
+      [code example]
+
+
+      ### Get Product Information
+
+
+      [code example]
+
+
+      ## Cart Management
+
+
+      ### Add to Cart
+
+
+      [code example]
+
+
+      ### View Cart
+
+
+      [code example]
+
+
+      ### Update Cart Item
+
+
+      [code example]
+
+
+      ### Remove from Cart
+
+
+      [code example]
+
+
+      ### Clear Cart
+
+
+      [code example]
+
+
+      ## Checkout Process
+
+
+      ### Start Checkout
+
+
+      [code example]
+
+
+      ### Apply Coupon
+
+
+      [code example]
+
+
+      ### Complete Order
+
+
+      [code example]
+
+
+      ## Order Management
+
+
+      ### View Order History
+
+
+      [code example]
+
+
+      ### Track Order
+
+
+      [code example]
+
+
+      ## Wishlist
+
+
+      ### Add to Wishlist
+
+
+      [code example]
+
+
+      ### View Wishlist
+
+
+      [code example]
+
+
+      ## Product Recommendations
+
+
+      ### Get Recommendations
+
+
+      [code example]
+
+
+      ## Complete Example
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Authentication** - Check user authentication for protected actions
+
+      2. **Validation** - Validate cart and inventory before checkout
+
+      3. **Feedback** - Provide clear voice feedback for all actions
+
+      4. **Error Handling** - Handle out-of-stock, invalid coupons gracefully
+
+      5. **Progress Updates** - Notify users during long operations
+
+      6. **Cart Persistence** - Save cart state across sessions
+
+      7. **Security** - Validate payment information server-side
+
+      8. **Accessibility** - Ensure voice commands are discoverable
+
+      9. **Analytics** - Track voice commerce conversions
+
+      10. **Testing** - Test complete checkout flow with voice
+
+
+      ## Related
+
+
+      - [Custom Actions](./custom-actions) - Advanced action patterns
+
+      - [Navigation](./navigation) - Navigation patterns
+
+      - [Event Notifications](./event-notifications) - Voice feedback
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 264
+    char_count: 1950
+  recipes/event-notifications:
+    title: Event Notifications
+    description: null
+    category: Recipes
+    url_path: /recipes/event-notifications/
+    content: '# Event Notifications
+
+
+      Learn how to programmatically trigger AI voice responses for application events.
+
+
+      ## Overview
+
+
+      Event notifications allow you to make the AI speak about things happening in
+      your app without requiring user voice input. This is perfect for:
+
+
+      - Order confirmations
+
+      - Timer expiry
+
+      - New messages
+
+      - System alerts
+
+      - Status updates
+
+
+      ## Basic Usage
+
+
+      [code example]
+
+
+      ## Common Patterns
+
+
+      ### Order Confirmation
+
+
+      [code example]
+
+
+      ### Timer Expiry
+
+
+      [code example]
+
+
+      ### New Message Notification
+
+
+      [code example]
+
+
+      ### Shopping Cart Updates
+
+
+      [code example]
+
+
+      ### Form Submission
+
+
+      [code example]
+
+
+      ## Advanced Patterns
+
+
+      ### Debounced Notifications
+
+
+      Prevent notification spam by debouncing:
+
+
+      [code example]
+
+
+      ### Conditional Notifications
+
+
+      Only notify based on user preferences:
+
+
+      [code example]
+
+
+      ### Priority Notifications
+
+
+      Handle urgent vs. non-urgent notifications:
+
+
+      [code example]
+
+
+      ### Queued Notifications
+
+
+      Queue notifications to prevent overlapping speech:
+
+
+      [code example]
+
+
+      ## React Integration
+
+
+      ### Hook for Event Notifications
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      Always handle errors when sending notifications:
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Keep messages concise** - Voice notifications should be brief and clear
+
+      2. **Provide context** - Include relevant data in the context object
+
+      3. **Don''t spam** - Use debouncing for frequent events
+
+      4. **Check connection** - Verify session is active before notifying
+
+      5. **Handle errors** - Always have a fallback for failed notifications
+
+      6. **Respect preferences** - Allow users to disable voice notifications
+
+
+      ## Related
+
+
+      - [Speaking State Tracking](./speaking-state) - Track when AI is speaking
+
+      - [Custom Actions](./custom-actions) - Define voice commands
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 248
+    char_count: 1768
+  recipes/index:
+    title: Recipes
+    description: null
+    category: Getting Started
+    url_path: /recipes/
+    content: '# Recipes
+
+
+      Practical examples and patterns for common use cases with Vowel.
+
+
+      ## Available Recipes
+
+
+      ### Core Features
+
+
+      - [Event Notifications](./event-notifications) - Programmatically trigger AI
+      voice responses
+
+      - [Custom Actions](./custom-actions) - Define business logic for voice commands
+
+      - [Dynamic Context](./dynamic-context) - Update AI context dynamically during
+      sessions
+
+      - [Navigation Control](./navigation) - Voice-controlled routing patterns
+
+      - [Page Automation](./page-automation) - Voice-controlled page interaction
+
+      - [Speaking State Tracking](./speaking-state) - Track user and AI speaking states
+
+      - [Connection Paradigms](./connection-paradigms) - Advanced connection patterns
+      (API keys, server-side tokens, sidecar pattern)
+
+
+      ### Use Cases
+
+
+      - [E-commerce Integration](./ecommerce) - Voice shopping experiences
+
+
+      ## What are Recipes?
+
+
+      Recipes are practical, copy-paste examples that solve specific problems. Each
+      recipe includes:
+
+
+      - **Problem** - What you''re trying to achieve
+
+      - **Solution** - Complete working code
+
+      - **Explanation** - How it works
+
+      - **Variations** - Alternative approaches
+
+
+      ## Contributing Recipes
+
+
+      Have a useful pattern to share? We''d love to include it! Submit a PR or reach
+      out on [Discord](https://discord.gg/Kb4zFmmSRr).
+
+
+      ## Need Something Specific?
+
+
+      Can''t find what you''re looking for? Check out:
+
+
+      - [API Reference](/api/) - Complete API documentation
+
+      - [Client](/guide/getting-started) - Integration and SDK concepts
+
+      - [Self-Hosted](/self-hosted/) - Deployment and operator documentation
+
+      - [Platform](/platform/) - Hosted product documentation
+
+      - [Examples](https://github.com/usevowel/examples) - Full example applications'
+    word_count: 203
+    char_count: 1656
+  recipes/navigation:
+    title: Navigation
+    description: null
+    category: Recipes
+    url_path: /recipes/navigation/
+    content: '# Navigation Control Recipe
+
+
+      Advanced patterns for voice-controlled navigation in your application.
+
+
+      ## Overview
+
+
+      This recipe covers advanced navigation patterns, including dynamic routes, protected
+      routes, navigation with state, and cross-tab navigation.
+
+
+      ## Dynamic Route Navigation
+
+
+      ### Route Parameters
+
+
+      Navigate to routes with dynamic parameters:
+
+
+      [code example]
+
+
+      ### Category Navigation
+
+
+      [code example]
+
+
+      ### Search Navigation
+
+
+      [code example]
+
+
+      ## Protected Routes
+
+
+      ### Authentication Check
+
+
+      [code example]
+
+
+      ### Role-Based Navigation
+
+
+      [code example]
+
+
+      ## Navigation with State
+
+
+      ### Passing Context
+
+
+      [code example]
+
+
+      ### Breadcrumb Navigation
+
+
+      [code example]
+
+
+      ## Smart Navigation
+
+
+      ### Context-Aware Navigation
+
+
+      [code example]
+
+
+      ### Conditional Navigation
+
+
+      [code example]
+
+
+      ## Cross-Tab Navigation
+
+
+      ### Controlled Navigation
+
+
+      For traditional sites with page reloads (Shopify, WordPress):
+
+
+      [code example]
+
+
+      ### Cross-Tab State Sync
+
+
+      [code example]
+
+
+      ## Navigation Notifications
+
+
+      ### Route Change Announcements
+
+
+      [code example]
+
+
+      ### Loading States
+
+
+      [code example]
+
+
+      ## Multi-Step Navigation
+
+
+      ### Wizard Navigation
+
+
+      [code example]
+
+
+      ## Deep Linking
+
+
+      ### URL State Management
+
+
+      [code example]
+
+
+      ### Shareable URLs
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Clear Descriptions** - Provide clear route descriptions
+
+      2. **Validate State** - Check prerequisites before navigation
+
+      3. **Handle Errors** - Gracefully handle navigation failures
+
+      4. **Provide Feedback** - Announce navigation changes
+
+      5. **Context Awareness** - Consider user state and permissions
+
+      6. **Loading States** - Show feedback during navigation
+
+      7. **Deep Linking** - Support URL parameters for shareable links
+
+      8. **Breadcrumbs** - Maintain navigation history
+
+      9. **Protected Routes** - Enforce authentication and authorization
+
+      10. **Cross-Tab Sync** - Coordinate navigation across tabs
+
+
+      ## Related
+
+
+      - [Adapters Guide](../guide/adapters) - Navigation adapter details
+
+      - [React Router](../guide/react-router) - React Router integration
+
+      - [Next.js](../guide/nextjs) - Next.js integration
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 265
+    char_count: 2085
+  recipes/page-automation:
+    title: Page Automation
+    description: null
+    category: Recipes
+    url_path: /recipes/page-automation/
+    content: '# Page Automation Recipe
+
+
+      Advanced patterns for voice-controlled page interaction and DOM manipulation.
+
+
+      ## Overview
+
+
+      Page automation enables voice-controlled interaction with page elements - clicking,
+      typing, scrolling, and more. This recipe covers advanced patterns for robust
+      page automation.
+
+
+      ## Element Search Patterns
+
+
+      ### Semantic Search
+
+
+      Search for elements using natural language:
+
+
+      [code example]
+
+
+      ### Contextual Search
+
+
+      Search within specific page regions:
+
+
+      [code example]
+
+
+      ## Form Automation
+
+
+      ### Form Filling
+
+
+      [code example]
+
+
+      ### Form Submission
+
+
+      [code example]
+
+
+      ## Visual Feedback
+
+
+      ### Floating Cursor
+
+
+      [code example]
+
+
+      ### Scroll to Element
+
+
+      [code example]
+
+
+      ## Complex Interactions
+
+
+      ### Multi-Step Interaction
+
+
+      [code example]
+
+
+      ### Conditional Interactions
+
+
+      [code example]
+
+
+      ## Page Analysis
+
+
+      ### Extract Page Information
+
+
+      [code example]
+
+
+      ### Find Specific Content
+
+
+      [code example]
+
+
+      ## Cross-Tab Automation
+
+
+      ### Controlled Automation
+
+
+      For traditional sites with page reloads:
+
+
+      [code example]
+
+
+      ## Error Handling
+
+
+      ### Retry Logic
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Clear Descriptions** - Use descriptive element searches
+
+      2. **Visual Feedback** - Show cursor for user feedback
+
+      3. **Wait for Load** - Add delays after navigation/clicks
+
+      4. **Error Handling** - Handle missing elements gracefully
+
+      5. **Retry Logic** - Implement retries for reliability
+
+      6. **Context Awareness** - Search within specific regions
+
+      7. **Multi-Step Actions** - Break complex tasks into steps
+
+      8. **Progress Updates** - Notify users of progress
+
+      9. **Validate Results** - Check if actions succeeded
+
+      10. **Cleanup** - Clear automation state when done
+
+
+      ## Related
+
+
+      - [Adapters Guide](../guide/adapters) - Automation adapter details
+
+      - [Custom Actions](./custom-actions) - Advanced action patterns
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 249
+    char_count: 1831
+  recipes/speaking-state:
+    title: Speaking State
+    description: null
+    category: Recipes
+    url_path: /recipes/speaking-state/
+    content: '# Speaking State Tracking Recipe
+
+
+      Advanced patterns for tracking and responding to voice activity states.
+
+
+      ## Overview
+
+
+      Vowel provides real-time state tracking for user speech, AI thinking, and AI
+      speech. This recipe covers patterns for building responsive UIs and logic based
+      on voice activity.
+
+
+      ## State Tracking
+
+
+      ### Basic State Access
+
+
+      [code example]
+
+
+      ### State Subscription
+
+
+      [code example]
+
+
+      ## UI Patterns
+
+
+      ### Visual Indicators
+
+
+      [code example]
+
+
+      ### Animated Indicators
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ### Transcript Display
+
+
+      [code example]
+
+
+      ## Conditional Logic
+
+
+      ### Prevent Actions During Speech
+
+
+      [code example]
+
+
+      ### Queue Notifications
+
+
+      [code example]
+
+
+      ## Analytics
+
+
+      ### Track Voice Usage
+
+
+      [code example]
+
+
+      ### Track State Transitions
+
+
+      [code example]
+
+
+      ## User Experience
+
+
+      ### Disable Input During Speech
+
+
+      [code example]
+
+
+      ### Show Context During Speech
+
+
+      [code example]
+
+
+      ## Accessibility
+
+
+      ### Screen Reader Announcements
+
+
+      [code example]
+
+
+      ## Best Practices
+
+
+      1. **Visual Feedback** - Always show voice activity state
+
+      2. **Prevent Conflicts** - Disable conflicting actions during speech
+
+      3. **Queue Notifications** - Avoid overlapping speech
+
+      4. **Track Analytics** - Monitor voice usage patterns
+
+      5. **Accessibility** - Provide screen reader announcements
+
+      6. **Error States** - Handle connection errors gracefully
+
+      7. **Loading States** - Show thinking/processing indicators
+
+      8. **User Guidance** - Provide context during voice interactions
+
+      9. **State Transitions** - Track and analyze state changes
+
+      10. **Performance** - Optimize state update handlers
+
+
+      ## Related
+
+
+      - [Event Notifications](./event-notifications) - Programmatic voice responses
+
+      - [Vowel Client](../guide/vowel-client) - Core client API
+
+      - [React Integration](../guide/react) - React-specific patterns
+
+      - [API Reference](/api/) - Complete API documentation'
+    word_count: 244
+    char_count: 1818
+  recipes/trusted-server:
+    title: Trusted Server
+    description: null
+    category: Recipes
+    url_path: /recipes/trusted-server/
+    content: '# Trusted Server Connections
+
+
+      This recipe walks through the full trusted-server workflow: minting a token,
+      connecting from a backend service, and handling server-side tool calls.
+
+
+      ## Before You Start
+
+
+      Make sure you have:
+
+
+      - A running self-hosted stack (see [Self-Hosted](/self-hosted/))
+
+      - An API key with the mint_trusted_session scope
+
+      - A backend service that can open WebSocket connections
+
+
+      For an overview of all connection patterns, see [Connection Paradigms](/recipes/connection-paradigms).
+
+
+      ## What Is a Trusted Server Connection?
+
+
+      A trusted server connection lets your backend participate directly in a voice
+      session. Instead of a browser client, your backend opens the WebSocket, sends
+      audio or text, and receives responses. The realtime engine can also forward
+      tool calls to your backend for server-side execution.
+
+
+      This is useful when:
+
+
+      - you need to drive a voice session from code (automation, testing, orchestration)
+
+      - your tools require server-side access (databases, internal APIs, order systems)
+
+      - you want to run voice workflows without a browser in the loop
+
+
+      ## Key Concepts
+
+
+      ### serviceId
+
+
+      A unique string that identifies your backend service. The engine logs it, uses
+      it for analytics, and includes it in tool-call routing. Pick something descriptive,
+      like order-service or ci-test-runner.
+
+
+      ### serverTools
+
+
+      Tool definitions you declare at token-issuance time. Each tool has a name, description,
+      and JSON Schema parameters. When the LLM decides to call one of these tools,
+      the engine forwards the call to your backend over the WebSocket instead of trying
+      to execute it client-side.
+
+
+      ### Scope Gating
+
+
+      Trusted-server tokens require the mint_trusted_session scope on the API key.
+      This is a separate scope from mint_ephemeral (used for browser tokens). A key
+      without the right scope will get a 403 response.
+
+
+      ## Step-by-Step
+
+
+      ### 1. Create an API Key with the Right Scope
+
+
+      Use the Core API or admin UI to create a fixed API key. The key must carry the
+      mint_trusted_session scope.
+
+
+      [code example]
+
+
+      Save the returned key. It will look like vkey_....
+
+
+      ### 2. Mint a Token
+
+
+      Your backend calls the token endpoint with connectionType: ''trusted_server''.
+
+
+      [code example]
+
+
+      The token expires after five minutes. Mint a fresh one for each session.
+
+
+      ### 3. Connect via WebSocket
+
+
+      Open a WebSocket to the realtime engine using the token.
+
+
+      [code example]
+
+
+      ### 4. Handle Server Tool Calls
+
+
+      When the LLM calls a server tool, the engine emits a response.output_item.added
+      event with a function_call item. Your backend executes the tool and sends the
+      result back.
+
+
+      [code example]
+
+
+      ### 5. Send Text or Audio
+
+
+      You can drive the conversation by sending text messages or audio buffers.
+
+
+      [code example]
+
+
+      ## Security Checklist
+
+
+      - **Never expose trusted-server tokens in browser code.** They are for backend
+      use only.
+
+      - **Use separate API keys** for trusted-server and browser token minting. The
+      scope separation exists for a reason.
+
+      - **Rotate keys periodically.** If a key is compromised, revoke it and create
+      a new one.
+
+      - **Validate tool inputs.** The engine forwards tool calls as-is. Your backend
+      should validate arguments before executing.
+
+      - **Log session lifecycle.** Track token minting, WebSocket connections, and
+      tool-call results for debugging and auditing.
+
+
+      ## Troubleshooting
+
+
+      ### 403 Forbidden
+
+
+      The API key does not carry the mint_trusted_session scope. Create a new key
+      with the correct scope.
+
+
+      ### Token Expired
+
+
+      Ephemeral tokens last five minutes. If your backend takes too long between minting
+      and connecting, mint a fresh token.
+
+
+      ### Tool Calls Not Arriving
+
+
+      - Verify the tool name in serverTools matches exactly what the LLM sees in its
+      tool list.
+
+      - Check engine logs for tool-registration messages.
+
+      - Make sure the tool is not also registered as a client tool (client tools take
+      priority).
+
+
+      ### WebSocket Disconnects
+
+
+      - Check the maxCallDurationMs and maxIdleDurationMs token claims. Sessions end
+      when either limit is hit.
+
+      - Look for error events on the WebSocket. The engine sends error events before
+      closing.
+
+
+      ## Reference Implementation
+
+
+      If you already use a server-issued token flow for browser clients, the token-minting
+      step is almost identical for trusted-server connections. The main difference
+      is that your backend keeps the WebSocket open itself and handles forwarded tool
+      calls directly.
+
+
+      ## Related Docs
+
+
+      - [Connection Paradigms](/recipes/connection-paradigms)
+
+      - [Self-Hosted Stack](/self-hosted/)
+
+      - [API Reference](/api/)'
+    word_count: 679
+    char_count: 4447
+  self-hosted/architecture:
+    title: Architecture
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/architecture/
+    content: '# Self-Hosted Architecture
+
+
+      The self-hosted stack separates control-plane responsibilities from realtime
+      session execution.
+
+
+      ## Core Components
+
+
+      The self-hosted deployment has two primary services:
+
+
+      - **Core**: the control plane and token service
+
+      - **Realtime engine**: the service that runs live voice sessions
+
+
+      ## High-Level Flow
+
+
+      [code example]
+
+
+      ## Responsibilities
+
+
+      ### Core
+
+
+      Core is responsible for:
+
+
+      - app configuration
+
+      - issuing short-lived session credentials
+
+      - managing the settings that shape session startup
+
+
+      ### Realtime Engine
+
+
+      The realtime engine is responsible for:
+
+
+      - accepting authenticated realtime connections
+
+      - managing live voice sessions
+
+      - coordinating model, speech, and tool execution
+
+
+      ## Operator Responsibilities
+
+
+      When you self-host, your team is responsible for:
+
+
+      - infrastructure and network access
+
+      - environment and secret management
+
+      - provider credentials
+
+      - service health and deployment lifecycle
+
+
+      ## When To Choose Self-Hosted
+
+
+      Choose self-hosted when you need:
+
+
+      - infrastructure control
+
+      - custom token issuance or backend policy
+
+      - self-managed deployment and networking
+
+      - separation between your app backend and the hosted platform'
+    word_count: 161
+    char_count: 1164
+  self-hosted/configuration:
+    title: Configuration
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/configuration/
+    content: '# Self-Hosted Configuration
+
+
+      Self-hosted deployments require configuration for tokens, providers, networking,
+      and browser connectivity. This page documents all environment variables and
+      configuration options for the self-hosted stack.
+
+
+      ## Environment File Location
+
+
+      The stack reads configuration from a stack.env file in the workspace root (one
+      level up from the stack/ directory):
+
+
+      [code example]
+
+
+      ## Required Variables
+
+
+      These variables must be set before starting the stack:
+
+
+      | Variable | Description | Example |
+
+      |----------|-------------|---------|
+
+      | ENCRYPTION_KEY | 32+ character secret for encrypting stored API keys | abcd1234...
+      (64 char hex) |
+
+      | ENGINE_API_KEY | Server-side API key for engine authentication | my-secure-api-key
+      |
+
+      | JWT_SECRET | 32+ character secret for JWT token signing | my-jwt-secret-min-32-chars
+      |
+
+      | CORE_BOOTSTRAP_PUBLISHABLE_KEY | Publishable key for Core to auto-create on
+      first boot | vkey_... (64 char hex) |
+
+      | DEEPGRAM_API_KEY | Deepgram API key for STT and TTS | Get from [deepgram.com](https://deepgram.com)
+      |
+
+      | GROQ_API_KEY or OPENROUTER_API_KEY | LLM provider API key | Get from provider
+      console |
+
+
+      ### Generating Secure Keys
+
+
+      Generate secure random keys for secrets:
+
+
+      [code example]
+
+
+      ## Provider Configuration
+
+
+      ### LLM Provider
+
+
+      Choose one LLM provider:
+
+
+      [code example]
+
+
+      **LLM Provider Variables:**
+
+
+      | Variable | Default | Description |
+
+      |----------|---------|-------------|
+
+      | LLM_PROVIDER | openrouter | groq, openrouter, or openai-compatible |
+
+      | GROQ_API_KEY | - | Groq API key |
+
+      | GROQ_MODEL | openai/gpt-oss-20b | Groq model ID |
+
+      | GROQ_WHISPER_MODEL | whisper-large-v3 | Groq Whisper model for STT |
+
+      | OPENROUTER_API_KEY | - | OpenRouter API key |
+
+      | OPENROUTER_MODEL | openrouter/healer-alpha | OpenRouter model ID |
+
+      | OPENAI_COMPATIBLE_BASE_URL | http://host.docker.internal:8000/v1 | Base URL
+      for compatible gateway |
+
+      | OPENAI_COMPATIBLE_API_KEY | - | API key for compatible gateway |
+
+      | OPENAI_COMPATIBLE_MODEL | gpt-4o-mini | Model ID for compatible gateway |
+
+
+      ### STT/TTS Configuration
+
+
+      Deepgram is the default provider for both speech-to-text and text-to-speech:
+
+
+      [code example]
+
+
+      **STT/TTS Variables:**
+
+
+      | Variable | Default | Description |
+
+      |----------|---------|-------------|
+
+      | STT_PROVIDER | deepgram | Speech-to-text provider |
+
+      | DEEPGRAM_STT_MODEL | nova-3 | Deepgram STT model |
+
+      | DEEPGRAM_STT_LANGUAGE | en-US | STT language code |
+
+      | TTS_PROVIDER | deepgram | Text-to-speech provider |
+
+      | DEEPGRAM_TTS_MODEL | aura-2-thalia-en | Deepgram TTS voice model |
+
+
+      ### VAD Configuration
+
+
+      Voice Activity Detection (VAD) detects when users start and stop speaking:
+
+
+      [code example]
+
+
+      **VAD Variables:**
+
+
+      | Variable | Default | Description |
+
+      |----------|---------|-------------|
+
+      | VAD_PROVIDER | silero | VAD provider (silero or none) |
+
+      | VAD_ENABLED | true | Enable server-side VAD |
+
+
+      ## Bootstrap Configuration
+
+
+      Core auto-creates an app and publishable API key on first boot using these variables:
+
+
+      [code example]
+
+
+      **Bootstrap Variables:**
+
+
+      | Variable | Default | Description |
+
+      |----------|---------|-------------|
+
+      | CORE_BOOTSTRAP_APP_ID | default | App ID to create |
+
+      | CORE_BOOTSTRAP_APP_NAME | Local Stack App | Display name |
+
+      | CORE_BOOTSTRAP_APP_DESCRIPTION | Bootstrap app for the self-hosted Docker
+      stack | Description |
+
+      | CORE_BOOTSTRAP_API_KEY_LABEL | Local Stack Key | API key label |
+
+      | CORE_BOOTSTRAP_SCOPES | mint_ephemeral | Comma-separated scopes |
+
+      | CORE_BOOTSTRAP_ALLOWED_PROVIDERS | vowel-prime | Comma-separated allowed providers
+      |
+
+      | CORE_BOOTSTRAP_ALLOWED_ENDPOINT_PRESETS | staging | Comma-separated allowed
+      presets |
+
+      | CORE_BOOTSTRAP_DEFAULT_ENDPOINT_PRESET | staging | Default preset |
+
+      | CORE_BOOTSTRAP_PUBLISHABLE_KEY | - | **Required.** Plaintext publishable key
+      to seed |
+
+
+      The publishable key is what client applications use to request tokens from Core.
+      It should be a 64-character hex string prefixed with vkey_.
+
+
+      ## Port Configuration
+
+
+      Override default ports when they conflict with existing services:
+
+
+      [code example]
+
+
+      **Port Variables:**
+
+
+      | Variable | Default | Description |
+
+      |----------|---------|-------------|
+
+      | CORE_HOST_PORT | 3000 | Host port for Core service |
+
+      | ENGINE_HOST_PORT | 8787 | Host port for Engine service |
+
+
+      After changing ports, update the Core environment to reflect the new engine
+      port:
+
+
+      [code example]
+
+
+      ## Runtime Config Ownership
+
+
+      The engine persists its runtime configuration as YAML at /app/data/config/runtime.yaml
+      on the engine-data Docker volume. Environment variables in stack.env act as
+      bootstrap defaults for the first boot and as fallback values when a key is missing
+      from the YAML.
+
+
+      ### HTTP Config Endpoints
+
+
+      The engine exposes HTTP endpoints for inspecting and updating runtime configuration
+      without rebuilding:
+
+
+      | Endpoint | Method | Description |
+
+      |----------|--------|-------------|
+
+      | /config | GET | Retrieve current runtime config |
+
+      | /config | PUT | Update runtime config |
+
+      | /config/validate | POST | Validate a config change |
+
+      | /config/reload | POST | Reload config from disk |
+
+      | /presets | GET | List available presets |
+
+
+      All config endpoints require the engine admin API key via Authorization: Bearer
+      $.
+
+
+      ### Example: Update Runtime Config
+
+
+      [code example]
+
+
+      ## Core Configuration Areas
+
+
+      ### Provider Credentials
+
+
+      Store all provider API keys in stack.env. Core encrypts provider keys before
+      storing them in its SQLite database using the ENCRYPTION_KEY.
+
+
+      ### Service URLs
+
+
+      Core needs to know how to reach the engine:
+
+
+      [code example]
+
+
+      ### Token Issuance Settings
+
+
+      Control who can request tokens and which providers they can use:
+
+
+      - CORE_BOOTSTRAP_SCOPES: Controls API key capabilities (mint_ephemeral, mint_trusted_session)
+
+      - CORE_BOOTSTRAP_ALLOWED_PROVIDERS: Which voice providers can be used
+
+      - CORE_BOOTSTRAP_ALLOWED_ENDPOINT_PRESETS: Which endpoint presets are available
+
+
+      ### Browser-Facing Origins
+
+
+      For CORS, Core accepts requests from any origin by default in development. In
+      production, configure your reverse proxy to handle CORS policy.
+
+
+      ## Environment-Specific Configuration
+
+
+      ### Development
+
+
+      [code example]
+
+
+      ### Production
+
+
+      [code example]
+
+
+      ## Security Guidance
+
+
+      - Rotate provider secrets regularly (every 90 days recommended)
+
+      - Scope credentials to the environments that need them
+
+      - Terminate TLS before exposing browser-facing endpoints
+
+      - Avoid embedding long-lived credentials in any client bundle
+
+      - Never commit stack.env to version control
+
+      - Use STACK_ENV_FILE to switch between environment files for different stages
+
+
+      ## Complete Example Configuration
+
+
+      [code example]'
+    word_count: 918
+    char_count: 6500
+  self-hosted/core:
+    title: Core
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/core/
+    content: '# Self-Hosted Core
+
+
+      Core is the control plane for the self-hosted stack. It provides token issuance,
+      app management, and a Web UI for configuring your self-hosted deployment.
+
+
+      ## What Core Does
+
+
+      Core is responsible for:
+
+
+      - App and session configuration
+
+      - Issuing short-lived session tokens
+
+      - Holding the configuration used when sessions are created
+
+      - Providing the browser-facing or backend-facing token entry point
+
+      - Encrypting and storing provider API keys
+
+      - Managing publishable API keys for client authentication
+
+
+      ## API Endpoints
+
+
+      ### Health Check
+
+
+      [code example]
+
+
+      Response:
+
+      [code example]
+
+
+      ### Token Generation
+
+
+      The primary endpoint for client applications to request ephemeral tokens.
+
+
+      [code example]
+
+
+      **Headers:**
+
+      - Content-Type: application/json
+
+      - X-API-Key: vkey_your_bootstrap_publishable_key
+
+
+      **Request Body:**
+
+      [code example]
+
+
+      **Response:**
+
+      [code example]
+
+
+      **Example curl:**
+
+      [code example]
+
+
+      ### Web UI
+
+
+      Core provides a web interface for managing apps and API keys:
+
+
+      [code example]
+
+
+      The Web UI allows you to:
+
+      - Create and manage apps
+
+      - Generate and revoke API keys
+
+      - View token usage statistics
+
+      - Configure endpoint presets
+
+
+      ## Bootstrap Process
+
+
+      On first boot, Core automatically creates an app and publishable API key based
+      on environment variables in stack.env:
+
+
+      1. **App Creation**: Creates an app with ID from CORE_BOOTSTRAP_APP_ID
+
+      2. **API Key Generation**: Creates a publishable key from CORE_BOOTSTRAP_PUBLISHABLE_KEY
+
+      3. **Endpoint Preset**: Configures the engine endpoint for the staging preset
+
+
+      **Verify Bootstrap:**
+
+      [code example]
+
+
+      Expected output:
+
+      [code example]
+
+
+      **Bootstrap Configuration Variables:**
+
+
+      | Variable | Default | Purpose |
+
+      |----------|---------|---------|
+
+      | CORE_BOOTSTRAP_APP_ID | default | App identifier |
+
+      | CORE_BOOTSTRAP_APP_NAME | Local Stack App | Display name |
+
+      | CORE_BOOTSTRAP_PUBLISHABLE_KEY | - | API key value (64 char hex with vkey_
+      prefix) |
+
+      | CORE_BOOTSTRAP_SCOPES | mint_ephemeral | Key capabilities |
+
+
+      ## Token Flow
+
+
+      ### 1. Client Requests Token
+
+
+      [code example]
+
+
+      ### 2. Client Connects to Engine
+
+
+      [code example]
+
+
+      ## When You Interact With Core
+
+
+      You interact with Core when you need to:
+
+
+      - Configure a self-hosted app
+
+      - Request a session token
+
+      - Control how new sessions are initialized
+
+      - Manage API keys and their scopes
+
+      - View app configuration and usage
+
+
+      In many deployments, the browser does not talk directly to the realtime engine
+      first. It fetches a token from Core or from your backend, then uses that token
+      to start the live session.
+
+
+      ## How Core Fits Into The Flow
+
+
+      1. Your app or backend requests a session token from Core
+
+      2. Core validates the publishable API key and app permissions
+
+      3. Core generates a short-lived JWT token (5-minute expiration)
+
+      4. Core returns the token and WebSocket URL
+
+      5. The client connects to the realtime engine with that token
+
+      6. The engine validates the JWT and starts the session
+
+
+      ## Configuration Reference
+
+
+      ### Core Environment Variables
+
+
+      Core reads these environment variables from stack.env:
+
+
+      **Required:**
+
+      - ENCRYPTION_KEY: For encrypting stored API keys
+
+      - ENGINE_URL: Internal URL to reach engine (http://engine:8787)
+
+      - ENGINE_WS_URL: External WebSocket URL for clients
+
+      - ENGINE_API_KEY: Shared secret with engine
+
+
+      **Optional:**
+
+      - DB_PATH: SQLite database location (/app/data/core.db)
+
+      - PORT: Service port (default: 3000)
+
+      - OPENAI_API_KEY: For OpenAI provider (if using)
+
+      - XAI_API_KEY: For xAI provider (if using)
+
+
+      ### Endpoint Presets
+
+
+      Core supports multiple engine endpoint presets for different environments:
+
+
+      [code example]
+
+
+      ## Demo Application Connection
+
+
+      To connect the demo application to your self-hosted Core:
+
+
+      ### 1. Configure Demo Environment
+
+
+      Create demos/demo/.env.local:
+
+
+      [code example]
+
+
+      ### 2. Start the Demo
+
+
+      [code example]
+
+
+      ### 3. Test the Connection
+
+
+      1. Open the demo URL (usually http://localhost:5173)
+
+      2. Click the microphone button
+
+      3. Speak - the demo should connect to Core, get a token, then connect to the
+      engine
+
+
+      ### Demo Configuration Values
+
+
+      | Variable | Value | Source |
+
+      |----------|-------|--------|
+
+      | VITE_CORE_BASE_URL | http://localhost:3000 | CORE_HOST_PORT from stack.env
+      |
+
+      | VITE_CORE_API_KEY | Your bootstrap key | CORE_BOOTSTRAP_PUBLISHABLE_KEY |
+
+      | VITE_CORE_APP_ID | default | CORE_BOOTSTRAP_APP_ID |
+
+
+      ## What Core Does Not Replace
+
+
+      Core is not the realtime runtime itself. It does not:
+
+      - Process audio streams
+
+      - Run voice activity detection
+
+      - Execute speech-to-text or text-to-speech
+
+      - Handle WebSocket connections
+
+      - Run the AI model inference
+
+
+      That role belongs to the [realtime engine](./engine).
+
+
+      ## Source Repository
+
+
+      Core is open source at [github.com/usevowel/core](https://github.com/usevowel/core).
+
+
+      ## Next Steps
+
+
+      - [Architecture](./architecture) - Understand how Core fits in the stack
+
+      - [Realtime Engine](./engine) - Learn about the voice runtime
+
+      - [Configuration](./configuration) - Configure environment variables
+
+      - [Deployment](./deployment) - Deploy the full stack
+
+      - [Troubleshooting](./troubleshooting) - Debug common issues'
+    word_count: 718
+    char_count: 4980
+  self-hosted/deployment:
+    title: Deployment
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/deployment/
+    content: '# Self-Hosted Deployment
+
+
+      Use the self-hosted stack when you want to run both the token service and the
+      realtime runtime on your own infrastructure.
+
+
+      ## Prerequisites
+
+
+      Before deploying, ensure you have:
+
+
+      | Requirement | Version | Purpose |
+
+      |-------------|---------|---------|
+
+      | Docker | 20.10+ | Container runtime |
+
+      | Docker Compose | v2+ | Multi-service orchestration |
+
+      | Bun | 1.1.0+ | Workspace scripts and demo |
+
+      | API Keys | - | Provider credentials (see below) |
+
+
+      ### Required API Keys
+
+
+      You need keys for two services: an **LLM provider** and **Deepgram** (STT +
+      TTS).
+
+
+      **LLM Provider** (pick one):
+
+
+      | Provider | Env Var | Where to get a key |
+
+      |----------|---------|--------------------|
+
+      | Groq | GROQ_API_KEY | [console.groq.com](https://console.groq.com) |
+
+      | OpenRouter | OPENROUTER_API_KEY | [openrouter.ai](https://openrouter.ai) |
+
+      | OpenAI-compatible | OPENAI_COMPATIBLE_API_KEY | Any OpenAI-compatible gateway
+      |
+
+
+      **Deepgram** (default STT + TTS):
+
+
+      | Env Var | Purpose |
+
+      |---------|---------|
+
+      | DEEPGRAM_API_KEY | Speech-to-text and text-to-speech |
+
+
+      Get a key at [deepgram.com](https://deepgram.com). The defaults use Deepgram
+      for both STT and TTS (nova-3 for STT, aura-2-thalia-en for TTS).
+
+
+      **Echoline** (optional self-hosted STT + TTS):
+
+
+      If you prefer fully self-hosted speech processing without external APIs, you
+      can use Echoline (requires NVIDIA GPU with 8GB+ VRAM). See [Deployment Modes](#deployment-modes)
+      below for details.
+
+
+      ## Quick Start (Docker Compose)
+
+
+      The fastest way to run the self-hosted stack is with Docker Compose:
+
+
+      [code example]
+
+
+      After startup, the services are available at:
+
+
+      | Service | URL | Purpose |
+
+      |---------|-----|---------|
+
+      | Core | http://localhost:3000 | Token issuance, app management, Web UI |
+
+      | Engine | ws://localhost:8787/v1/realtime | Realtime voice AI WebSocket |
+
+
+      ## Stack Management Commands
+
+
+      The workspace provides several commands for managing the stack:
+
+
+      | Command | Description |
+
+      |---------|-------------|
+
+      | bun run stack:up | Build and start all services (CPU mode) |
+
+      | bun run stack:up:gpu | Start with GPU acceleration |
+
+      | bun run stack:up:full | Start with Echoline (self-hosted STT/TTS) |
+
+      | bun run stack:down | Stop and remove containers (with volumes) |
+
+      | bun run stack:logs | Follow logs from all services |
+
+      | bun run stack:build | Rebuild container images |
+
+      | bun run stack:test | Run smoke tests against the stack |
+
+      | bun run stack:sync-secrets | Sync secrets from engine .dev.vars to stack.env
+      |
+
+
+      ### Log Inspection
+
+
+      View logs for specific services:
+
+
+      [code example]
+
+
+      ### Custom Environment File
+
+
+      To use a different environment file:
+
+
+      [code example]
+
+
+      ## Docker Compose Services
+
+
+      The stack consists of two services defined in docker-compose.yml:
+
+
+      ### Core (vowel-core)
+
+
+      - **Container**: vowel-core
+
+      - **Default Port**: 3000 (configurable via CORE_HOST_PORT)
+
+      - **Purpose**: Token issuance, app management, Web UI
+
+      - **Depends on**: Engine (health check)
+
+      - **Volume**: core-data for SQLite database
+
+
+      ### Engine (vowel-engine)
+
+
+      - **Container**: vowel-engine
+
+      - **Default Port**: 8787 (configurable via ENGINE_HOST_PORT)
+
+      - **Purpose**: Realtime voice AI (OpenAI-compatible WebSocket)
+
+      - **Volume**: engine-data for runtime config persistence
+
+      - **Health Check**: /health endpoint
+
+
+      ## Deployment Modes
+
+
+      Choose one of three deployment configurations based on your needs:
+
+
+      ### Mode 1: Deepgram-Powered (Default - Recommended)
+
+
+      Uses hosted STT/TTS from Deepgram. Works on all machines (no GPU required).
+
+
+      - **Pros**: Fast setup, professional-grade quality, no model downloads
+
+      - **Cons**: Requires Deepgram API key, ongoing API costs
+
+      - **Requirements**: Deepgram API key + LLM provider key (Groq or OpenRouter)
+
+      - **Command**: bun run stack:up
+
+
+      ### Mode 2: Fully Self-Hosted with Echoline
+
+
+      Local speech processing with faster-whisper + Kokoro. Requires NVIDIA GPU.
+
+
+      - **Pros**: No external APIs, data privacy, works offline, no API costs
+
+      - **Cons**: Requires GPU, ~5GB disk space, slower initial startup
+
+      - **Requirements**: NVIDIA GPU with 8GB+ VRAM
+
+      - **Command**: bun run stack:up:full
+
+
+      ### Mode 3: GPU-Accelerated (NVIDIA GPU Only)
+
+
+      Uses GPU for lower VAD latency with Deepgram quality.
+
+
+      - **Requirements**: NVIDIA GPU + Container Toolkit
+
+      - **Command**: bun run stack:up:gpu
+
+
+      ### Local Evaluation
+
+
+      For development and testing, use the default Docker Compose setup:
+
+
+      [code example]
+
+
+      Validation checklist:
+
+
+      - [ ] Core is reachable over HTTP (curl http://localhost:3000/health)
+
+      - [ ] Engine is reachable over WebSocket (wscat -c ws://localhost:8787/v1/realtime)
+
+      - [ ] Token issuance succeeds (bun run stack:test)
+
+      - [ ] Browser client can complete a live connection
+
+
+      ### Single-Environment Deployment
+
+
+      For internal tooling or staging without full production complexity:
+
+
+      [code example]
+
+
+      Considerations:
+
+
+      - Use a dedicated host or VM
+
+      - Enable basic authentication on Core
+
+      - Set up simple log rotation
+
+      - Monitor disk usage for Docker volumes
+
+
+      ### Production Deployment
+
+
+      For production workloads, plan for:
+
+
+      #### HTTPS and WSS Endpoints
+
+
+      [code example]
+
+
+      #### Health Check Endpoints
+
+
+      Monitor these endpoints:
+
+
+      [code example]
+
+
+      #### Secret Rotation
+
+
+      Rotate secrets periodically:
+
+
+      1. Generate new ENCRYPTION_KEY, JWT_SECRET, ENGINE_API_KEY
+
+      2. Update stack.env
+
+      3. Run bun run stack:down && bun run stack:up
+
+      4. Regenerate publishable keys in Core UI
+
+
+      #### Volume Persistence
+
+
+      Data is stored in Docker volumes:
+
+
+      - core-data: SQLite database at /app/data/core.db
+
+      - engine-data: Runtime config at /app/data/config/runtime.yaml
+
+
+      Back up volumes for disaster recovery:
+
+
+      [code example]
+
+
+      ## Network Expectations
+
+
+      A production deployment usually exposes:
+
+
+      - An HTTP endpoint for token issuance or control-plane access
+
+      - A WSS endpoint for realtime sessions
+
+
+      Keep the realtime endpoint stable so client applications do not need to change
+      between deploys.
+
+
+      ### Port Configuration
+
+
+      Override default ports via environment variables:
+
+
+      [code example]
+
+
+      ## Acceptance Checklist
+
+
+      Before shipping a self-hosted deployment, verify:
+
+
+      - [ ] Browser clients can fetch tokens from Core
+
+      - [ ] Browser clients can connect to the realtime engine
+
+      - [ ] Microphone flows work over HTTPS (not just HTTP)
+
+      - [ ] Session startup, speech input, and responses complete successfully
+
+      - [ ] Failure states produce actionable logs
+
+      - [ ] Health check endpoints respond correctly
+
+      - [ ] Logs are being collected and rotated
+
+      - [ ] Secrets are stored securely (not in version control)
+
+      - [ ] Backup strategy is in place for volumes
+
+
+      ## Demo Application Connection
+
+
+      To connect the demo application to your self-hosted stack:
+
+
+      [code example]
+
+
+      Create .env.local:
+
+
+      [code example]
+
+
+      Start the demo:
+
+
+      [code example]
+
+
+      ## Troubleshooting
+
+
+      See [Troubleshooting](./troubleshooting) for common issues and debugging commands.'
+    word_count: 983
+    char_count: 6711
+  self-hosted/engine:
+    title: Engine
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/engine/
+    content: '# Self-Hosted Realtime Engine
+
+
+      The realtime engine runs live voice sessions in a self-hosted deployment. It
+      provides an OpenAI-compatible WebSocket API for real-time voice AI.
+
+
+      ## What The Realtime Engine Does
+
+
+      The realtime engine is responsible for:
+
+
+      - Accepting authenticated realtime WebSocket connections
+
+      - Creating and managing live voice sessions
+
+      - Coordinating speech-to-text, model inference, and text-to-speech
+
+      - Executing custom tools and actions
+
+      - Streaming audio and text responses back to clients
+
+      - Managing conversation history and session state
+
+
+      ## WebSocket Endpoint
+
+
+      The primary endpoint for voice sessions:
+
+
+      [code example]
+
+
+      In production with TLS:
+
+
+      [code example]
+
+
+      **Connection requires:**
+
+      - Valid ephemeral token in Authorization header or query parameter
+
+      - WebSocket protocol upgrade support
+
+
+      ### Example Connection
+
+
+      [code example]
+
+
+      [code example]
+
+
+      ## Ephemeral Token Flow
+
+
+      ### 1. Request Token from Core
+
+
+      [code example]
+
+
+      **Response:**
+
+      [code example]
+
+
+      ### 2. Connect with Token
+
+
+      [code example]
+
+
+      ### 3. Session Established
+
+
+      Upon successful connection, the engine sends:
+
+
+      [code example]
+
+
+      ## HTTP Endpoints
+
+
+      ### Health Check
+
+
+      [code example]
+
+
+      Response:
+
+      [code example]
+
+
+      ### Runtime Configuration
+
+
+      The engine exposes HTTP endpoints for managing runtime configuration without
+      restarting:
+
+
+      **Get current config:**
+
+      [code example]
+
+
+      **Update config:**
+
+      [code example]
+
+
+      **Validate config change:**
+
+      [code example]
+
+
+      **Reload config from disk:**
+
+      [code example]
+
+
+      **List available presets:**
+
+      [code example]
+
+
+      ## WebSocket Events
+
+
+      ### Client → Server Events
+
+
+      | Event | Description |
+
+      |-------|-------------|
+
+      | session.update | Update session configuration |
+
+      | input_audio_buffer.append | Stream audio chunk (PCM16, 24kHz, mono) |
+
+      | input_audio_buffer.commit | Signal end of speech |
+
+      | conversation.item.create | Add text message to conversation |
+
+      | response.create | Request AI response |
+
+      | response.cancel | Cancel in-progress response |
+
+
+      ### Server → Client Events
+
+
+      | Event | Description |
+
+      |-------|-------------|
+
+      | session.created | Session initialized |
+
+      | input_audio_buffer.speech_started | Speech detected |
+
+      | input_audio_buffer.speech_stopped | Speech ended |
+
+      | conversation.item.created | New conversation item |
+
+      | response.text.delta | Streaming text response |
+
+      | response.audio.delta | Streaming audio response (PCM16) |
+
+      | response.done | Response complete |
+
+      | error | Error occurred |
+
+
+      ### Example: Update Session
+
+
+      [code example]
+
+
+      ### Example: Send Audio
+
+
+      [code example]
+
+
+      ## How It Fits With Core
+
+
+      Core and the realtime engine have different responsibilities:
+
+
+      - **Core** prepares and issues short-lived access for session startup (token
+      generation, app management)
+
+      - **Realtime engine** runs the session after the client connects (audio processing,
+      AI inference, TTS)
+
+
+      [code example]
+
+
+      ## What Operators Should Care About
+
+
+      ### Public WebSocket Endpoint Stability
+
+
+      Keep the WebSocket URL stable between deployments. Clients store this URL in
+      their configuration.
+
+
+      ### Health and Restart Behavior
+
+
+      The engine includes a health check endpoint (/health) used by Docker and load
+      balancers. The container restarts automatically on failure (restart: unless-stopped).
+
+
+      ### Upstream Provider Configuration
+
+
+      Provider settings are loaded from:
+
+      1. Environment variables (bootstrap/fallback)
+
+      2. Runtime YAML config (/app/data/config/runtime.yaml)
+
+      3. Runtime config HTTP API
+
+
+      Update providers without restarting:
+
+      [code example]
+
+
+      ### TLS and Proxy Support
+
+
+      For production deployments behind a reverse proxy:
+
+
+      [code example]
+
+
+      ### Logs and Metrics
+
+
+      View engine logs:
+
+      [code example]
+
+
+      ## Provider Configuration
+
+
+      ### LLM Providers
+
+
+      Configure the LLM provider via environment variables or runtime config:
+
+
+      **Groq (default, fast):**
+
+      [code example]
+
+
+      **OpenRouter (100+ models):**
+
+      [code example]
+
+
+      ### Speech-to-Text
+
+
+      Default: Deepgram Nova-3
+
+
+      [code example]
+
+
+      ### Text-to-Speech
+
+
+      Default: Deepgram Aura-2
+
+
+      [code example]
+
+
+      ### Voice Activity Detection
+
+
+      Default: Silero VAD
+
+
+      [code example]
+
+
+      ## Runtime Config Ownership
+
+
+      The engine persists its runtime configuration as YAML at /app/data/config/runtime.yaml
+      on the engine-data Docker volume. Environment variables act as bootstrap defaults
+      and fallbacks.
+
+
+      **Config hierarchy (highest priority first):**
+
+      1. Runtime config HTTP API updates
+
+      2. Runtime YAML file (/app/data/config/runtime.yaml)
+
+      3. Environment variables
+
+
+      This allows updating configuration without rebuilding or restarting containers.
+
+
+      ## Typical Session Flow
+
+
+      1. **Token Acquisition**: Client requests token from Core
+
+      2. **WebSocket Connection**: Client connects to engine with token
+
+      3. **Session Creation**: Engine validates token and creates session
+
+      4. **Audio Streaming**: Client sends audio chunks
+
+      5. **Speech Detection**: VAD detects speech start/end
+
+      6. **Transcription**: STT converts speech to text
+
+      7. **AI Processing**: LLM generates response
+
+      8. **Synthesis**: TTS converts text to audio
+
+      9. **Streaming**: Audio/text streamed back to client
+
+
+      ## Source Repository
+
+
+      The realtime engine is open source at [github.com/usevowel/engine](https://github.com/usevowel/engine).
+
+
+      ## Related Docs
+
+
+      - [Architecture](./architecture) - How the engine fits in the stack
+
+      - [Core](./core) - Token service and control plane
+
+      - [Configuration](./configuration) - Environment variables and config options
+
+      - [Deployment](./deployment) - Deploying the full stack
+
+      - [Troubleshooting](./troubleshooting) - Debugging engine issues'
+    word_count: 718
+    char_count: 5406
+  self-hosted/index:
+    title: Self Hosted
+    description: null
+    category: Getting Started
+    url_path: /self-hosted/
+    content: '# Self-Hosted
+
+
+      Self-hosted deployment lets you run vowel on infrastructure you control.
+
+
+      ::: warning Beta Release
+
+      This open-source release is in beta. You may encounter rough edges, incomplete
+      features, or breaking changes. We are actively reviewing and merging community
+      PRs, but please expect some instability as we iterate toward a stable release.
+      Your feedback and contributions are welcome.
+
+      :::
+
+
+      ## Who This Is For
+
+
+      Choose self-hosted when you want:
+
+
+      - Your own deployment boundary
+
+      - Your own token issuance path
+
+      - Custom networking, auth, or backend policy
+
+      - Operator control over runtime configuration
+
+      - Data privacy with fully offline operation (optional)
+
+
+      ## What The Self-Hosted Stack Includes
+
+
+      The self-hosted stack includes these services:
+
+
+      | Service | Default URL | Purpose |
+
+      |---------|-------------|---------|
+
+      | **Core** | http://localhost:3000 | Token issuance, app management, Web UI
+      |
+
+      | **Realtime Engine** | ws://localhost:8787/v1/realtime | Voice AI WebSocket
+      (OpenAI-compatible) |
+
+      | **Echoline** (optional) | http://localhost:8000 | Self-hosted STT/TTS with
+      faster-whisper + Kokoro |
+
+
+      Your application typically talks to Core or your own backend to get a token,
+      then connects to the realtime engine with that token.
+
+
+      ## Deployment Options
+
+
+      ### Option 1: Deepgram-Powered (Default - Recommended)
+
+      Uses hosted STT/TTS from Deepgram. Works on all machines (no GPU required).
+
+
+      - **Pros**: Fast setup, professional-grade quality, no model downloads
+
+      - **Cons**: Requires Deepgram API key, ongoing API costs
+
+      - **Requirements**: Deepgram API key + LLM provider key (Groq or OpenRouter)
+
+      - **Command**: bun run stack:up
+
+
+      ### Option 2: Fully Self-Hosted with Echoline
+
+      Local speech processing with faster-whisper + Kokoro. Requires NVIDIA GPU.
+
+
+      - **Pros**: No external APIs, data privacy, works offline, no API costs
+
+      - **Cons**: Requires GPU, ~5GB disk space, slower initial startup
+
+      - **Requirements**: NVIDIA GPU with 8GB+ VRAM
+
+      - **Command**: bun run stack:up:full
+
+
+      ### Option 3: GPU-Accelerated (NVIDIA GPU Only)
+
+      Uses GPU for lower VAD latency with Deepgram quality.
+
+
+      - **Requirements**: NVIDIA GPU + Container Toolkit
+
+      - **Command**: bun run stack:up:gpu
+
+
+      ## Command Reference
+
+
+      Common stack management commands:
+
+
+      | Command | Description |
+
+      |---------|-------------|
+
+      | bun run stack:up | Start CPU stack (default) |
+
+      | bun run stack:up:gpu | Start with GPU acceleration |
+
+      | bun run stack:up:full | Start with Echoline (self-hosted STT/TTS) |
+
+      | bun run stack:down | Stop and remove containers |
+
+      | bun run stack:logs | View service logs |
+
+      | bun run stack:build | Rebuild container images |
+
+      | bun run stack:test | Run smoke tests |
+
+
+      ## Hosted Vs Self-Hosted
+
+
+      Use the **hosted platform** if you want:
+
+
+      - The fastest path to integration
+
+      - Managed app configuration
+
+      - Platform-managed setup with appId
+
+
+      Use **self-hosted** if you want:
+
+
+      - Infrastructure control
+
+      - Your own token and networking boundaries
+
+      - Custom backend mediation for session access
+
+
+      ## Required API Keys
+
+
+      Before deploying, obtain API keys from:
+
+
+      | Provider | Purpose | Where to Get |
+
+      |----------|---------|--------------|
+
+      | **Deepgram** | Speech-to-text and text-to-speech | [deepgram.com](https://deepgram.com)
+      |
+
+      | **Groq** or **OpenRouter** | LLM for AI responses | [groq.com](https://groq.com)
+      or [openrouter.ai](https://openrouter.ai) |
+
+
+      Echoline (self-hosted STT/TTS option) does not require external API keys.
+
+
+      ## Testing
+
+
+      The stack includes multiple testing capabilities:
+
+
+      **Smoke Test** (bun run stack:test)
+
+      A quick health check that verifies the Core and Engine services are running,
+      validates token generation works, and confirms WebSocket connections can be
+      established.
+
+
+      **Test Harness Framework**
+
+      An LLM-powered automated testing system in the Engine that simulates human users
+      conducting conversations with your voice agent. It validates that the agent
+      correctly uses tools, handles multi-turn conversations, and maintains context
+      across interactions. The framework includes built-in test scenarios for weather
+      lookups, calculations, multi-tool conversations, and context retention.
+
+
+      **Custom Test Scenarios**
+
+      Create your own test cases by defining conversation objectives, expected tool
+      calls with validation logic, and mock return data. Tests can be run against
+      different LLM providers and generate detailed Markdown logs of each run.
+
+
+      See the **[Testing](./testing)** page for detailed documentation on the Test
+      Harness, creating custom scenarios, and CI/CD integration.
+
+
+      ## Documentation
+
+
+      - **[Deployment](./deployment)** - Docker Compose setup, prerequisites, production
+      deployment
+
+      - **[Configuration](./configuration)** - Complete environment variable reference
+
+      - **[Core](./core)** - Token service API, bootstrap process, Web UI
+
+      - **[Realtime Engine](./engine)** - WebSocket API, events, runtime config
+
+      - **[Architecture](./architecture)** - How components fit together
+
+      - **[Testing](./testing)** - Smoke tests, Test Harness framework, custom scenarios
+
+      - **[Troubleshooting](./troubleshooting)** - Debug common issues, logs, health
+      checks
+
+
+      ## Source Repository
+
+
+      The self-hosted stack is open source at [github.com/usevowel/stack](https://github.com/usevowel/stack).
+
+
+      Individual components:
+
+      - Core: [github.com/usevowel/core](https://github.com/usevowel/core)
+
+      - Engine: [github.com/usevowel/engine](https://github.com/usevowel/engine)'
+    word_count: 725
+    char_count: 5324
+  self-hosted/troubleshooting:
+    title: Troubleshooting
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/troubleshooting/
+    content: "# Self-Hosted Troubleshooting\n\nUse this page to narrow down the most\
+      \ common self-hosted failures and debug issues with practical commands.\n\n\
+      ## Quick Troubleshooting\n\n| Issue | Solution |\n|-------|----------|\n| Build\
+      \ fails / dist/ not found | Run bun run build before docker compose up |\n|\
+      \ Docker cache issues | docker builder prune -f && docker compose build --no-cache\
+      \ |\n| Token generation fails | Verify API key has \"Generate session tokens\"\
+      \ scope in Core UI |\n| Services won't connect | Check docker compose ps to\
+      \ ensure all containers are healthy |\n| GPU not detected | Verify nvidia-smi\
+      \ works on host and NVIDIA Container Toolkit is installed |\n\nFor detailed\
+      \ troubleshooting, see the sections below.\n\n## Quick Diagnostic Commands\n\
+      \n### Check Service Health\n\n[code example]\n\n### View Service Logs\n\n[code\
+      \ example]\n\n### Check Container Status\n\n[code example]\n\n## Token Issuance\
+      \ Fails\n\n### Diagnostic Steps\n\n1. **Check Core is running:**\n   [code example]\n\
+      \n2. **Verify required secrets are set:**\n   [code example]\n\n3. **Test token\
+      \ endpoint directly:**\n   [code example]\n\n4. **Check Core logs for errors:**\n\
+      \   [code example]\n\n### Common Causes and Solutions\n\n| Symptom | Cause |\
+      \ Solution |\n|---------|-------|----------|\n| 401 Unauthorized | Invalid or\
+      \ missing API key | Verify X-API-Key header matches CORE_BOOTSTRAP_PUBLISHABLE_KEY\
+      \ |\n| 500 Internal Server | Missing ENCRYPTION_KEY | Add ENCRYPTION_KEY to\
+      \ stack.env and restart |\n| 404 Not Found | Wrong endpoint URL | Use POST /vowel/api/generateToken\
+      \ |\n| Empty response | Core not healthy | Check curl http://localhost:3000/health\
+      \ |\n\n## Realtime Connection Fails\n\n### Diagnostic Steps\n\n1. **Check WebSocket\
+      \ endpoint is reachable:**\n   [code example]\n\n2. **Verify token validity:**\n\
+      \   [code example]\n\n3. **Check token expiration:**\n   [code example]\n\n\
+      4. **Check engine logs:**\n   [code example]\n\n### Common Causes and Solutions\n\
+      \n| Symptom | Cause | Solution |\n|---------|-------|----------|\n| Connection\
+      \ refused | Engine not running | Check docker ps and bun run stack:logs |\n\
+      | 401 on WebSocket | Invalid/expired token | Generate new token from Core |\n\
+      | 403 Forbidden | Wrong environment | Verify token was minted for correct engine\
+      \ |\n| TLS error | HTTPS required | Use WSS:// in production, or set NODE_ENV=development\
+      \ |\n| Proxy 502 error | WebSocket not forwarded | Configure proxy to forward\
+      \ Upgrade headers |\n\n## Browser Microphone Issues\n\n### Diagnostic Steps\n\
+      \n1. **Check HTTPS (required for microphone):**\n   [code example]\n\n2. **Verify\
+      \ microphone permissions in browser:**\n   - Chrome: Click lock icon in address\
+      \ bar → Site settings → Microphone\n   - Firefox: Click lock icon → Permissions\
+      \ → Microphone\n\n3. **Test microphone availability:**\n   [code example]\n\n\
+      4. **Check browser console for errors:**\n   - Look for NotAllowedError (permission\
+      \ denied)\n   - Look for NotFoundError (no microphone)\n   - Look for WebSocket\
+      \ connection errors\n\n### Common Causes and Solutions\n\n| Symptom | Cause\
+      \ | Solution |\n|---------|-------|----------|\n| NotAllowedError | Permission\
+      \ denied | Grant microphone permission in browser settings |\n| NotFoundError\
+      \ | No microphone detected | Connect microphone and refresh |\n| Silence after\
+      \ connecting | VAD not detecting speech | Check VAD_ENABLED=true and speak clearly\
+      \ |\n| No audio output | TTS misconfigured | Verify DEEPGRAM_API_KEY and TTS\
+      \ model |\n\n## Provider Misconfiguration\n\n### Diagnostic Steps\n\n1. **Check\
+      \ provider credentials in environment:**\n   [code example]\n\n2. **Test provider\
+      \ directly:**\n   [code example]\n\n3. **Check engine logs for provider errors:**\n\
+      \   [code example]\n\n4. **Verify model names:**\n   [code example]\n\n### Common\
+      \ Causes and Solutions\n\n| Symptom | Cause | Solution |\n|---------|-------|----------|\n\
+      | 401 Unauthorized from provider | Invalid API key | Regenerate key from provider\
+      \ console |\n| 404 Model not found | Invalid model ID | Check provider docs\
+      \ for correct model string |\n| 429 Rate limited | Quota exceeded | Check provider\
+      \ usage dashboard |\n| 500 Provider error | Provider outage | Check provider\
+      \ status page |\n| STT returns empty | Audio format issue | Verify PCM16, 24kHz,\
+      \ mono format |\n\n## Port, Host, Or Proxy Issues\n\n### Diagnostic Steps\n\n\
+      1. **Check ports are not in use:**\n   [code example]\n\n2. **Test with custom\
+      \ ports:**\n   [code example]\n\n3. **Check reverse proxy configuration:**\n\
+      \   [code example]\n\n4. **Verify proxy forwards Upgrade headers:**\n   [code\
+      \ example]\n\n### Common Causes and Solutions\n\n| Symptom | Cause | Solution\
+      \ |\n|---------|-------|----------|\n| bind: address already in use | Port conflict\
+      \ | Use CORE_HOST_PORT/ENGINE_HOST_PORT to change ports |\n| WebSocket closes\
+      \ immediately | Proxy drops Upgrade | Configure proxy to forward WebSocket headers\
+      \ |\n| 502 Bad Gateway | Proxy can't reach service | Check service is running\
+      \ and proxy target is correct |\n| CORS errors | Origin not allowed | Configure\
+      \ CORS in reverse proxy or Core |\n| SSL error | TLS certificate issue | Verify\
+      \ certificate chain and domain match |\n\n## Container Issues\n\n### Container\
+      \ Won't Start\n\n[code example]\n\n### Container Exits Immediately\n\nCommon\
+      \ causes:\n- Missing required environment variables\n- Invalid encryption key\
+      \ format\n- Database permission issues\n\nCheck logs:\n[code example]\n\n###\
+      \ Volume Permission Issues\n\n[code example]\n\n## Bootstrap Issues\n\n### App\
+      \ Not Created\n\nCheck bootstrap logs:\n[code example]\n\nExpected output:\n\
+      [code example]\n\nIf bootstrap fails:\n1. Verify CORE_BOOTSTRAP_PUBLISHABLE_KEY\
+      \ is set\n2. Check CORE_BOOTSTRAP_APP_ID is valid (alphanumeric, no spaces)\n\
+      3. Ensure Core can write to /app/data volume\n\n### API Key Not Working\n\n\
+      Verify the key matches:\n[code example]\n\n## Smoke Test Failures\n\nThe smoke\
+      \ test (bun run stack:test) validates:\n1. Engine health endpoint\n2. Core health\
+      \ endpoint\n3. Token minting\n4. WebSocket connection\n\nIf the smoke test fails:\n\
+      \n[code example]\n\n## Getting More Help\n\nIf issues persist:\n\n1. **Collect\
+      \ diagnostic information:**\n   [code example]\n\n2. **Check provider status\
+      \ pages:**\n   - Groq: https://status.groq.com\n   - Deepgram: https://status.deepgram.com\n\
+      \   - OpenRouter: https://status.openrouter.ai\n\n3. **Review the deployment\
+      \ and configuration docs:**\n   - [Deployment](./deployment)\n   - [Configuration](./configuration)"
+    word_count: 928
+    char_count: 6201
+  self-hosted/quickstart:
+    title: Quickstart
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/quickstart/
+    content: "# Quickstart\n\nComplete walkthrough from clone to working voice demo.\n\
+      \n## Prerequisites\n\nBefore starting, ensure you have:\n\n- [Bun](https://bun.sh)\
+      \ installed (recommended) or Node.js with npm/yarn\n- [Docker](https://docker.com)\
+      \ and Docker Compose\n- API keys from [Deepgram](https://deepgram.com) (speech-to-text)\
+      \ and either [Groq](https://groq.com) or [OpenRouter](https://openrouter.ai)\
+      \ (LLM)\n\n## Step-by-Step Setup\n\n### 1. Clone the Repository\n\n[code example]\n\
+      \nThe stack includes submodules for Core, Engine, Client SDK, and demos:\n\n\
+      [code example]\n\n### 2. Install Dependencies\n\nInstall dependencies for all\
+      \ workspaces:\n\n[code example]\n\n### 3. Build Client and UI Assets\n\nBuild\
+      \ the Client SDK and Core UI assets before starting the stack:\n\n[code example]\n\
+      \n### 4. Copy Environment Template\n\nCreate your environment file from the\
+      \ example template:\n\n[code example]\n\n### 5. Configure Required Variables\n\
+      \nEdit .env and configure the following:\n\n| Variable | Description | How to\
+      \ Set |\n|----------|-------------|------------|\n| DEEPGRAM_API_KEY | Speech-to-text\
+      \ API key | Get from [deepgram.com](https://deepgram.com) |\n| LLM_PROVIDER\
+      \ | Choose groq or openrouter | Set provider name |\n| GROQ_API_KEY or OPENROUTER_API_KEY\
+      \ | LLM API key | Get from your chosen provider |\n| VAD_PROVIDER | Voice activity\
+      \ detection | Set to none if using Deepgram Nova-3 (has built-in VAD) |\n| VAD_ENABLED\
+      \ | Enable/disable VAD | Set to false when using Deepgram Nova-3 |\n| ENCRYPTION_KEY\
+      \ | Encryption for sensitive data | Generate a secure random string |\n| ENGINE_API_KEY\
+      \ | Engine authentication | Generate a secure random string |\n| JWT_SECRET\
+      \ | Token signing secret | Generate a secure random string |\n| CORE_BOOTSTRAP_PUBLISHABLE_KEY\
+      \ | Bootstrap API key | Generate a secure random string |\n\n**Security key\
+      \ generation tip:** Use a secure random generator for all keys (64+ character\
+      \ hex strings recommended).\n\n### 6. Start the Stack\n\nStart all services\
+      \ with Docker Compose:\n\n[code example]\n\nThis builds and starts Core (token\
+      \ service + Web UI) and the Realtime Engine (WebSocket voice server).\n\nServices\
+      \ will be available at:\n- **Core**: http://localhost:3000 (token service, Web\
+      \ UI)\n- **Engine**: ws://localhost:8787/v1/realtime (WebSocket for voice)\n\
+      \n### 7. Create an App and API Key in Core UI\n\n1. Open the Core UI at http://localhost:3000\n\
+      2. Navigate to **Apps** and click **\"Create app\"**\n   - Give your app a name\
+      \ (e.g., \"Local Stack App\")\n   - Save to create the app\n3. Create a publishable\
+      \ key:\n   - Click **\"Manage keys\"** on your new app\n   - Click **\"Create\
+      \ key\"**\n   - Add a label for the key\n   - Select **\"Generate session tokens\"\
+      ** scope\n   - Select **\"Vowel Engine\"** as an allowed provider\n   - Click\
+      \ **Create**\n4. Copy the key (starts with vkey_) - you'll need it for the demo\
+      \ configuration\n5. Also copy the **App ID** displayed in the app details\n\n\
+      ### 8. Validate Setup via Test Lab\n\nBefore integrating your own application,\
+      \ verify the stack works:\n\n1. In Core UI, navigate to **Test Lab** (left sidebar)\n\
+      2. Click **\"Generate and inspect token\"** to create a sample token\n3. Scroll\
+      \ to **Live validation client**\n4. Click the microphone icon, allow browser\
+      \ permissions, and speak (e.g., \"Hello, can you hear me?\")\n5. Verify transcript\
+      \ appears and AI responds - this confirms the full pipeline works\n\n### 9.\
+      \ Configure Demo Environment\n\nTo run the included e-commerce demo application:\n\
+      \n[code example]\n\nReplace:\n- vkey_your-64-char-hex-key-here with your publishable\
+      \ key from step 7\n- your-app-id-from-core-ui with your app ID from step 7\n\
+      \n### 10. Start the Demo\n\nLaunch the demo development server:\n\n[code example]\n\
+      \nOpen the provided localhost URL (e.g., http://localhost:3902) in your browser.\
+      \ Click the microphone and speak to test real-time voice interaction with the\
+      \ demo e-commerce application.\n\n## Next Steps\n\n- **[Architecture](./architecture)**\
+      \ - Understand how the components work together\n- **[Configuration](./configuration)**\
+      \ - Complete environment variable reference\n- **[Core](./core)** - Token service\
+      \ API details\n- **[Realtime Engine](./engine)** - WebSocket API and events\n\
+      - **[Troubleshooting](./troubleshooting)** - Debug common issues"
+    word_count: 612
+    char_count: 4148
+  self-hosted/testing:
+    title: Testing
+    description: null
+    category: Self Hosted
+    url_path: /self-hosted/testing/
+    content: "# Testing\n\nThe self-hosted stack includes multiple testing capabilities\
+      \ to verify functionality and validate voice agent behavior.\n\n## Quick Start\n\
+      \nRun the built-in smoke test to verify your stack is working:\n\n[code example]\n\
+      \nRun the full test suite with the Test Harness:\n\n[code example]\n\n## Smoke\
+      \ Test\n\nThe smoke test (bun run stack:test) performs a quick health check\
+      \ of your entire stack without requiring complex setup.\n\n### What It Tests\n\
+      \n1. **Engine Health** - Verifies the engine responds to health checks\n2. **Core\
+      \ Health** - Verifies the Core token service is running\n3. **Token Minting**\
+      \ - Tests that Core can generate ephemeral tokens\n4. **WebSocket Connection**\
+      \ - Validates tokens work for engine connections\n5. **Session Creation** -\
+      \ Confirms the engine creates sessions properly\n\n### Running the Smoke Test\n\
+      \n[code example]\n\nThe smoke test will report:\n- ✅ Engine health: OK - Engine\
+      \ container is responsive\n- ✅ Core health: OK - Core container is responsive\n\
+      - ✅ Token minted: <token_prefix>... - Token generation works\n- ✅ Connected\
+      \ to WebSocket - WebSocket connection succeeds\n- ✅ Session created - Full flow\
+      \ is working\n\n### Interpreting Results\n\n| Result | Meaning |\n|--------|---------|\n\
+      | All checks pass | Stack is fully operational |\n| Engine/Core health fails\
+      \ | Containers not running or not healthy |\n| Token minting fails | Check .env\
+      \ configuration and API keys |\n| WebSocket/Session fails | Engine configuration\
+      \ or provider issues |\n\n## Test Harness Framework\n\nThe stack includes a\
+      \ sophisticated **Test Harness** in the Engine for automated end-to-end testing\
+      \ of voice agent conversations.\n\n### Architecture\n\nThe Test Harness uses\
+      \ an **LLM-powered Test Driver** that simulates a human user conducting conversations\
+      \ with your voice agent:\n\n[code example]\n\n**Components:**\n\n- **TestDriver**:\
+      \ LLM agent that generates realistic user messages and evaluates responses\n\
+      - **TestHarness**: Orchestrates the conversation, manages WebSocket connection,\
+      \ validates tool calls\n- **EngineConnection**: Handles WebSocket communication\
+      \ with the engine\n- **Scenarios**: Pre-defined test cases with objectives and\
+      \ expected tool calls\n\n### Key Features\n\n- **Automated Conversation Flow**:\
+      \ The TestDriver carries natural conversations toward test objectives\n- **Tool\
+      \ Call Validation**: Verifies the agent uses the right tools with correct arguments\n\
+      - **Mock Tool Results**: Returns realistic mock data so conversations can continue\n\
+      - **Detailed Logging**: Generates timestamped Markdown logs of every test run\n\
+      - **Timeout Handling**: Gracefully handles slow responses or connection issues\n\
+      - **Retry Logic**: Automatic retry with exponential backoff for rate-limited\
+      \ LLM calls\n\n## Demo Test Scenarios\n\nThe Test Harness includes four built-in\
+      \ scenarios matching the demo application's tools:\n\n### 1. Weather Tool Test\n\
+      \nTests that the agent correctly uses the get_weather tool.\n\n[code example]\n\
+      \n### 2. Calculator Tool Test\n\nTests that the agent uses the calculate tool\
+      \ for math queries.\n\n[code example]\n\n### 3. Multi-Tool Conversation Test\n\
+      \nTests multiple tool usage in a single conversation flow.\n\n[code example]\n\
+      \n### 4. Context Retention Test\n\nTests that the agent remembers context across\
+      \ conversation turns.\n\n[code example]\n\n## Running Tests\n\n### Prerequisites\n\
+      \n1. **Stack must be running**:\n   [code example]\n\n2. **API Key configured**:\
+      \ You need a valid publishable API key\n   [code example]\n\n3. **Install tester\
+      \ dependencies**:\n   [code example]\n\n### Running All Tests\n\n[code example]\n\
+      \n### Running a Single Test\n\n[code example]\n\n### Running with Different\
+      \ LLM Providers\n\nThe TestDriver supports Groq and OpenRouter for its own LLM\
+      \ calls:\n\n[code example]\n\n### Configuring Test Endpoints\n\nOverride the\
+      \ default endpoints if your stack runs on non-standard ports:\n\n[code example]\n\
+      \n## Creating Custom Test Scenarios\n\n### Basic Scenario Structure\n\n[code\
+      \ example]\n\n### Step-by-Step Custom Test Creation\n\n1. **Create a scenario\
+      \ file** (my-scenarios.ts):\n\n[code example]\n\n2. **Create a test file** (my-test.test.ts):\n\
+      \n[code example]\n\n3. **Run your custom test**:\n\n[code example]\n\n## Troubleshooting\
+      \ Tests\n\n### Common Issues\n\n#### \"API_KEY not set\"\n\n[code example]\n\
+      \n#### \"Connection refused\" / \"ECONNREFUSED\"\n\n[code example]\n\n#### \"\
+      Token generation failed\" / 401 errors\n\n- Verify your API key is valid and\
+      \ has mint_ephemeral scope\n- Check that the app is configured in Core UI\n\
+      - Ensure the key matches CORE_BOOTSTRAP_PUBLISHABLE_KEY if using bootstrap\n\
+      \n#### Tests timeout frequently\n\n[code example]\n\n#### Tool calls not detected\n\
+      \n- Check engine logs: docker logs vowel-engine | grep -i tool\n- Verify tool\
+      \ names match exactly between scenario and agent\n- Ensure mock results return\
+      \ valid JSON\n\n#### \"Rate limit exceeded\"\n\nThe TestDriver has built-in\
+      \ retry logic, but you can also:\n\n[code example]\n\n### Debug Mode\n\nEnable\
+      \ verbose logging to see detailed WebSocket traffic:\n\n[code example]\n\n###\
+      \ Log Files\n\nThe Test Harness automatically generates detailed Markdown logs\
+      \ in ./logs/:\n\n[code example]\n\n### Manual WebSocket Testing\n\nFor direct\
+      \ WebSocket testing without the Test Harness:\n\n[code example]\n\n## Advanced\
+      \ Usage\n\n### Parallel Test Execution\n\n[code example]\n\n### CI/CD Integration\n\
+      \n[code example]\n\n### Performance Benchmarking\n\n[code example]\n\n## Summary\n\
+      \n| Test Type | Command | Purpose |\n|-----------|---------|---------|\n| **Smoke\
+      \ Test** | bun run stack:test | Quick health check |\n| **E2E Tests** | bun\
+      \ test --cwd engine/packages/tester | Full conversation validation |\n| **Custom\
+      \ Tests** | Write scenarios using TestHarness | Validate your specific use cases\
+      \ |"
+    word_count: 821
+    char_count: 5565
+  vowelbot/index:
+    title: Vowelbot
+    description: null
+    category: Getting Started
+    url_path: /vowelbot/
+    content: "# vowelbot\n\n  <img src=\"/images/vowelbot.png\" alt=\"vowelbot - Auto-implement\
+      \ AI voice\" style=\"width: 100%; display: block; border-radius: 8px;\">\n \
+      \ \n    \n  </div>\n</a>\n\n[**vowelbot**](https://vowel.to/vowelbot) is a GitHub-integrated\
+      \ service that adds voice agent capabilities to web projects (React, vanilla\
+      \ JavaScript, or Web Components) via GitHub comments. Click the image above\
+      \ to watch the demo video.\n\nUse vowelbot to add vowel to a GitHub repository\
+      \ with an **automatic** onboarding flow at [add.vowel.to](https://add.vowel.to).\
+      \ Just click a button — the integration runs entirely in an isolated branch,\
+      \ leaving your existing work pristine.\n\n## Supported Projects\n\n- **Supported:**\
+      \ React, vanilla JavaScript, Web Components (web projects only)\n- **Not yet\
+      \ supported:** iOS Swift, Android, Flutter, and other non-web frameworks\n\n\
+      ## Quick Start\n\n### 1. API Keys (Optional)\n\nvowelbot uses **[OpenCode](https://opencode.ai/)\
+      \ directly inside the GitHub action** — no setup required! The integration automatically\
+      \ uses high-quality free models (Minimax M2.5, Big Pickle, or Kimi K2.5).\n\n\
+      **Want premium models?** Add one of these as a GitHub secret:\n\n| Secret name\
+      \ | Where to get it |\n|-------------|-----------------|\n| ANTHROPIC_API_KEY\
+      \ | [console.anthropic.com](https://console.anthropic.com) — Claude models |\n\
+      | OPENAI_API_KEY | [platform.openai.com](https://platform.openai.com) — GPT\
+      \ models |\n| GROQ_API_KEY | [console.groq.com](https://console.groq.com) —\
+      \ Fast Llama models |\n| OPENCODE_API_KEY | [opencode.ai/zen](https://opencode.ai/zen)\
+      \ — Use paid models with OpenCode credits |\n\n**Where to add secrets:**\n\n\
+      - **Organization:** Org → Settings → Secrets and variables → Actions → New organization\
+      \ secret\n- **Single repo:** Repo → Settings → Secrets and variables → Actions\
+      \ → New repository secret\n\n**Note:** If you add any API key, vowelbot will\
+      \ use that provider instead of the free [OpenCode](https://opencode.ai/) models.\n\
+      \n### 2. Integrate — One Click\n\nGo to **[add.vowel.to](https://add.vowel.to)**\
+      \ and click **Add vowel to your project**. Choose the repo you want to integrate\
+      \ vowel into.\n\nThat's it. The workflow is added to your repo, the first integration\
+      \ runs automatically, and OpenCode opens a PR with voice agent changes tailored\
+      \ to your stack (React, vanilla JS, or <vowel-voice-widget>). Everything runs\
+      \ in one go — no manual re-run needed.\n\n**Your existing code stays untouched.**\
+      \ The integration uses [agent skills from the vowel repository](https://github.com/usevowel/skills/tree/main/skills)\
+      \ — [vowel-react](https://github.com/usevowel/skills/tree/main/skills/vowel-react),\
+      \ [vowel-vanilla](https://github.com/usevowel/skills/tree/main/skills/vowel-vanilla),\
+      \ [vowel-webcomponent](https://github.com/usevowel/skills/tree/main/skills/vowel-webcomponent),\
+      \ or [voweldocs](https://github.com/usevowel/skills/tree/main/skills/voweldocs)\
+      \ — selected automatically based on your project type.\n\nDuring setup, vowelbot\
+      \ creates an isolated **add-vowel** branch in your repository. All workflow\
+      \ setup, integration logic, and voice agent changes are committed to this branch\
+      \ only. When complete, it opens a pull request from the add-vowel branch to\
+      \ your default branch for you to review and merge. Your existing branches and\
+      \ work remain completely untouched until you choose to merge.\n\n### 3. Use\
+      \ It (Later Runs)\n\n- **In an issue or PR:** Comment /vowelbot integrate (or\
+      \ /vowelbot + your request)\n- **Manual run:** Actions → vowelbot integration\
+      \ → Run workflow\n\nYour keys stay in your repo — vowelbot never sees them.\n\
+      \n### GitHub Codespaces\n\nNo additional setup required — when the OpenCode\
+      \ agent integrates vowel into your repository, a [GitHub Codespaces](https://github.com/codespaces/new?repo=usevowel/skills)\
+      \ environment is automatically configured for testing.\n\nYou can also explore\
+      \ the skills directly in GitHub Codespaces: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repo=usevowel/skills)\n\
+      \n## Troubleshooting\n\n| Issue | Solution |\n|-------|----------|\n| **Workflow\
+      \ fails with \"no API key\"** | This should not happen — vowelbot uses free\
+      \ [OpenCode](https://opencode.ai/) models by default. If you see this error,\
+      \ it may be a temporary issue with the free model provider. Try running the\
+      \ workflow again, or add an API key from Anthropic, OpenAI, or Groq as a fallback.\
+      \ |\n| **Clicked integrate and workflow failed** | Go to Actions → vowelbot\
+      \ integration → Run workflow to retry. Free models may occasionally be unavailable\
+      \ during high demand — adding an API key ensures reliable access. |\n| **\"\
+      Project not compatible\"** | Vowel supports React, vanilla JavaScript, and Web\
+      \ Components only. iOS Swift, Android, Flutter, and other non-web frameworks\
+      \ are not yet supported. |\n\n## Onboarding Flow\n\n[code example]\n\n## Architecture\n\
+      \n[code example]\n\n### Key Architectural Principles\n\n1. **Branch-based onboarding\
+      \ (pristine)**: All changes happen in an isolated add-vowel branch. Your existing\
+      \ branches, default branch, and working code remain completely untouched. The\
+      \ integration runs entirely within this branch, then opens a PR for your review.\
+      \ Nothing changes in your repository until you explicitly merge.\n\n2. **Zero\
+      \ key custody**: User API keys stay in their repo secrets. We only use GitHub\
+      \ App credentials.\n\n3. **GitHub-native triggers**: After initial setup, /vowelbot\
+      \ comments trigger Actions directly — no persistent infrastructure in the hot\
+      \ path.\n\n## Reference\n\n- Watch the [vowelbot demo video](https://youtu.be/lgs5OecnABU)\
+      \ for a visual walkthrough\n- Visit [add.vowel.to](https://add.vowel.to) to\
+      \ start integrating"
+    word_count: 728
+    char_count: 5601
+  voweldocs/index:
+    title: Voweldocs
+    description: null
+    category: Getting Started
+    url_path: /voweldocs/
+    content: '# voweldocs
+
+
+      Add voice-powered AI navigation to your documentation site. voweldocs is a reference
+      implementation showing how to integrate the vowel client into any documentation
+      platform.
+
+
+      ## What is voweldocs?
+
+
+      **voweldocs** enables users to:
+
+
+      - **Navigate by voice** - "Take me to the installation guide"
+
+      - **Ask questions with RAG** - "What is Vowel?" with answers grounded in your
+      docs
+
+      - **Interact with content** - "Copy the first code example"
+
+      - **Search documentation** - "Search for adapters" using VitePress DocSearch
+
+
+      ## Architecture Overview
+
+
+      [code example]
+
+
+      The system consists of UI components (VoiceLayout, VoiceConfigModal, VoiceAgent),
+      core dependencies (Vowel SDK, routes manifest, localStorage), and a privacy-first
+      RAG layer using Haven VectorDB with local embeddings.
+
+
+      ## Documentation Sections
+
+
+      - [**Architecture**](./architecture) - System components, VoiceLayout, voice-client.ts,
+      and RAG Knowledge Base
+
+      - [**Configuration**](./configuration) - Decision tree for choosing hosted vs
+      self-hosted, environment variables, URL resolution
+
+      - [**RAG**](./rag) - Privacy-first retrieval-augmented generation with Haven
+      VectorDB
+
+      - [**Integration**](./integration) - Step-by-step guide to add voweldocs to
+      your documentation site
+
+      - [**Troubleshooting**](./troubleshooting) - Security considerations and common
+      issues
+
+
+      ## Quick Start
+
+
+      [code example]
+
+
+      See the [Integration Guide](./integration) for complete setup instructions.
+
+
+      ## Agent Skills
+
+
+      When working with voweldocs in Cursor/Claude, these agent skills provide detailed
+      guidance:
+
+
+      - **voweldocs** - Main skill for voice-enabling documentation sites (VitePress/Vue
+      pattern)
+
+      - **rag-prebuild** - Pre-build RAG embeddings using scripts/build-rag.py
+
+      - **haven-local-rag** - Work with Haven VectorDB, browser-based semantic search,
+      and local RAG pipelines
+
+
+      Skills are located in .agents/skills/ and provide context-aware assistance for
+      specific tasks.'
+    word_count: 242
+    char_count: 1914
+  voweldocs/architecture:
+    title: Architecture
+    description: null
+    category: Voweldocs
+    url_path: /voweldocs/architecture/
+    content: "# Architecture\n\n## System Overview\n\n[code example]\n\n## Key Components\n\
+      \n### VoiceLayout.vue\n\nCustom VitePress theme layout that:\n- Adds a \"voweldocs\"\
+      \ button to the navbar\n- Shows voice configuration modal\n- Mounts the voice\
+      \ agent widget\n- Handles configuration state\n\n### VoiceConfigModal.vue\n\n\
+      Configuration UI supporting two modes:\n\n- **Hosted (SaaS)**: Uses appId from\
+      \ [vowel.to](https://vowel.to) with hardcoded realtime URL\n- **Self-Hosted**:\
+      \ Uses either:\n  - appId + url (manual configuration)\n  - JWT token with embedded\
+      \ URL (from environment variable)\n\n![voweldocs Configuration Modal](/images/voweldocs-config.png)\n\
+      \n### voice-client.ts\n\nCore initialization logic:\n- Reads credentials from\
+      \ localStorage\n- Builds Vowel configuration based on mode\n- Registers documentation-specific\
+      \ actions:\n  - searchKnowledgeBase - **RAG-powered semantic search** over docs\
+      \ (Haven VectorDB)\n  - searchDocs - Trigger DocSearch\n  - getCurrentPageInfo\
+      \ - Read page structure\n  - copyCodeExample - Copy code blocks\n  - jumpToSection\
+      \ - Scroll to headings\n  - listSections - Enumerate page sections\n  - showRelatedPages\
+      \ - Find related docs\n  - openRagDebugChat - Open debug panel to see STT/RAG\
+      \ results\n\n### Routes Manifest\n\nThe generate-routes-plugin.ts Vite plugin\
+      \ scans all markdown files at build time and generates routes-manifest.ts with\
+      \ page paths and descriptions for voice navigation.\n\n### RAG Knowledge Base\
+      \ (Haven VectorDB)\n\nPowered by [Haven](https://github.com/kyrillosishak/Haven)\
+      \ - a privacy-first vector database that runs entirely in the browser:\n\n-\
+      \ **Local semantic search** using Transformers.js embeddings\n- **Pre-built\
+      \ index** loaded from rag-index.yml (generated at build time via bun run build:rag)\n\
+      - **Zero cloud dependencies** - all processing happens client-side via WebAssembly\n\
+      - **Instant answers** - the AI searches your docs before responding, ensuring\
+      \ factual, grounded answers\n- **Debug visibility** - RAG debug chat shows exactly\
+      \ what the AI retrieved\n\n![RAG Files Structure](/images/voweldocs-rag-files.png)\n\
+      \n## Agent Skills Reference\n\nImplementation details for agents working with\
+      \ this codebase:\n\n- **voweldocs** (.agents/skills/voweldocs/) - VitePress/Vue\
+      \ integration pattern, voice layout components\n- **rag-prebuild** (.agents/skills/rag-prebuild/)\
+      \ - Pre-computed embedding generation with build-rag.py\n- **haven-local-rag**\
+      \ (.agents/skills/haven-local-rag/) - Haven VectorDB, Transformers.js embeddings,\
+      \ browser-based RAG"
+    word_count: 305
+    char_count: 2444
+  voweldocs/configuration:
+    title: Configuration
+    description: null
+    category: Voweldocs
+    url_path: /voweldocs/configuration/
+    content: '# Configuration
+
+
+      The voweldocs configuration modal allows end users to enter their own vowel
+      credentials to enable voice-powered navigation on your documentation site.
+
+
+      ![voweldocs Configuration Modal](https://blog-assets.vowel.to/assets/voweldocs-config.png)
+
+
+      ## Two Configuration Modes
+
+
+      ### Pre-configured Mode (No User Input Required)
+
+
+      If you provide credentials via environment variables at build time, the voice
+      agent initializes automatically. Users can start speaking immediately without
+      any configuration - the "voweldocs" button simply opens/closes the voice interface.
+
+
+      **Environment variables for pre-configuration:**
+
+      - VITE_VOWEL_APP_ID + VITE_VOWEL_URL (Hosted or Self-Hosted Manual)
+
+      - VITE_VOWEL_JWT_TOKEN + VITE_VOWEL_USE_JWT=true (Self-Hosted JWT)
+
+
+      This is ideal for:
+
+      - SaaS documentation where you want zero-friction voice access
+
+      - Internal documentation with a shared self-hosted instance
+
+      - Any site where you want to provide voice out-of-the-box
+
+
+      ### User-Configured Mode (Bring Your Own Credentials)
+
+
+      If no credentials are pre-configured via environment variables, clicking the
+      "voweldocs" button opens the configuration modal where users enter their own
+      credentials:
+
+
+      #### Hosted Mode
+
+
+      For users connecting to the hosted vowel.to platform:
+
+
+      1. Sign up at [vowel.to](https://vowel.to/dashboard) and create an app in the
+      dashboard
+
+      2. Copy the appId and paste it into the "App ID" field
+
+      3. The realtime URL is automatically set to wss://realtime.vowel.to/v1
+
+      4. Click "Save Configuration" to activate voice navigation
+
+
+      #### Self-Hosted (Manual)
+
+
+      For users running their own vowel infrastructure:
+
+
+      1. Enter the appId from your self-hosted Core configuration
+
+      2. Enter your custom realtime endpoint URL (e.g., wss://your-domain.com/realtime)
+
+      3. Save to connect to your private instance
+
+
+      #### Self-Hosted (JWT)
+
+
+      For production self-hosted deployments using JWT authentication:
+
+
+      1. Enable JWT mode to use a token with embedded URL
+
+      2. Enter or paste a JWT token (can be pre-filled via VITE_VOWEL_JWT_TOKEN env
+      var)
+
+      3. The URL is extracted automatically from the JWT payload
+
+
+      ::: info Storage
+
+      Credentials are stored in browser localStorage (per-user, per-device). The voice
+      agent initializes immediately after saving.
+
+      :::
+
+
+      ## Decision Tree
+
+
+      When setting up voweldocs for your documentation project, use this decision
+      tree to determine which credentials you need:
+
+
+      [code example]
+
+
+      ## Environment Variables
+
+
+      Create a .env file (see .env.example):
+
+
+      | Variable | Mode | Purpose |
+
+      |----------|------|---------|
+
+      | VITE_VOWEL_APP_ID | Hosted | Your app ID from vowel.to |
+
+      | VITE_VOWEL_URL | Self-hosted | Your realtime endpoint (e.g., wss://your-instance.com/realtime)
+      |
+
+      | VITE_VOWEL_USE_JWT | Self-hosted | Set to true to enable JWT mode |
+
+      | VITE_VOWEL_JWT_TOKEN | Self-hosted | JWT token with embedded URL |
+
+      | VITE_VOWEL_DEBUG_RAG | Dev only | Set to true to enable RAG debug UI (shows
+      STT transcripts + search results) |
+
+
+      ## URL Resolution Priority (Self-Hosted)
+
+
+      When using self-hosted mode, the realtime URL is resolved in this order:
+
+
+      1. **JWT payload** (url, endpoint, or rtu claim) - Highest priority
+
+      2. **Environment variable** (VITE_VOWEL_URL)
+
+      3. **Fallback placeholder** - Only used if neither above is set'
+    word_count: 449
+    char_count: 3220
+  voweldocs/rag:
+    title: Rag
+    description: null
+    category: Voweldocs
+    url_path: /voweldocs/rag/
+    content: '# RAG Knowledge Base
+
+
+      The voice agent includes a **privacy-first RAG (Retrieval-Augmented Generation)**
+      system powered by [Haven](https://github.com/kyrillosishak/Haven), a local vector
+      database that runs entirely in the browser.
+
+
+      ## How It Works
+
+
+      1. **Build-time indexing**: Run bun run build:rag to generate embeddings from
+      all documentation using llama.cpp with Vulkan acceleration
+
+      2. **Local embeddings**: Uses Transformers.js with Xenova/all-MiniLM-L6-v2 for
+      fast, local semantic embeddings
+
+      3. **Semantic search**: When the user asks a question, the AI first searches
+      the knowledge base for relevant docs
+
+      4. **Grounded responses**: The AI formulates answers based on retrieved context,
+      ensuring factual accuracy
+
+
+      ## Generated Files
+
+
+      When you run bun run build:rag, the system generates pre-computed embedding
+      artifacts that are loaded directly into the browser. These files contain chunked
+      documentation content with corresponding vector embeddings, ready for instant
+      semantic search without any client-side processing.
+
+
+      ![RAG Generated Files](https://blog-assets.vowel.to/assets/voweldocs-rag-files.png)
+
+
+      The build process creates a complete RAG knowledge base including:
+
+      - docs.json — chunked documentation content with metadata
+
+      - embeddings.json — vector embeddings for semantic search
+
+      - stats.json — index statistics for the VectorDB
+
+
+      These files are served as static assets and loaded into Haven''s local VectorDB
+      on page initialization.
+
+
+      ## Key Features
+
+
+      - **Zero cloud costs**: No API calls or external services for search
+
+      - **Privacy-preserving**: All data stays in the browser''s IndexedDB
+
+      - **Offline-capable**: Works without internet after initial page load
+
+      - **Instant responses**: ~50ms search latency for 10K+ documents
+
+      - **Source citations**: The AI can reference specific documentation pages
+
+
+      ## Debug Mode
+
+
+      Set VITE_VOWEL_DEBUG_RAG=true to enable a debug panel that shows:
+
+      - Real-time STT (speech-to-text) transcripts
+
+      - RAG search queries and retrieved documents
+
+      - Confidence scores and source paths
+
+
+      Users can also say "Open the debug chat" to see this panel.
+
+
+      ![RAG Debug Chat](/images/rag-chat.png)
+
+
+      ## Agent Skills
+
+
+      - **haven-local-rag** (.agents/skills/haven-local-rag/) - Complete guide to
+      Haven VectorDB, browser embeddings, and local RAG pipelines
+
+      - **rag-prebuild** (.agents/skills/rag-prebuild/) - Pre-build embeddings with
+      build-rag.py for production'
+    word_count: 313
+    char_count: 2381
+  voweldocs/integration:
+    title: Integration
+    description: null
+    category: Voweldocs
+    url_path: /voweldocs/integration/
+    content: '# Integration Guide
+
+
+      To adapt voweldocs for your own documentation site:
+
+
+      ## 1. Install Dependencies
+
+
+      [code example]
+
+
+      The haven package provides the local vector database for RAG functionality.
+
+
+      ## 2. Copy Core Files
+
+
+      Copy these files from the voweldocs reference implementation:
+
+      - .vitepress/theme/voice-client.ts - Core client logic (includes RAG actions)
+
+      - .vitepress/theme/VoiceLayout.vue - Layout wrapper
+
+      - .vitepress/theme/VoiceConfigModal.vue - Configuration UI
+
+      - .vitepress/theme/VoiceAgent.vue - React wrapper component
+
+      - .vitepress/theme/VoiceAgentWrapper.tsx - React integration
+
+      - .vitepress/theme/generate-routes-plugin.ts - Route generation
+
+      - .vitepress/theme/prebuilt-rag.ts - Haven VectorDB initialization for local
+      RAG
+
+      - .vitepress/theme/rag-debug/ - Debug UI for viewing STT/RAG results (optional)
+
+
+      ## 3. Configure VitePress Theme
+
+
+      Update .vitepress/theme/index.ts:
+
+
+      [code example]
+
+
+      ## 4. Add Route Generation Plugin
+
+
+      Update vite.config.ts:
+
+
+      [code example]
+
+
+      ## 5. Configure Environment
+
+
+      Create .env based on your chosen mode (see [Configuration](./configuration)).
+
+
+      ## 6. Generate RAG Index (Optional but Recommended)
+
+
+      For AI-powered answers grounded in your documentation, generate the pre-built
+      embedding index:
+
+
+      [code example]
+
+
+      This script (scripts/build-rag.py):
+
+      - Processes all markdown documentation files
+
+      - Chunks content into searchable segments
+
+      - Generates embeddings using llama.cpp with Vulkan GPU acceleration
+
+      - Outputs public/rag-index.yml ready for Haven VectorDB
+
+
+      For full production build (includes RAG + routes + VitePress):
+
+
+      [code example]
+
+
+      The build process generates:
+
+      - routes-manifest.ts - Navigation routes for voice commands
+
+      - public/rag-index.yml - Pre-computed embeddings for semantic search
+
+
+      ## 7. Customize Actions
+
+
+      Edit voice-client.ts to register documentation-specific actions for your content:
+
+
+      [code example]
+
+
+      ## Agent Skills
+
+
+      When working with voweldocs in Cursor/Claude, reference these agent skills in
+      .agents/skills/:
+
+
+      - **voweldocs** - Main skill for voice-enabling documentation sites (VitePress/Vue
+      pattern)
+
+      - **rag-prebuild** - Pre-build RAG embeddings with build-rag.py (llama.cpp +
+      Vulkan)
+
+      - **haven-local-rag** - Haven VectorDB, browser-based semantic search, and local
+      RAG pipelines'
+    word_count: 276
+    char_count: 2243
+  voweldocs/troubleshooting:
+    title: Troubleshooting
+    description: null
+    category: Voweldocs
+    url_path: /voweldocs/troubleshooting/
+    content: '# Security and Troubleshooting
+
+
+      ## Security Considerations
+
+
+      - Credentials are stored in browser localStorage (per-user, not shared)
+
+      - App IDs and JWTs should be treated as sensitive tokens
+
+      - JWT mode is recommended for production self-hosted deployments
+
+      - Environment variables are only used for pre-filling the UI, not for server-side
+      rendering
+
+
+      ## Troubleshooting
+
+
+      | Issue | Solution |
+
+      |-------|----------|
+
+      | Voice agent not appearing | Check browser console for initialization errors
+      |
+
+      | "No voice configuration found" | Click the voweldocs button and configure
+      credentials |
+
+      | JWT URL not detected | Verify JWT format (should have url, endpoint, or rtu
+      claim) |
+
+      | Navigation not working | Check that routes-manifest.ts is generated (run build)
+      |
+
+      | Microphone not working | Ensure HTTPS (required outside localhost) |
+
+      | AI answers seem wrong | Enable RAG debug (VITE_VOWEL_DEBUG_RAG=true) to see
+      what docs were retrieved |
+
+      | RAG not finding results | Check that rag-index.yml exists in public/ and was
+      generated at build time |
+
+
+      ## Further Reading
+
+
+      - [Vowel Client Guide](/guide/vowel-client)
+
+      - [React Integration](/guide/react)
+
+      - [Self-Hosted Stack](/self-hosted/)
+
+      - [Haven VectorDB](https://github.com/kyrillosishak/Haven) - Privacy-first browser-based
+      RAG
+
+      - [vowel.to Platform](https://vowel.to)'
+    word_count: 186
+    char_count: 1301

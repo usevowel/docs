@@ -2,6 +2,18 @@
 
 Use this page to narrow down the most common self-hosted failures and debug issues with practical commands.
 
+## Quick Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Build fails / `dist/` not found | Run `bun run build` before `docker compose up` |
+| Docker cache issues | `docker builder prune -f && docker compose build --no-cache` |
+| Token generation fails | Verify API key has "Generate session tokens" scope in Core UI |
+| Services won't connect | Check `docker compose ps` to ensure all containers are healthy |
+| GPU not detected | Verify `nvidia-smi` works on host and NVIDIA Container Toolkit is installed |
+
+For detailed troubleshooting, see the sections below.
+
 ## Quick Diagnostic Commands
 
 ### Check Service Health

@@ -169,6 +169,13 @@ Core reads these environment variables from `stack.env`:
 - `PORT`: Service port (default: 3000)
 - `OPENAI_API_KEY`: For OpenAI provider (if using)
 - `XAI_API_KEY`: For xAI provider (if using)
+- `DEEPGRAM_API_KEY`: Enables Deepgram STT/TTS choices in Core app settings
+- `OPENAI_COMPATIBLE_BASE_URL`: Enables OpenAI-compatible audio choices in Core app settings
+- `DEFAULT_STT_PROVIDER`: Default STT provider for bootstrap and new app defaults
+- `DEFAULT_TTS_PROVIDER`: Default TTS provider for bootstrap and new app defaults
+- `CORE_ENABLE_DEV_VOICE_OVERRIDES`: Allows hidden client `_voiceConfig` overrides for development only
+
+Core does not store speech-provider secrets in app settings. Operators keep those secrets in the stack environment, and apps store only provider selections plus non-secret model, language, and voice defaults.
 
 ### Endpoint Presets
 

@@ -75,26 +75,35 @@ OPENAI_COMPATIBLE_MODEL=gpt-4o-mini
 
 ### STT/TTS Configuration
 
-Deepgram is the default provider for both speech-to-text and text-to-speech:
+The stack can keep credentials for multiple speech providers at once. Core app settings choose which configured provider each app should use, while engine env values remain stack defaults and fallbacks.
 
 ```bash
 STT_PROVIDER=deepgram
+DEFAULT_STT_PROVIDER=deepgram
 DEEPGRAM_API_KEY=your_deepgram_key
 DEEPGRAM_STT_MODEL=nova-3
 DEEPGRAM_STT_LANGUAGE=en-US
 TTS_PROVIDER=deepgram
+DEFAULT_TTS_PROVIDER=deepgram
 DEEPGRAM_TTS_MODEL=aura-2-thalia-en
+OPENAI_COMPATIBLE_BASE_URL=http://echoline:8000/v1
+OPENAI_COMPATIBLE_API_KEY=
 ```
 
 **STT/TTS Variables:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `STT_PROVIDER` | `deepgram` | Speech-to-text provider |
+| `STT_PROVIDER` | `deepgram` | Engine fallback/default STT provider |
+| `DEFAULT_STT_PROVIDER` | `STT_PROVIDER` | Core bootstrap/app default STT provider |
 | `DEEPGRAM_STT_MODEL` | `nova-3` | Deepgram STT model |
 | `DEEPGRAM_STT_LANGUAGE` | `en-US` | STT language code |
-| `TTS_PROVIDER` | `deepgram` | Text-to-speech provider |
+| `TTS_PROVIDER` | `deepgram` | Engine fallback/default TTS provider |
+| `DEFAULT_TTS_PROVIDER` | `TTS_PROVIDER` | Core bootstrap/app default TTS provider |
 | `DEEPGRAM_TTS_MODEL` | `aura-2-thalia-en` | Deepgram TTS voice model |
+| `OPENAI_COMPATIBLE_BASE_URL` | - | Base URL for an OpenAI-compatible audio service |
+| `OPENAI_COMPATIBLE_API_KEY` | - | API key for that audio service, if required |
+| `CORE_ENABLE_DEV_VOICE_OVERRIDES` | `false` | Allow hidden client `_voiceConfig` runtime overrides in Core |
 
 ### VAD Configuration
 

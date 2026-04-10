@@ -33,6 +33,10 @@ You need keys for two services: an **LLM provider** and **Deepgram** (STT + TTS)
 
 Get a key at [deepgram.com](https://deepgram.com). The defaults use Deepgram for both STT and TTS (`nova-3` for STT, `aura-2-thalia-en` for TTS).
 
+**Echoline** (optional self-hosted STT + TTS):
+
+If you prefer fully self-hosted speech processing without external APIs, you can use Echoline (requires NVIDIA GPU with 8GB+ VRAM). See [Deployment Modes](#deployment-modes) below for details.
+
 ## Quick Start (Docker Compose)
 
 The fastest way to run the self-hosted stack is with Docker Compose:
@@ -72,7 +76,9 @@ The workspace provides several commands for managing the stack:
 
 | Command | Description |
 |---------|-------------|
-| `bun run stack:up` | Build and start all services |
+| `bun run stack:up` | Build and start all services (CPU mode) |
+| `bun run stack:up:gpu` | Start with GPU acceleration |
+| `bun run stack:up:full` | Start with Echoline (self-hosted STT/TTS) |
 | `bun run stack:down` | Stop and remove containers (with volumes) |
 | `bun run stack:logs` | Follow logs from all services |
 | `bun run stack:build` | Rebuild container images |
@@ -126,6 +132,33 @@ The stack consists of two services defined in `docker-compose.yml`:
 - **Health Check**: `/health` endpoint
 
 ## Deployment Modes
+
+Choose one of three deployment configurations based on your needs:
+
+### Mode 1: Deepgram-Powered (Default - Recommended)
+
+Uses hosted STT/TTS from Deepgram. Works on all machines (no GPU required).
+
+- **Pros**: Fast setup, professional-grade quality, no model downloads
+- **Cons**: Requires Deepgram API key, ongoing API costs
+- **Requirements**: Deepgram API key + LLM provider key (Groq or OpenRouter)
+- **Command**: `bun run stack:up`
+
+### Mode 2: Fully Self-Hosted with Echoline
+
+Local speech processing with faster-whisper + Kokoro. Requires NVIDIA GPU.
+
+- **Pros**: No external APIs, data privacy, works offline, no API costs
+- **Cons**: Requires GPU, ~5GB disk space, slower initial startup
+- **Requirements**: NVIDIA GPU with 8GB+ VRAM
+- **Command**: `bun run stack:up:full`
+
+### Mode 3: GPU-Accelerated (NVIDIA GPU Only)
+
+Uses GPU for lower VAD latency with Deepgram quality.
+
+- **Requirements**: NVIDIA GPU + Container Toolkit
+- **Command**: `bun run stack:up:gpu`
 
 ### Local Evaluation
 
