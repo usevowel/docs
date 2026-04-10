@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun run docs:dev",
     "docs:dev": "vitepress dev",
-    "docs:build": "npm run docs:generate-api && npm run build:rag && vitepress build && rm -f .vitepress/dist/_redirects",
+    "docs:build": "bun scripts/patch-client-css.mjs && npm run docs:generate-api && npm run build:rag && vitepress build && rm -f .vitepress/dist/_redirects",
     "docs:preview": "vitepress preview",
     "docs:generate-api": "rm -rf api/reference && typedoc && bun scripts/sanitize-generated-api.mjs",
     "build:rag": "cd scripts && uv run python build-rag.py",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@vowel.to/client": "^0.1.2-beta.564",
     "@wllama/wllama": "^2.3.7",
+    "haven": "file:./vendor/haven",
     "js-yaml": "^4.1.1",
     "marked": "^17.0.6",
     "react": "^19.2.0",

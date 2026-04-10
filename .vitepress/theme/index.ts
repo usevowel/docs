@@ -8,9 +8,6 @@ import VoiceLayout from './VoiceLayout.vue'
 import LogoWrapper from './LogoWrapper.vue'
 import './custom.css'
 
-// Import Vowel client styles
-import '@vowel.to/client/css'
-
 // Import RAG debug tool
 import { initializeRAGDebug } from './rag-debug'
 

@@ -4,7 +4,6 @@ import { generateRoutesPlugin } from './theme/generate-routes-plugin'
 import { config } from 'dotenv'
 import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid'
 
-// Load environment variables from .env file
 config()
 
 export default defineConfig({
@@ -19,6 +18,7 @@ export default defineConfig({
     ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/images/favicon-32.png' }],
     ['link', { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/images/favicon-192.png' }],
     ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/images/favicon-180.png' }],
+    ['link', { rel: 'stylesheet', href: '/vowel-client.css' }],
     // Respect user's stored theme preference, default to dark only for new visitors
     ['script', { id: 'theme-preference' }, `
       (function() {
@@ -43,10 +43,10 @@ export default defineConfig({
   srcExclude: ['**/README.md', '**/AGENTS.md', 'cloudflare-pages.md', 'guide/v2-api-migration.md', 'api/index/**', 'api/react/**'],
   
   vite: {
-    plugins: [
+plugins: [
       react(),
-      generateRoutesPlugin(), // Auto-generate routes for voice navigation
-      MermaidPlugin() // Enable Mermaid diagrams
+      generateRoutesPlugin(),
+      MermaidPlugin()
     ],
     define: {
       // Define env variables for voice agent
@@ -77,7 +77,13 @@ export default defineConfig({
     esbuild: {
       target: 'es2022'
     },
+    ssr: {
+      external: ['@vowel.to/client', '@vowel.to/client/react', '@vowel.to/client/css', 'haven', '@r2wc/core', '@r2wc/react-to-web-component']
+    },
     build: {
+      target: 'es2022',
+      rollupOptions: {
+      },
       commonjsOptions: {
         transformMixedEsModules: true
       }
