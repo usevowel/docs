@@ -808,6 +808,24 @@ async function initialize(progressCallback?: (progress: InitializationProgress) 
         message: checkingMsg,
       });
 
+      // Pre-warm the WebGPU/WASM embedding pipeline so first search is instant
+      const warmupMsg = 'Pre-loading embedding model...';
+      updateState({ stage: 'loading', progress: 25, message: warmupMsg });
+      progressCallback?.({
+        stage: 'loading',
+        progress: 25,
+        total: 0,
+        processed: 0,
+        message: warmupMsg,
+      });
+      try {
+        // Warmup with empty string - just triggers pipeline initialization
+        await getQueryEmbedding('');
+      } catch (warmupError) {
+        // Non-fatal: fall back to lazy loading on first search
+        warn('WebGPU/WASM pipeline warmup failed, will initialize on first search:', warmupError);
+      }
+
       const fetchingMsg = 'Fetching prebuilt index...';
       updateState({ stage: 'fetching', progress: 30, message: fetchingMsg });
       progressCallback?.({

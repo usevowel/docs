@@ -911,13 +911,14 @@ export const DEBUG_STYLES = `
     pointer-events: none;
   }
 
-  .rag-debug-fab.loading svg {
-    animation: spin 1.5s linear infinite;
+  .rag-debug-fab.loading .rag-spinner {
+    animation: rag-spin 0.8s cubic-bezier(0.4, 0.15, 0.6, 0.85) infinite;
+    transform-origin: center;
   }
 
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  @keyframes rag-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   .rag-debug-fab-progress {

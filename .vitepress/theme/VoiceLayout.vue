@@ -12,6 +12,8 @@
     <template #layout-bottom>
       <!-- Add voice agent at the bottom of every page -->
       <VoiceAgent v-if="voiceEnabled" />
+      <!-- Add RAG debug tool -->
+      <RAGDebug />
     </template>
     <template #nav-bar-content-before>
       <!-- Voice configuration button in navbar -->
@@ -55,6 +57,7 @@ import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import VoiceAgent from './VoiceAgent.vue'
+import RAGDebug from './RAGDebug.vue'
 import LogoWrapper from './LogoWrapper.vue'
 import HomeHero from './HomeHero.vue'
 import VoiceConfigModal from './VoiceConfigModal.vue'

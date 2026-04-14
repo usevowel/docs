@@ -19,8 +19,7 @@ import { SiTurso } from 'react-icons/si';
 export const ICONS = {
   turso: renderToStaticMarkup(createElement(SiTurso, { size: 24 })),
 
-  /** Loading spinner icon */
-  loading: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M22 12h-4"/><path d="m19.1 16.2 2.9 2.9"/><path d="M12 22v-4"/><path d="m7.8 16.2-2.9 2.9"/><path d="M2 12h4"/><path d="m4.9 7.8-2.9-2.9"/></svg>`,
+  loading: `<svg class="rag-spinner" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M12 3a9 9 0 0 1 9 9"/></svg>`,
 
   /** Close/X icon */
   close: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
