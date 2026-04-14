@@ -1,56 +1,90 @@
-# @vowel.to/client Documentation
+# vowel Documentation
 
-This directory contains the documentation site for the @vowel.to/client library, built with VitePress and TypeDoc.
+This directory contains the documentation site for the vowel platform, built with VitePress.
 
-## 🎤 Voice Navigation
+## Platform Overview
 
-**NEW!** The documentation now includes voice-powered navigation! You can use voice commands to navigate between pages, search documentation, and interact with code examples.
+This documentation covers the complete vowel platform:
+
+- **Client** - SDK installation, framework integrations (React, Vue, vanilla JS), connection models, and core concepts
+- **Self-Hosted** - Deploy Core, the realtime engine, and optional Echoline speech services on your own infrastructure
+- **vowelbot** - GitHub-based onboarding service for adding vowel to repositories via add.vowel.to
+- **Platform** - Hosted platform documentation (coming soon after the initial self-hosted launch)
+- **Recipes** - Task-oriented examples for actions, events, navigation, automation, and advanced flows
+- **API Reference** - Generated SDK reference for the Client library
+- **voweldocs** - Reference implementation for voice-powered documentation sites
+
+## 🎤 Voice Navigation with RAG
+
+The documentation includes a voice-powered AI navigation system with **privacy-first RAG (Retrieval-Augmented Generation)** built on Turso WASM:
+
+- **Navigate by voice** - "Take me to the installation guide"
+- **Ask questions with grounded answers** - "What is vowel?" with answers retrieved from the docs
+- **Interact with content** - "Copy the first code example"
+- **Search documentation** - "Search for adapters"
+
+**RAG Architecture:**
+- Browser-local [Turso](https://turso.tech) WASM database with vector search
+- Transformers.js for in-browser query embeddings
+- Pre-built embedding index generated at build time from all documentation
+- Zero cloud dependencies - all processing happens client-side
 
 **Quick Setup:**
-1. Create `.env.local` with your `VITE_VOWEL_APP_ID`
-2. Run `bun run dev`
-3. Click the microphone button and say "Go to getting started"
+1. Run `bun install`
+2. Run `bun run build:rag` to generate the RAG index
+3. Run `bun run dev`
+4. Click the microphone button and configure voice access:
+   - **Hosted mode**: Enter your App ID from [vowel.to](https://vowel.to)
+   - **Self-hosted mode**: Enter your base URL and App ID (or JWT token)
+5. Say "Go to getting started"
 
-📖 See [VOICE_SETUP_QUICK_START.md](./VOICE_SETUP_QUICK_START.md) for setup instructions  
-📚 See [VOICE_INTEGRATION.md](./VOICE_INTEGRATION.md) for full documentation
+**Optional Pre-configuration:**
+You can pre-configure credentials via environment variables (see `.env.example`) to skip the setup modal:
+- `VITE_VOWEL_URL` + `VITE_VOWEL_APP_ID` - For self-hosted mode
+- `VITE_VOWEL_JWT_TOKEN` + `VITE_VOWEL_USE_JWT=true` - For JWT-based self-hosted
 
-## Important Licensing Note
-
-**The client library source code (`../client/`) is proprietary and NOT open source.** Only this documentation is publicly accessible. The documentation provides usage guides and API reference for developers using the library, but the source code itself remains closed-source.
+See [voweldocs README](./voweldocs-README.md) for complete integration documentation.
 
 ## Structure
 
 ```
 docs/
-├── .ai/                        # Future features documentation
-│   └── interactive-examples-approach.md
 ├── .vitepress/                 # VitePress configuration
 │   ├── config.ts
 │   └── theme/                  # Custom theme with voice integration
-│       ├── index.ts
 │       ├── VoiceLayout.vue
 │       ├── VoiceAgent.vue
 │       ├── voice-client.ts
 │       └── custom.css
-├── api/                        # Auto-generated API reference (from TypeDoc)
-│   ├── index.md
-│   ├── index-1.md             # Main module documentation
-│   └── react.md               # React module documentation
-├── guide/                      # User guides
+├── guide/                      # Client SDK guides
 │   ├── getting-started.md
 │   ├── installation.md
 │   ├── quick-start.md
 │   ├── adapters.md
 │   └── ...
+├── self-hosted/                # Self-hosted deployment docs
+│   ├── index.md
+│   ├── architecture.md
+│   ├── core.md
+│   └── ...
+├── vowelbot/                   # GitHub onboarding docs
+│   └── index.md
+├── platform/                   # Hosted platform docs
+│   ├── index.md
+│   └── ...
 ├── recipes/                    # Practical examples
 │   ├── index.md
 │   ├── event-notifications.md
 │   └── ...
+├── voweldocs/                  # Voice navigation docs
+│   ├── index.md
+│   ├── architecture.md
+│   ├── rag.md
+│   └── ...
+├── api/                        # Auto-generated API reference
+│   └── reference/
 ├── index.md                    # Home page
-├── package.json
-├── typedoc.json               # TypeDoc configuration
-└── tsconfig.typedoc.json      # TypeScript config for TypeDoc
-
+└── package.json
 ```
 
 ## Development
@@ -61,21 +95,23 @@ docs/
 bun install
 ```
 
+### Generate RAG Index
+
+Build the semantic search index for voice navigation:
+
+```bash
+bun run build:rag
+```
+
+This generates `public/rag-index.yml` with pre-computed embeddings using llama.cpp.
+
 ### Start Dev Server
 
 ```bash
-bun run docs:dev
+bun run dev
 ```
 
-Visit http://localhost:5173
-
-### Generate API Documentation
-
-```bash
-bun run docs:generate-api
-```
-
-This runs TypeDoc to generate API reference from the `../client` source code.
+Visit https://localhost:5173 (HTTPS is required for microphone access)
 
 ### Build for Production
 
@@ -95,50 +131,13 @@ bun run docs:preview
 
 - **Guides** - Hand-written markdown files in `guide/`
 - **Recipes** - Hand-written examples in `recipes/`
-- **API Reference** - Auto-generated from TypeScript source in `../client` using TypeDoc
-
-## TypeDoc Configuration
-
-TypeDoc is configured to:
-- Parse `../client/index.ts` and `../client/react.ts` entry points
-- Include all files in `../client/lib/`
-- Exclude examples, tests, and config files
-- Generate markdown output in `api/` directory
-- Use the `typedoc-plugin-markdown` plugin for markdown generation
-
-## Adding New Documentation
-
-### Adding a Guide
-
-1. Create a new `.md` file in `guide/`
-2. Add it to the sidebar in `.vitepress/config.ts`
-3. Write your content using markdown
-
-### Adding a Recipe
-
-1. Create a new `.md` file in `recipes/`
-2. Add it to the sidebar in `.vitepress/config.ts`
-3. Include problem, solution, and explanation sections
-
-### Updating API Reference
-
-The API reference is automatically generated from TypeScript source code. To update:
-
-1. Add/update TSDoc comments in `../client` source files
-2. Run `bun run docs:generate-api`
-3. The API docs will be regenerated
-
-## Future Features
-
-See `.ai/interactive-examples-approach.md` for planned interactive examples feature that will allow users to input their App ID and see live demos.
+- **Self-Hosted** - Deployment and operations docs in `self-hosted/`
+- **voweldocs** - Voice navigation implementation docs in `voweldocs/`
+- **API Reference** - Auto-generated from TypeScript source
 
 ## Deployment
 
 This documentation site is configured for deployment to **Cloudflare Pages** at `docs.vowel.to`.
-
-### Cloudflare Pages Deployment
-
-See [cloudflare-pages.md](./cloudflare-pages.md) for detailed deployment instructions.
 
 **Quick Deploy:**
 
@@ -172,11 +171,10 @@ When contributing to documentation:
 2. Use clear, concise language
 3. Include code examples
 4. Test your changes locally before committing
-5. Ensure TypeDoc generation still works
+5. Run `bun run build:rag` to update the RAG index if documentation content changes
 
 ## Support
 
 - 📧 Email: support@vowel.to
 - 💬 Discord: [Join our community](https://discord.gg/Kb4zFmmSRr)
-- 🐛 Issues: [GitHub Issues](https://github.com/usevowel/client/issues)
-
+- 🐛 Issues: [GitHub Issues](https://github.com/usevowel/vowel/issues)

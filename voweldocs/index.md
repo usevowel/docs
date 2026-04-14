@@ -49,6 +49,21 @@ bun run build:rag
 bun run docs:build
 ```
 
+### Configure Voice Access
+
+Users can configure voice navigation in two ways:
+
+**1. Via the UI** (easiest for end users): Click the voweldocs button in the navbar and enter credentials:
+- **Hosted mode**: App ID from [vowel.to](https://vowel.to/dashboard)
+- **Self-hosted mode**: Your base URL + App ID (or JWT token for production deployments)
+
+**2. Via environment variables** (for pre-configured deployments): Set credentials at build time so users don't need to configure anything:
+- `VITE_VOWEL_APP_ID` - For hosted mode
+- `VITE_VOWEL_URL` + `VITE_VOWEL_APP_ID` - For self-hosted mode
+- `VITE_VOWEL_JWT_TOKEN` + `VITE_VOWEL_USE_JWT=true` - For JWT-based authentication
+
+See [Configuration](./configuration) for the complete decision tree and environment variable reference.
+
 See the [Integration Guide](./integration) for complete setup instructions.
 
 ## Agent Skills
