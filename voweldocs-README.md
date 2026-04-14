@@ -36,9 +36,9 @@ flowchart TB
         LS
     end
 
-    subgraph RAGLayer[RAG Layer - Haven VectorDB]
+    subgraph RAGLayer[RAG Layer - Turso WASM]
         RAG
-        DB[(IndexedDB)]
+        DB[(Browser-local Turso DB)]
         EMB[Transformers.js Embeddings]
         RAG --> DB
         RAG --> EMB
@@ -103,7 +103,7 @@ Core initialization logic:
 - Reads credentials from localStorage
 - Builds Vowel configuration based on mode
 - Registers documentation-specific actions:
-  - `searchKnowledgeBase` - **RAG-powered semantic search** over docs (Haven VectorDB)
+  - `searchKnowledgeBase` - **RAG-powered semantic search** over docs (Turso WASM)
   - `searchDocs` - Trigger DocSearch
   - `getCurrentPageInfo` - Read page structure
   - `copyCodeExample` - Copy code blocks
@@ -115,8 +115,8 @@ Core initialization logic:
 ### 4. Routes Manifest (Auto-generated)
 The `generate-routes-plugin.ts` Vite plugin scans all markdown files at build time and generates `routes-manifest.ts` with page paths and descriptions for voice navigation.
 
-### 5. RAG Knowledge Base (Haven VectorDB)
-Powered by [Haven](https://github.com/kyrillosishak/Haven) - a privacy-first vector database that runs entirely in the browser:
+### 5. RAG Knowledge Base (Turso WASM)
+Powered by Turso WASM plus Transformers.js query embeddings in the browser:
 - **Local semantic search** using Transformers.js embeddings
 - **Pre-built index** loaded from `rag-index.yml` (generated at build time)
 - **Zero cloud dependencies** - all processing happens client-side via WebAssembly
@@ -168,19 +168,19 @@ When using self-hosted mode, the realtime URL is resolved in this order:
 
 ## RAG Knowledge Base
 
-The voice agent includes a **privacy-first RAG (Retrieval-Augmented Generation)** system powered by [Haven](https://github.com/kyrillosishak/Haven), a local vector database that runs entirely in the browser.
+The voice agent includes a **privacy-first RAG (Retrieval-Augmented Generation)** system powered by Turso WASM, using a browser-local database with in-browser query embeddings.
 
 ### How It Works
 
 1. **Build-time indexing**: A pre-built index is generated from all documentation at build time
-2. **Local embeddings**: Uses Transformers.js with Xenova/all-MiniLM-L6-v2 for fast, local semantic embeddings
+2. **Local embeddings**: Uses Transformers.js with Xenova/all-MiniLM-L6-v2 for fast, local semantic query embeddings
 3. **Semantic search**: When the user asks a question, the AI first searches the knowledge base for relevant docs
 4. **Grounded responses**: The AI formulates answers based on retrieved context, ensuring factual accuracy
 
 ### Key Features
 
 - **Zero cloud costs**: No API calls or external services for search
-- **Privacy-preserving**: All data stays in the browser's IndexedDB
+- **Privacy-preserving**: All data stays in the browser
 - **Offline-capable**: Works without internet after initial page load
 - **Instant responses**: ~50ms search latency for 10K+ documents
 - **Source citations**: The AI can reference specific documentation pages
@@ -211,9 +211,9 @@ The following diagram shows how documentation files are processed and prepared f
    - Original text chunks
    - 384-dimensional vector embeddings
    - Source file paths and section metadata
-   - Search index optimized for Haven VectorDB
+   - Search index prepared for browser-side import into Turso
 
-When the voice client initializes, it loads this pre-built index directly into Haven's browser-based VectorDB, enabling instant semantic search without any server-side processing or API calls.
+When the voice client initializes, it loads this pre-built index into a browser-local Turso database, enabling instant semantic search without any server-side processing or API calls.
 
 ## For Other Documentation Projects
 
@@ -222,10 +222,10 @@ To adapt voweldocs for your own documentation site:
 ### 1. Install Dependencies
 
 ```bash
-bun add @vowel.to/client @ricky0123/vad-web haven
+bun add @vowel.to/client @ricky0123/vad-web @tursodatabase/database-wasm @xenova/transformers
 ```
 
-The `haven` package provides the local vector database for RAG functionality.
+`@tursodatabase/database-wasm` provides the browser-local database layer for retrieval, and `@xenova/transformers` generates query embeddings in the browser.
 
 ### 2. Copy Core Files
 
@@ -236,7 +236,7 @@ Copy these files from the voweldocs reference implementation:
 - `.vitepress/theme/VoiceAgent.vue` - React wrapper component
 - `.vitepress/theme/VoiceAgentWrapper.tsx` - React integration
 - `.vitepress/theme/generate-routes-plugin.ts` - Route generation
-- `.vitepress/theme/prebuilt-rag.ts` - Haven VectorDB initialization for local RAG
+- `.vitepress/theme/prebuilt-rag.ts` - Turso browser database initialization for local RAG
 - `.vitepress/theme/rag-debug/` - Debug UI for viewing STT/RAG results (optional)
 
 ### 3. Configure VitePress Theme
@@ -280,7 +280,7 @@ For AI-powered answers grounded in your documentation, generate the pre-built em
 
 ```bash
 # Generate RAG embeddings using llama.cpp with Vulkan acceleration
-# This creates public/rag-index.yml with pre-computed embeddings for Haven VectorDB
+# This creates public/rag-index.yml with pre-computed embeddings for the browser-local RAG database
 bun run build:rag
 ```
 
@@ -288,7 +288,7 @@ This script (`scripts/build-rag.py`):
 - Processes all markdown documentation files
 - Chunks content into searchable segments
 - Generates embeddings using llama.cpp with Vulkan GPU acceleration (falls back to CPU if no Vulkan)
-- Outputs `public/rag-index.yml` ready for Haven VectorDB
+- Outputs `public/rag-index.yml` ready for browser-side import into Turso
 
 For full production build (includes RAG + routes + VitePress):
 
@@ -344,12 +344,12 @@ When working with this codebase in Cursor/Claude, these agent skills provide det
 |-------|----------|---------|
 | `voweldocs` | `.agents/skills/voweldocs/` | Main pattern for voice-enabling documentation sites (VitePress/Vue implementation) |
 | `rag-prebuild` | `.agents/skills/rag-prebuild/` | Pre-build RAG embeddings with `scripts/build-rag.py` |
-| `haven-local-rag` | `.agents/skills/haven-local-rag/` | Haven VectorDB, browser-based semantic search, local RAG pipelines |
+| `haven-local-rag` | `.agents/skills/haven-local-rag/` | Browser-based semantic search and local RAG pipeline background |
 
 ## Further Reading
 
 - [Vowel Client Guide](/guide/vowel-client)
 - [React Integration](/guide/react)
 - [Self-Hosted Stack](/self-hosted/)
-- [Haven VectorDB](https://github.com/kyrillosishak/Haven) - Privacy-first browser-based RAG
+- [Turso WASM](https://github.com/tursodatabase/turso/tree/main/bindings/javascript/packages/wasm) - Browser-local database runtime for RAG
 - [vowel.to Platform](https://vowel.to)

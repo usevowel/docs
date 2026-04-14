@@ -24,5 +24,5 @@
 - [Vowel Client Guide](/guide/vowel-client)
 - [React Integration](/guide/react)
 - [Self-Hosted Stack](/self-hosted/)
-- [Haven VectorDB](https://github.com/kyrillosishak/Haven) - Privacy-first browser-based RAG
+- [Turso WASM](https://github.com/tursodatabase/turso/tree/main/bindings/javascript/packages/wasm) - Browser-local database runtime for RAG
 - [vowel.to Platform](https://vowel.to)

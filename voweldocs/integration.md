@@ -5,10 +5,10 @@ To adapt voweldocs for your own documentation site:
 ## 1. Install Dependencies
 
 ```bash
-bun add @vowel.to/client @ricky0123/vad-web haven
+bun add @vowel.to/client @ricky0123/vad-web @tursodatabase/database-wasm @xenova/transformers
 ```
 
-The `haven` package provides the local vector database for RAG functionality.
+`@tursodatabase/database-wasm` provides the browser-local database layer for RAG retrieval, and `@xenova/transformers` generates query embeddings in the browser.
 
 ## 2. Copy Core Files
 
@@ -19,7 +19,7 @@ Copy these files from the voweldocs reference implementation:
 - `.vitepress/theme/VoiceAgent.vue` - React wrapper component
 - `.vitepress/theme/VoiceAgentWrapper.tsx` - React integration
 - `.vitepress/theme/generate-routes-plugin.ts` - Route generation
-- `.vitepress/theme/prebuilt-rag.ts` - Haven VectorDB initialization for local RAG
+- `.vitepress/theme/prebuilt-rag.ts` - Turso browser database initialization for local RAG
 - `.vitepress/theme/rag-debug/` - Debug UI for viewing STT/RAG results (optional)
 
 ## 3. Configure VitePress Theme
@@ -63,7 +63,7 @@ For AI-powered answers grounded in your documentation, generate the pre-built em
 
 ```bash
 # Generate RAG embeddings using llama.cpp with Vulkan acceleration
-# This creates public/rag-index.yml with pre-computed embeddings for Haven VectorDB
+# This creates public/rag-index.yml with pre-computed embeddings for the browser-local RAG database
 bun run build:rag
 ```
 
@@ -71,7 +71,7 @@ This script (`scripts/build-rag.py`):
 - Processes all markdown documentation files
 - Chunks content into searchable segments
 - Generates embeddings using llama.cpp with Vulkan GPU acceleration
-- Outputs `public/rag-index.yml` ready for Haven VectorDB
+- Outputs `public/rag-index.yml` ready for browser-side import into Turso
 
 For full production build (includes RAG + routes + VitePress):
 
@@ -106,4 +106,4 @@ When working with voweldocs in Cursor/Claude, reference these agent skills in `.
 
 - **`voweldocs`** - Main skill for voice-enabling documentation sites (VitePress/Vue pattern)
 - **`rag-prebuild`** - Pre-build RAG embeddings with `build-rag.py` (llama.cpp + Vulkan)
-- **`haven-local-rag`** - Haven VectorDB, browser-based semantic search, and local RAG pipelines
+- **`haven-local-rag`** - Browser-based semantic search and local RAG pipeline background

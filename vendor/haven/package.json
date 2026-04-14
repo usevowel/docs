@@ -1,0 +1,26 @@
+{
+  "name": "haven",
+  "version": "0.1.0",
+  "description": "Your Private AI Stack - Vector database + RAG + LLM, all in the browser",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "peerDependencies": {
+    "@wllama/wllama": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@wllama/wllama": {
+      "optional": true
+    }
+  }
+}

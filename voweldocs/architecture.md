@@ -10,7 +10,7 @@ flowchart TB
     VC --> SDKSDK
     VC --> RM
     VC --> LS
-    VC --> RAG[Haven RAG]
+    VC --> RAG[Turso RAG]
 
     subgraph UI[UI Layer]
         VL
@@ -24,9 +24,9 @@ flowchart TB
         LS[LocalStorage]
     end
 
-    subgraph RAGLayer[RAG Layer - Haven VectorDB]
+    subgraph RAGLayer[RAG Layer - Turso WASM]
         RAG
-        DB[(IndexedDB)]
+        DB[(Browser-local Turso DB)]
         EMB[Transformers.js Embeddings]
         RAG --> DB
         RAG --> EMB
@@ -60,7 +60,7 @@ Core initialization logic:
 - Reads credentials from localStorage
 - Builds Vowel configuration based on mode
 - Registers documentation-specific actions:
-  - `searchKnowledgeBase` - **RAG-powered semantic search** over docs (Haven VectorDB)
+  - `searchKnowledgeBase` - **RAG-powered semantic search** over docs (Turso WASM)
   - `searchDocs` - Trigger DocSearch
   - `getCurrentPageInfo` - Read page structure
   - `copyCodeExample` - Copy code blocks
@@ -73,9 +73,9 @@ Core initialization logic:
 
 The `generate-routes-plugin.ts` Vite plugin scans all markdown files at build time and generates `routes-manifest.ts` with page paths and descriptions for voice navigation.
 
-### RAG Knowledge Base (Haven VectorDB)
+### RAG Knowledge Base (Turso WASM)
 
-Powered by [Haven](https://github.com/kyrillosishak/Haven) - a privacy-first vector database that runs entirely in the browser:
+Powered by Turso WASM plus Transformers.js query embeddings in the browser:
 
 - **Local semantic search** using Transformers.js embeddings
 - **Pre-built index** loaded from `rag-index.yml` (generated at build time via `bun run build:rag`)
@@ -91,4 +91,4 @@ Implementation details for agents working with this codebase:
 
 - **`voweldocs`** (`.agents/skills/voweldocs/`) - VitePress/Vue integration pattern, voice layout components
 - **`rag-prebuild`** (`.agents/skills/rag-prebuild/`) - Pre-computed embedding generation with `build-rag.py`
-- **`haven-local-rag`** (`.agents/skills/haven-local-rag/`) - Haven VectorDB, Transformers.js embeddings, browser-based RAG
+- **`haven-local-rag`** (`.agents/skills/haven-local-rag/`) - Browser-based semantic search and local RAG pipeline background

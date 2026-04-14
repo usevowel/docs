@@ -8,18 +8,20 @@ import VoiceLayout from './VoiceLayout.vue'
 import LogoWrapper from './LogoWrapper.vue'
 import './custom.css'
 
-// Import Vowel client styles
-import '@vowel.to/client/css'
-
 // Import RAG debug tool
 import { initializeRAGDebug } from './rag-debug'
 
 export default {
   extends: DefaultTheme,
   Layout: VoiceLayout,
-  enhanceApp({ app, router }) {
+  async enhanceApp({ app, router }) {
     // Register the logo component globally
     app.component('VitePressLogo', LogoWrapper)
+
+    // Import Vowel client styles (client-side only)
+    if (typeof window !== 'undefined') {
+      await import('@vowel.to/client/css')
+    }
 
     // Initialize RAG debug tool after navigation
     // Only runs if PUBLIC_VOWEL_DEBUG_RAG is enabled

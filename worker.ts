@@ -21,12 +21,31 @@ interface Fetcher {
   fetch(request: Request): Promise<Response>;
 }
 
+const CROSS_ORIGIN_ISOLATION_HEADERS = {
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'credentialless',
+} as const;
+
+function withCrossOriginIsolationHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+
+  for (const [key, value] of Object.entries(CROSS_ORIGIN_ISOLATION_HEADERS)) {
+    headers.set(key, value);
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // Serve static files from the ASSETS binding
     // This is configured via [assets] in wrangler.toml
     if (!env.ASSETS) {
-      return new Response('Assets binding not configured', { status: 500 });
+      return withCrossOriginIsolationHeaders(new Response('Assets binding not configured', { status: 500 }));
     }
 
     const url = new URL(request.url);
@@ -36,7 +55,7 @@ export default {
     
     // If the asset exists, return it
     if (response.status !== 404) {
-      return response;
+      return withCrossOriginIsolationHeaders(response);
     }
     
     // For SPA routing: if the request is for a path (not a file), serve index.html
@@ -47,16 +66,16 @@ export default {
     
     if (!hasFileExtension && pathname !== '/index.html') {
       // Try to fetch index.html for SPA routing
-      const indexRequest = new Request(new URL('/index.html', request.url), request);
+      const indexRequest = new Request(new URL('/index.html', request.url).toString(), request);
       response = await env.ASSETS.fetch(indexRequest);
       
       if (response.status !== 404) {
-        return response;
+        return withCrossOriginIsolationHeaders(response);
       }
     }
     
     // Return the original 404 if nothing matched
-    return response;
+    return withCrossOriginIsolationHeaders(response);
   },
 };
 

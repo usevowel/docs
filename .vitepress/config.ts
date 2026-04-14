@@ -1,11 +1,41 @@
 import { defineConfig } from 'vitepress'
+import type { Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
+import mkcert from 'vite-plugin-mkcert'
 import { generateRoutesPlugin } from './theme/generate-routes-plugin'
 import { config } from 'dotenv'
 import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-// Load environment variables from .env file
 config()
+
+const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+const CROSS_ORIGIN_ISOLATION_HEADERS = {
+  'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'credentialless'
+} as const
+
+function crossOriginIsolationHeaders(): Plugin {
+  const applyHeaders = (_req: unknown, res: { setHeader: (key: string, value: string) => void }, next: () => void) => {
+    for (const [key, value] of Object.entries(CROSS_ORIGIN_ISOLATION_HEADERS)) {
+      res.setHeader(key, value)
+    }
+
+    next()
+  }
+
+  return {
+    name: 'voweldocs-cross-origin-isolation-headers',
+    configureServer(server) {
+      server.middlewares.use(applyHeaders)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(applyHeaders)
+    }
+  }
+}
 
 export default defineConfig({
   title: 'vowel Docs',
@@ -43,8 +73,17 @@ export default defineConfig({
   srcExclude: ['**/README.md', '**/AGENTS.md', 'cloudflare-pages.md', 'guide/v2-api-migration.md', 'api/index/**', 'api/react/**'],
   
   vite: {
+    server: {
+      https: true,
+      headers: CROSS_ORIGIN_ISOLATION_HEADERS
+    },
+    preview: {
+      headers: CROSS_ORIGIN_ISOLATION_HEADERS
+    },
     plugins: [
+      crossOriginIsolationHeaders(),
       react(),
+      mkcert(), // Auto-generate local SSL certificates for HTTPS dev server
       generateRoutesPlugin(), // Auto-generate routes for voice navigation
       MermaidPlugin() // Enable Mermaid diagrams
     ],
@@ -59,17 +98,26 @@ export default defineConfig({
       'import.meta.env.VITE_VOWEL_DEBUG_RAG': JSON.stringify(process.env.VITE_VOWEL_DEBUG_RAG || 'false')
     },
     resolve: {
-      alias: {
+      alias: [
+        { find: /^react$/, replacement: resolve(docsRoot, 'node_modules/react/index.js') },
+        { find: /^react\/jsx-runtime$/, replacement: resolve(docsRoot, 'node_modules/react/jsx-runtime.js') },
+        { find: /^react\/jsx-dev-runtime$/, replacement: resolve(docsRoot, 'node_modules/react/jsx-dev-runtime.js') },
+        { find: /^react-dom$/, replacement: resolve(docsRoot, 'node_modules/react-dom/index.js') },
+        { find: /^react-dom\/client$/, replacement: resolve(docsRoot, 'node_modules/react-dom/client.js') },
         // @wllama/wllama@2.3.7 publishes a broken package entrypoint;
         // Haven's optional WllamaProvider can still load the real ESM build.
-        '@wllama/wllama': '@wllama/wllama/esm/index.js',
-      },
+        {
+          find: '@wllama/wllama',
+          replacement: '@wllama/wllama/esm/index.js',
+        },
+      ],
+      dedupe: ['react', 'react-dom'],
       // Ensure .ts extensions are resolved properly for theme imports
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
     },
     optimizeDeps: {
       include: ['js-yaml', 'mermaid'],
-      exclude: ['haven', '@wllama/wllama'],
+      exclude: ['@tursodatabase/database-wasm', '@tursodatabase/database-wasm/vite', '@wllama/wllama'],
       esbuildOptions: {
         target: 'es2022'
       }
@@ -78,6 +126,7 @@ export default defineConfig({
       target: 'es2022'
     },
     build: {
+      target: 'esnext',
       commonjsOptions: {
         transformMixedEsModules: true
       }
@@ -257,7 +306,7 @@ export default defineConfig({
     },
 
     footer: {
-      copyright: 'Copyright © 2025 vowel.to'
+      copyright: 'Copyright © 2026 vowel.to'
     }
   },
 
@@ -267,7 +316,7 @@ export default defineConfig({
       dark: 'github-dark'
     },
     config: (md) => {
-      MermaidMarkdown(md)
+      MermaidMarkdown(md, undefined)
     }
   }
 })

@@ -20,8 +20,14 @@ export default defineConfig(async ({ command, mode }) => {
     const { cloudflare } = await import('@cloudflare/vite-plugin')
     plugins.push(cloudflare())
   }
-  
+
   return {
     plugins,
+    // optimizeDeps: {
+    //   include: ['@vowel.to/client'],
+    // },
+    // ssr: {
+    //   noExternal: ['@vowel.to/client'],
+    // },
   }
 })

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vowel Turso RAG"
+  short_description: "Add Turso browser RAG with vowel integration"
+  default_prompt: "Use $vowel-turso-rag to add Turso browser RAG with a debug panel and vowel client actions."
