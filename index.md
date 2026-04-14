@@ -2,8 +2,8 @@
 layout: home
 
 hero:
-  text: "Vowel Docs"
-  tagline: Client SDK and self-hosted deployment documentation for the open-source launch, with hosted platform docs marked as coming soon
+  text: "vowel platform docs"
+  tagline: Documentation for the vowel platform
   actions:
     - theme: brand
       text: Client Docs

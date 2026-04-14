@@ -198,10 +198,10 @@ async function buildVowelConfig(
     automationAdapter,
 
     // Voice configuration
-    voiceConfig: {
+    _voiceConfig: {
       provider: 'vowel-prime',
       llmProvider: 'groq',
-      model: 'openai/gpt-oss-20b',
+      model: 'openai/gpt-oss-120b',
       // model: 'moonshotai/kimi-k2-instruct-0905',
       voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
       language: 'en-US',
@@ -249,11 +249,11 @@ async function buildVowelConfig(
   // Build config based on mode
   if (credentials.mode === 'hosted' && credentials.hosted) {
     // SaaS: Always use hardcoded URL, never from localStorage
-    return {
-      ...baseConfig,
-      appId: credentials.hosted.appId,
-      realtimeApiUrl: HOSTED_REALTIME_URL,
-    } as VowelConfig
+      return {
+        ...baseConfig,
+        appId: credentials.hosted.appId,
+        realtimeApiUrl: HOSTED_REALTIME_URL,
+      } as VowelConfig
   } else if (credentials.mode === 'selfhosted' && credentials.selfHosted) {
     // Self-hosted: Two modes - JWT (when env var set) or appId + URL (default)
     if (credentials.selfHosted.jwt) {
@@ -303,8 +303,9 @@ function getSystemInstruction(): string {
 **Pattern for every user question:**
 1. Call \`searchKnowledgeBase\` with the user's query (or key terms from it)
 2. Review the returned documents/scores
-3. Formulate your answer based on the retrieved context
-4. Cite specific docs when helpful
+3. **If a highly relevant result is found with a specific page path, navigate to that page using \`navigate_to_page\`** - this helps the user see the full documentation
+4. Formulate your answer based on the retrieved context
+5. Cite specific docs when helpful
 
 **Example:**
 User: "How do I add Vowel to my React app?"
@@ -338,7 +339,7 @@ Vowel is a JavaScript/TypeScript library that adds real-time voice interaction t
 ## Available Actions
 
 **Knowledge Base (RAG):**
-- \`searchKnowledgeBase\` - **ALWAYS CALL THIS FIRST** for any user question. Performs semantic search over all documentation (guides, recipes, self-hosted, platform, API reference) using the local Haven VectorDB.
+- \`searchKnowledgeBase\` - **ALWAYS CALL THIS FIRST** for any user question. Performs semantic search over all documentation (guides, recipes, self-hosted, platform, API reference) using the local browser RAG database.
 
 **Navigation:**
 - \`navigate_to_page\` - Navigate to any documentation page (guides, recipes, self-hosted docs, platform docs, API reference)
@@ -441,8 +442,9 @@ Vowel is a JavaScript/TypeScript library that adds real-time voice interaction t
 **When users ask ANY question:**
 1. **ALWAYS** call \`searchKnowledgeBase\` first
 2. Review the retrieved documents
-3. Provide a **high-level summary** - maximum two short paragraphs
-4. Offer to navigate to relevant pages or provide more detail if they ask
+3. **If the search returns a clearly relevant page, proactively navigate there using \`navigate_to_page\`** - don't wait for the user to ask
+4. Provide a **high-level summary** - maximum two short paragraphs
+5. Offer to provide more detail if they ask
 
 **When users ask "What is Vowel?" or similar:**
 Call searchKnowledgeBase first, then explain it's a library for adding voice interaction to web apps, highlight the key features, and suggest /guide/getting-started
@@ -450,8 +452,9 @@ Call searchKnowledgeBase first, then explain it's a library for adding voice int
 **When users ask "How do I..." questions:**
 - Call searchKnowledgeBase with their question
 - Identify the right documentation page from results
+- **Navigate to that page using \`navigate_to_page\`** - take them directly to the relevant docs
 - Briefly explain the concept based on retrieved docs
-- Navigate them to the page or show them relevant code
+- Show them relevant code from that page
 - Suggest related topics
 
 **When users ask about specific features:**
@@ -597,7 +600,6 @@ async function getRagDebugChat() {
  * Register documentation-specific custom actions
  */
 function registerDocsActions(vowel: VowelType) {
-  // 0. Search Knowledge Base (Haven RAG) - Local semantic search
   vowel.registerAction(
     'searchKnowledgeBase',
     {
@@ -625,7 +627,7 @@ function registerDocsActions(vowel: VowelType) {
         // Initialize RAG if needed and search
         const prebuiltRAG = await getPrebuiltRAG()
         if (!prebuiltRAG.isReady()) {
-          await addChatMessage('system', 'Initializing Haven RAG...')
+          await addChatMessage('system', 'Initializing local RAG...')
           await prebuiltRAG.initialize()
         }
 

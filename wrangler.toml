@@ -7,7 +7,7 @@ compatibility_date = "2025-11-03"
 compatibility_flags = ["nodejs_compat"]
 
 # Account ID - set via CLOUDFLARE_ACCOUNT_ID environment variable or uncomment below
-# account_id = "your-account-id-here"
+account_id = "placeholders"
 
 # Custom domain configuration
 # Custom domain: docs.vowel.to
@@ -26,8 +26,8 @@ directory = ".vitepress/dist"
 binding = "ASSETS"
 
 # Build configuration
-[build]
-command = "bun run docs:build"
+# [build]
+# command = "bun run docs:build"
 
 # Environment variables (if needed)
 [vars]
