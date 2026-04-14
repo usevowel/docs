@@ -1,7 +1,7 @@
 {
   "name": "@vowel.to/docs",
   "version": "1.0.0",
-  "description": "Documentation for @vowel.to/client",
+  "description": "Documentation for the vowel platform",
   "private": true,
   "type": "module",
   "scripts": {
