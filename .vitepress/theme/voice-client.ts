@@ -13,6 +13,13 @@ import type { Vowel as VowelType, VowelConfig } from '@vowel.to/client'
 let vowelInstance: VowelType | null = null
 
 /**
+ * Toggle to use Grok as the realtime voice provider instead of vowel-prime.
+ * When enabled, connects directly to xAI Grok API for voice conversations.
+ * Set via VITE_USE_GROK environment variable.
+ */
+const USE_GROK = import.meta.env.VITE_USE_GROK === 'true'
+
+/**
  * Configuration modes for vowel voice agent
  */
 type ConfigMode = 'hosted' | 'selfhosted'
@@ -195,21 +202,34 @@ async function buildVowelConfig(
   // Base configuration common to both modes
   const baseConfig: Partial<VowelConfig> = {
     navigationAdapter,
-    automationAdapter,
+    // automationAdapter,
 
-    // Voice configuration
-    _voiceConfig: {
-      provider: 'vowel-prime',
-      llmProvider: 'groq',
-      model: 'openai/gpt-oss-120b',
-      // model: 'moonshotai/kimi-k2-instruct-0905',
-      voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
-      language: 'en-US',
-      // Server-side VAD configuration for more accurate speech detection
-      turnDetection: {
-        mode: 'server_vad',
-      },
-    },
+    // Voice configuration - Use Grok when USE_GROK flag is enabled
+    voiceConfig: USE_GROK
+      ? {
+          // Direct Grok provider configuration
+          provider: 'grok',
+          clientIdleHibernateTimeoutMs: 50000,
+          // model: 'grok-2-1212', // Grok's multimodal model for voice
+          voice: 'Arcadia', // Grok voice option: Arcadia, Ara, Leo, Rex, Sal
+          language: 'en-US',
+        }
+      : {
+          // vowel-prime provider configuration (default)
+          provider: 'vowel-prime',
+          vowelPrimeConfig: {
+            environment: 'testing',
+          },
+          llmProvider: 'groq',
+          model: 'openai/gpt-oss-120b',
+          // model: 'moonshotai/kimi-k2-instruct-0905',
+          voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
+          language: 'en-US',
+          // Server-side VAD configuration for more accurate speech detection
+          turnDetection: {
+            mode: 'server_vad',
+          },
+        },
 
     // Enable captions display for transcription visibility
     _caption: {
@@ -290,27 +310,60 @@ function getSystemInstruction(): string {
 - Questions about the product: "how does val work" means "how does vowel work"
 - References to this assistant: "val" referring to the product/assistant means "vowel"
 
-## CRITICAL: Always Search Knowledge Base First
+## CRITICAL: Always Search Knowledge Base First - NO EXCEPTIONS
 
-**⚠️ MOST IMPORTANT RULE**: When a user asks ANY question, you MUST call \`searchKnowledgeBase\` FIRST before answering. This retrieves relevant documentation to ground your response in facts.
+**⚠️ MOST IMPORTANT RULE - MANDATORY**: You MUST call \`searchKnowledgeBase\` FIRST for EVERY user request, WITHOUT EXCEPTION. This is a hard requirement - do not skip this step ever.
 
-**Why this matters:**
-- The knowledge base contains the full, up-to-date documentation
-- Searching first ensures accurate, factual answers
-- The RAG system finds semantically relevant content even if keywords don't match exactly
+**NO EXCEPTIONS - You MUST search even when:**
+- The question seems obvious or straightforward
+- You think you already know the answer
+- The user asks about navigation ("go to the React guide")
+- The user asks a simple question ("what is Vowel?")
+- The user asks about something you think is in your training data
+- The user wants to navigate somewhere specific
+- ANY other circumstance - there are zero exceptions
+
+**Why this is mandatory:**
+- The knowledge base contains the authoritative, up-to-date documentation
+- Product details change frequently - your training data may be outdated
+- Searching first ensures accurate, factual, current answers
+- The RAG system finds semantically relevant content even if keywords don't match
 - This demonstrates the RAG integration working in real-time
+- **NEVER rely on your training data for product-specific answers**
 
-**Pattern for every user question:**
-1. Call \`searchKnowledgeBase\` with the user's query (or key terms from it)
-2. Review the returned documents/scores
-3. **If a highly relevant result is found with a specific page path, navigate to that page using \`navigate_to_page\`** - this helps the user see the full documentation
-4. Formulate your answer based on the retrieved context
-5. Cite specific docs when helpful
+**REQUIRED WORKFLOW - FOLLOW THESE STEPS IN ORDER:**
 
-**Example:**
+**Step 1: SEARCH**
+Call \`searchKnowledgeBase\` with the user's query (or key terms from it)
+
+**Step 2: REVIEW** 
+Look at the returned documents, scores, and page paths
+
+**Step 3: NAVIGATE (if relevant)**
+If a highly relevant result is found with a specific page path, navigate to that page using \`navigate_to_page\` - this helps the user see the full documentation
+
+**Step 4: ANSWER**
+Formulate your response based on the retrieved context, not from your training data
+
+**Step 5: CITE**
+Reference specific docs or pages when helpful
+
+**⚠️ DO NOT SKIP STEP 1 - EVER**
+
+**Examples:**
 User: "How do I add Vowel to my React app?"
 You: [Call searchKnowledgeBase with query "React installation setup"]
 You: [Review results, then answer based on the retrieved docs]
+
+User: "Go to the React guide"
+You: [Call searchKnowledgeBase with query "React guide"]
+You: [Navigate to the page from search results]
+
+User: "What is Vowel?"
+You: [Call searchKnowledgeBase with query "what is Vowel overview"]
+You: [Answer based on retrieved docs, not from training data]
+
+**⚠️ FAILURE TO SEARCH FIRST IS A SYSTEM FAILURE - NEVER SKIP THIS STEP**
 
 ## About Vowel.to
 
@@ -348,74 +401,10 @@ Vowel is a JavaScript/TypeScript library that adds real-time voice interaction t
 - \`listSections\` - List all sections on current page
 
 **Information Access:**
-- \`searchDocs\` - Open VitePress DocSearch UI (legacy keyword search)
 - \`copyCodeExample\` - Copy a code block to clipboard
 - \`showRelatedPages\` - Show related documentation pages based on current section
 - \`openRagDebugChat\` - Open debug panel to see STT transcripts and RAG search results
 - \`closeRagDebugChat\` - Close the RAG debug panel
-
-## Documentation Structure
-
-**Getting Started:**
-- /guide/getting-started - Overview and first steps
-- /guide/installation - How to install the package
-- /guide/quick-start - Minimal working example
-
-**Core Concepts:**
-- /guide/vowel-client - The Vowel client class
-- /guide/adapters - Navigation and automation adapters
-- /guide/actions - Custom action registration
-- /guide/event-notifications - Programmatic voice responses
-- /guide/connection-models - Connection and authentication models
-
-**Framework Integration:**
-- /guide/react - React components and hooks
-- /guide/react-router - React Router integration
-- /guide/nextjs - Next.js App Router integration
-- /guide/tanstack-router - TanStack Router integration
-- /guide/vue-router - Vue Router integration
-- /guide/web-component - Web component usage
-- /guide/standalone-js - Vanilla JavaScript integration
-
-**Recipes (Practical Examples):**
-- /recipes/custom-actions - Creating custom voice commands
-- /recipes/navigation - Navigation control patterns
-- /recipes/page-automation - DOM interaction patterns
-- /recipes/event-notifications - Notification examples
-- /recipes/speaking-state - Track AI speaking state
-- /recipes/ecommerce - E-commerce integration example
-- /recipes/connection-paradigms - Connection paradigm patterns
-- /recipes/dynamic-context - Dynamic context management
-- /recipes/trusted-server - Trusted server patterns
-
-**Self-Hosted:**
-- /self-hosted/ - Self-hosted deployment overview
-- /self-hosted/quickstart - Quick start for self-hosting
-- /self-hosted/architecture - System architecture
-- /self-hosted/core - Core configuration
-- /self-hosted/engine - Realtime engine setup
-- /self-hosted/configuration - Full configuration guide
-- /self-hosted/deployment - Deployment instructions
-- /self-hosted/testing - Testing your setup
-- /self-hosted/troubleshooting - Common issues and fixes
-
-**Platform (Hosted):**
-- /platform/ - Hosted platform overview
-- /platform/hosted-realtime-api - Hosted realtime API
-- /platform/apps-and-management - App management (coming soon)
-- /platform/billing-and-organizations - Billing and orgs (coming soon)
-
-**vowelbot:**
-- /vowelbot/ - GitHub-integrated voice setup
-- /guide/vowelbot - vowelbot documentation
-
-**API Reference:**
-- /api/ - Full API documentation
-- /api/index/ - Core API (classes, functions, interfaces)
-- /api/react/ - React-specific APIs
-
-**Migration:**
-- /guide/v2-api-migration - Migrating to v2 API
 
 ## Response Guidelines
 
@@ -540,6 +529,11 @@ export async function initVoiceAgent(
 
   console.log('🎤 Initializing voice agent for VitePress docs...')
   console.log(`   Mode: ${config.mode}`)
+  if (USE_GROK) {
+    console.log('   Provider: grok (xAI Grok Realtime)')
+  } else {
+    console.log('   Provider: vowel-prime')
+  }
 
   try {
     // Build configuration based on credentials
@@ -669,43 +663,6 @@ function registerDocsActions(vowel: VowelType) {
           message: `Failed to search knowledge base: ${errorMsg}`,
         }
       }
-    }
-  )
-
-  // 1. Search documentation (legacy VitePress search)
-  vowel.registerAction(
-    'searchDocs',
-    {
-      description: 'Search the VitePress documentation UI for a specific topic (opens the DocSearch interface)',
-      parameters: {
-        query: {
-          type: 'string',
-          description: 'Search query - can be a topic, feature name, or keyword',
-        },
-      },
-    },
-    async ({ query }) => {
-      console.log('🔍 Searching docs UI for:', query)
-
-      const searchButton = document.querySelector(
-        '.DocSearch-Button, .VPNavBarSearch button'
-      )
-      if (searchButton) {
-        ;(searchButton as HTMLElement).click()
-
-        setTimeout(async () => {
-          const searchInput = document.querySelector(
-            '.DocSearch-Input'
-          ) as HTMLInputElement
-          if (searchInput) {
-            searchInput.value = query
-            searchInput.dispatchEvent(new Event('input', { bubbles: true }))
-            await vowel.notifyEvent(`Searching for "${query}"`)
-          }
-        }, 300)
-      }
-
-      return { success: true, message: `Searching for "${query}"` }
     }
   )
 
@@ -957,7 +914,7 @@ function registerDocsActions(vowel: VowelType) {
     }
   )
 
-  console.log('✅ Registered 8 custom documentation actions (including searchKnowledgeBase)')
+  console.log('✅ Registered 7 custom documentation actions (including searchKnowledgeBase)')
 }
 
 /**
