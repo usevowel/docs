@@ -102,6 +102,16 @@ export const DEBUG_STYLES = `
     gap: 8px;
   }
 
+  .rag-debug-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+  }
+
   .rag-debug-close {
     background: rgba(255, 255, 255, 0.2);
     border: none;
@@ -153,6 +163,52 @@ export const DEBUG_STYLES = `
     color: #3b82f6;
     border-bottom: 2px solid #3b82f6;
     background: var(--vp-c-bg, white);
+  }
+
+  .rag-debug-tabs-list {
+    display: flex;
+    border-bottom: 1px solid var(--vp-c-divider, #e2e8f0);
+    background: var(--vp-c-bg-soft, #f8fafc);
+    flex-shrink: 0;
+  }
+
+  .rag-debug-tab-trigger {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--vp-c-text-2, #64748b);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .rag-debug-tab-trigger:hover {
+    color: var(--vp-c-text-1, #334155);
+    background: rgba(59, 130, 246, 0.05);
+  }
+
+  .rag-debug-tab-trigger[data-state="active"] {
+    color: #3b82f6;
+    border-bottom: 2px solid #3b82f6;
+    background: var(--vp-c-bg, white);
+  }
+
+  .rag-debug-tab-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .rag-debug-tab-content[data-state="inactive"] {
+    display: none;
   }
 
   /* Tab Content - Flex container for panels */
@@ -896,6 +952,12 @@ export const DEBUG_STYLES = `
     font-size: 11px;
     min-width: 40px;
     text-align: right;
+  }
+
+  .rag-debug-index-size {
+    font-size: 11px;
+    color: var(--vp-c-text-2, #64748b);
+    margin-left: 8px;
   }
 
   /* Floating Action Button Loading State */

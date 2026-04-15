@@ -11,7 +11,7 @@
  */
 
 import type { ChatMessage, SearchResult } from './types';
-import { state, debugDialog, getLocalRAG } from './state';
+import { state, getLocalRAG, notifyChatMessageListeners } from './state';
 import { ICONS } from './icons';
 import { escapeHtml, formatTime } from './utils';
 import * as yaml from 'js-yaml';
@@ -239,9 +239,14 @@ function renderDocumentWithHighlights(content: string, chunks: SearchResult[]): 
  * @param role - Message role (user, assistant, system)
  * @param content - Message content
  * @param results - Optional search results to display
+ * @returns The created message
  * @public
  */
-export async function addChatMessage(role: ChatMessage['role'], content: string, results?: SearchResult[]): Promise<void> {
+export async function addChatMessage(
+  role: ChatMessage['role'], 
+  content: string, 
+  results?: SearchResult[]
+): Promise<ChatMessage> {
   const message: ChatMessage = {
     role,
     content,
@@ -250,74 +255,26 @@ export async function addChatMessage(role: ChatMessage['role'], content: string,
   };
 
   state.chatMessages.push(message);
+  notifyChatMessageListeners();
 
-  const container = debugDialog?.querySelector('#rag-debug-chat-messages');
-  if (!container) return;
+  return message;
+}
 
-  const messageEl = document.createElement('div');
-  messageEl.className = `rag-debug-message ${role}`;
-
-  let html = `<div class="rag-debug-message-content">${escapeHtml(content)}</div>`;
-
-  if (role !== 'system') {
-    html += `<div class="rag-debug-message-time">${formatTime(message.timestamp)}</div>`;
-  }
-
-  // Render search results if present - grouped by file with full markdown rendering
-  if (results && results.length > 0) {
-    const groupedResults = groupResultsByFile(results.slice(0, 5));
-    const uniqueFiles = Array.from(groupedResults.entries());
+export async function warmUpRAG(): Promise<void> {
+  console.log('[rag-debug] Warming up RAG model...');
+  
+  try {
+    const localRAG = await getLocalRAG();
     
-    html += '<div class="rag-debug-results">';
-    html += `<div class="rag-debug-results-title">Retrieved ${uniqueFiles.length} unique document${uniqueFiles.length > 1 ? 's' : ''}</div>`;
-    
-    // Generate unique IDs for this message's collapsible items
-    const messageId = `msg-${message.timestamp}`;
-
-    // Get the documents cache for full content lookup
-    const docCache = await getDocumentsCache();
-
-    for (let i = 0; i < uniqueFiles.length; i++) {
-      const [path, chunks] = uniqueFiles[i]!;
-      const topResult = chunks[0]!; // Highest scoring chunk for this file
-      const fileId = `${messageId}-file-${i}`;
-      
-      // Try to get the full document content
-      const docKey = getDocumentKeyFromPath(path);
-      const fullDoc = docCache.get(docKey) || docCache.get(topResult.metadata.urlPath);
-      
-      // Collapsed header (always visible)
-      html += `
-        <div class="rag-debug-result-file" data-file-id="${fileId}" id="${fileId}">
-          <div class="rag-debug-result-file-header" onclick="this.closest('.rag-debug-result-file').classList.toggle('expanded')">
-            <span class="rag-debug-result-toggle">${ICONS['chevron-right']}</span>
-            <div class="rag-debug-result-file-info">
-              <div class="rag-debug-result-file-name">${escapeHtml(topResult.metadata.title)}</div>
-              <div class="rag-debug-result-file-path">${escapeHtml(path)}</div>
-            </div>
-            <span class="rag-debug-result-file-score">${Math.round(topResult.score * 100)}%</span>
-          </div>
-          <div class="rag-debug-result-file-content">
-            ${fullDoc 
-              ? `<div class="rag-debug-result-full-doc">${renderDocumentWithHighlights(fullDoc.content, chunks)}</div>`
-              : chunks.map((chunk, chunkIdx) => `
-                <div class="rag-debug-result-chunk">
-                  <div class="rag-debug-result-chunk-header">Chunk ${chunkIdx + 1} (${Math.round(chunk.score * 100)}%)</div>
-                  <div class="rag-debug-result-chunk-text">${escapeHtml(chunk.text)}</div>
-                </div>
-              `).join('')
-            }
-          </div>
-        </div>
-      `;
+    if (!localRAG.isReady()) {
+      await localRAG.initialize();
     }
-
-    html += '</div>';
+    
+    await localRAG.search('test', 1);
+    console.log('[rag-debug] RAG warm-up complete');
+  } catch (error) {
+    console.warn('[rag-debug] RAG warm-up failed (non-critical):', error);
   }
-
-  messageEl.innerHTML = html;
-  container.appendChild(messageEl);
-  container.scrollTop = container.scrollHeight;
 }
 
 /**
@@ -326,13 +283,10 @@ export async function addChatMessage(role: ChatMessage['role'], content: string,
  * @param query - User query string
  * @public
  */
-export async function sendChatMessage(query: string): Promise<void> {
+export async function sendChatMessage(query: string): Promise<ChatMessage | null> {
   console.log('[rag-debug] sendChatMessage called with query:', query);
-  await addChatMessage('user', query);
 
   try {
-    await addChatMessage('system', 'Loading Turso Browser RAG and searching...');
-
     const localRAG = await getLocalRAG();
     console.log('[rag-debug] localRAG ready:', localRAG.isReady());
 
@@ -340,29 +294,32 @@ export async function sendChatMessage(query: string): Promise<void> {
       await localRAG.initialize();
     }
 
-    // Remove the loading message
-    const container = debugDialog?.querySelector('#rag-debug-chat-messages');
-    const messages = container?.querySelectorAll('.rag-debug-message.system');
-    messages?.forEach(m => {
-      if (m.textContent?.includes('Loading Turso Browser RAG')) {
-        m.remove();
-      }
-    });
-
     console.log('[rag-debug] Calling search with query:', query);
     const results = await localRAG.search(query, 5);
     console.log('[rag-debug] Search returned', results.length, 'results');
 
     if (results.length === 0) {
-      await addChatMessage('assistant', 'No relevant documents found for your query.');
+      return {
+        role: 'assistant',
+        content: 'No relevant documents found for your query.',
+        timestamp: Date.now(),
+      };
     } else {
       const response = formatSearchResultsForChat(results);
-      await addChatMessage('assistant', response, results);
+      return {
+        role: 'assistant',
+        content: response,
+        timestamp: Date.now(),
+        results,
+      };
     }
   } catch (error) {
     console.error('[rag-debug] Chat search failed:', error);
-    await addChatMessage('assistant', `Error: ${error instanceof Error ? error.message : 'Search failed'}`);
-    await addChatMessage('system', 'Tip: If Turso Browser RAG keeps failing to load, refresh the page. If it still stalls, the persistent local database may be unavailable and the app should fall back to memory mode.');
+    return {
+      role: 'assistant',
+      content: `Error: ${error instanceof Error ? error.message : 'Search failed'}`,
+      timestamp: Date.now(),
+    };
   }
 }
 

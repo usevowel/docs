@@ -53,7 +53,13 @@ export {
 } from './documents';
 
 // Re-export chat functions
-export { addChatMessage, sendChatMessage } from './chat';
+export { addChatMessage, sendChatMessage, warmUpRAG } from './chat';
 
 // Re-export state (for advanced usage)
 export { state, debugDialog, floatingButton } from './state';
+
+// Re-export React components
+export { RAGDebugFAB, type RAGDebugFABProps } from './RAGDebugFAB';
+export { DocumentsPanel, type DocumentsPanelProps } from './DocumentsPanel';
+export { ReusableSpinner, type SpinnerProps as ReusableSpinnerProps } from './ReusableSpinner';
+export { ChatPanel, type ChatPanelProps } from './ChatPanel';

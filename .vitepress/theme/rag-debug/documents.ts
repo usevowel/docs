@@ -100,10 +100,7 @@ export async function getIndexedDocuments(): Promise<DebugDocument[]> {
  * 
  * @public
  */
-export async function refreshDocuments(): Promise<void> {
-  const treeContainer = debugDialog?.querySelector('#rag-debug-doc-tree');
-  if (!treeContainer) return;
-
+export async function refreshDocuments(): Promise<DebugDocument[]> {
   state.isLoading = true;
   void updateStatus();
   updateProgressBar(0, 'Loading documents...');
@@ -113,66 +110,22 @@ export async function refreshDocuments(): Promise<void> {
     state.documents = docs;
 
     if (docs.length === 0) {
-      // Check if we got an error or just no docs
-      const statusText = debugDialog?.querySelector('#rag-debug-status-text')?.textContent;
-      if (statusText?.includes('Error')) {
-        treeContainer.innerHTML = `
-          <div class="rag-debug-empty">
-            ${ICONS.database}
-            <p>Failed to load documents. Check console for details.</p>
-            <p style="font-size: 11px; margin-top: 8px;">${statusText}</p>
-            <button class="rag-debug-btn" style="margin-top: 12px;" id="rag-debug-retry-rag">
-              ${ICONS.refresh} Retry Loading
-            </button>
-          </div>
-        `;
-        treeContainer.querySelector('#rag-debug-retry-rag')?.addEventListener('click', () => {
-          void refreshDocuments();
-        });
-      } else {
-        treeContainer.innerHTML = `
-          <div class="rag-debug-empty">
-            ${ICONS.database}
-            <p>No documents indexed yet. Click "Reload" to index documentation.</p>
-          </div>
-        `;
-      }
+      updateStatusMessage('No documents indexed yet.', 'ready');
     } else {
-      // Build folder tree structure
-      const tree = buildFolderTree(docs);
-      treeContainer.innerHTML = renderFolderTree(tree);
-
-      // Add click handlers for expand/collapse
-      treeContainer.querySelectorAll('.rag-debug-folder-name').forEach((el) => {
-        el.addEventListener('click', (e) => {
-          const folder = (e.currentTarget as HTMLElement).closest('.rag-debug-folder');
-          folder?.classList.toggle('expanded');
-        });
-      });
-
       updateStatusMessage(`Loaded ${docs.length} documents`, 'ready');
       updateProgressBar(100);
     }
+    
+    return docs;
   } catch (error) {
     console.error('[rag-debug] Failed to refresh documents:', error);
-    treeContainer.innerHTML = `
-      <div class="rag-debug-empty">
-        ${ICONS.database}
-        <p>Error loading documents</p>
-        <p style="font-size: 11px; margin-top: 8px;">${error instanceof Error ? error.message : String(error)}</p>
-        <button class="rag-debug-btn" style="margin-top: 12px;" id="rag-debug-retry-load">
-          ${ICONS.refresh} Retry
-        </button>
-      </div>
-    `;
-    treeContainer.querySelector('#rag-debug-retry-load')?.addEventListener('click', () => {
-      void refreshDocuments();
-    });
+    updateStatusMessage(`Error: ${error instanceof Error ? error.message : 'Failed to load'}`, 'error');
     updateProgressBar(0);
+    return [];
+  } finally {
+    state.isLoading = false;
+    void updateStatus();
   }
-
-  state.isLoading = false;
-  void updateStatus();
 }
 
 /**
