@@ -11,7 +11,7 @@
  */
 
 import type { ChatMessage, SearchResult } from './types';
-import { state, getLocalRAG } from './state';
+import { state, getLocalRAG, notifyChatMessageListeners } from './state';
 import { ICONS } from './icons';
 import { escapeHtml, formatTime } from './utils';
 import * as yaml from 'js-yaml';
@@ -255,6 +255,7 @@ export async function addChatMessage(
   };
 
   state.chatMessages.push(message);
+  notifyChatMessageListeners();
 
   return message;
 }

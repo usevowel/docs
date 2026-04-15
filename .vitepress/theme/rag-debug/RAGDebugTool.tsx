@@ -30,7 +30,8 @@ import type { InitializationProgress } from '../prebuilt-rag';
 import { 
   getPrebuiltRAG, 
   markAutoInitStarted, 
-  autoInitStarted 
+  autoInitStarted,
+  subscribeToChatMessages
 } from './state';
 import { 
   refreshDocuments, 
@@ -186,6 +187,14 @@ export function RAGDebugTool(): React.ReactElement | null {
     return () => {
       // Cleanup if needed
     };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToChatMessages((messages) => {
+      setChatMessages(messages);
+    });
+    
+    return unsubscribe;
   }, []);
 
   /**

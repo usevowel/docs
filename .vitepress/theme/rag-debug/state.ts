@@ -21,6 +21,37 @@ export const state: DebugState = {
 };
 
 /**
+ * Subscription callbacks for chat message changes
+ */
+type ChatMessageListener = (messages: ChatMessage[]) => void;
+const chatMessageListeners: Set<ChatMessageListener> = new Set();
+
+/**
+ * Subscribe to chat message changes
+ * @param listener - Callback to be called when chat messages change
+ * @returns Unsubscribe function
+ * @public
+ */
+export function subscribeToChatMessages(listener: ChatMessageListener): () => void {
+  chatMessageListeners.add(listener);
+  listener(state.chatMessages);
+  
+  return () => {
+    chatMessageListeners.delete(listener);
+  };
+}
+
+/**
+ * Notify all listeners of chat message changes
+ * @internal
+ */
+export function notifyChatMessageListeners(): void {
+  chatMessageListeners.forEach(listener => {
+    listener(state.chatMessages);
+  });
+}
+
+/**
  * Reference to the dialog element
  * @public
  */
