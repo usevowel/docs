@@ -105,6 +105,15 @@ OPENAI_COMPATIBLE_API_KEY=
 | `OPENAI_COMPATIBLE_API_KEY` | - | API key for that audio service, if required |
 | `CORE_ENABLE_DEV_VOICE_OVERRIDES` | `false` | Allow hidden client `_voiceConfig` runtime overrides in Core |
 
+### STT/TTS Provider Selection (Dev-Only)
+
+The ability to configure STT/TTS providers through the token system (via `voiceConfig.stt` and `voiceConfig.tts` in token requests) is a **development-only feature**. This follows the same pattern as LLM provider/model overrides:
+
+- **Development**: When `CORE_ENABLE_DEV_VOICE_OVERRIDES=true` (self-hosted Core) or `VOWEL_ENABLE_DEV_VOICE_CONFIG_OVERRIDES=true` (hosted platform), clients can override speech providers via token configuration
+- **Production**: Speech providers should be configured through app presets, not client token overrides. The token's provider configuration is ignored in production - only preset-backed configuration is used
+
+This ensures consistent behavior across sessions and prevents configuration drift in production environments. The dev flags exist to allow rapid iteration during development without requiring preset changes.
+
 ### VAD Configuration
 
 Voice Activity Detection (VAD) detects when users start and stop speaking:

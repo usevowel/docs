@@ -7,7 +7,7 @@ compatibility_date = "2025-11-03"
 compatibility_flags = ["nodejs_compat"]
 
 # Account ID - set via CLOUDFLARE_ACCOUNT_ID environment variable or uncomment below
-account_id = "placeholders"
+account_id = "84882f590c2154079d59fbaef6fb382b"
 
 # Custom domain configuration
 # Custom domain: docs.vowel.to

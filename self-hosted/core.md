@@ -175,6 +175,8 @@ Core reads these environment variables from `stack.env`:
 - `DEFAULT_TTS_PROVIDER`: Default TTS provider for bootstrap and new app defaults
 - `CORE_ENABLE_DEV_VOICE_OVERRIDES`: Allows hidden client `_voiceConfig` overrides for development only
 
+> **Note:** The ability to override STT/TTS providers via token configuration is a development-only feature. In production, speech providers should be configured through app presets, not client token overrides. This ensures consistent behavior across sessions and prevents configuration drift.
+
 Core does not store speech-provider secrets in app settings. Operators keep those secrets in the stack environment, and apps store only provider selections plus non-secret model, language, and voice defaults.
 
 ### Endpoint Presets

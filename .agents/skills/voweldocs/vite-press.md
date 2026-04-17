@@ -111,7 +111,7 @@ async function buildVowelConfig(router: any, credentials: StoredCredentials): Pr
       provider: 'vowel-prime',
       llmProvider: 'groq',
       model: 'openai/gpt-oss-20b',
-      voice: 'vowel',
+      voice: 'Timothy',
       language: 'en-US',
       turnDetection: { mode: 'server_vad' },
     },

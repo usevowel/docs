@@ -207,28 +207,32 @@ async function buildVowelConfig(
     // Voice configuration - Use Grok when USE_GROK flag is enabled
     voiceConfig: USE_GROK
       ? {
-          // Direct Grok provider configuration
           provider: 'grok',
           clientIdleHibernateTimeoutMs: 50000,
-          // model: 'grok-2-1212', // Grok's multimodal model for voice
-          voice: 'Arcadia', // Grok voice option: Arcadia, Ara, Leo, Rex, Sal
+          model: 'grok-voice-think-fast-1.0',
+          voice: 'Arcadia',
           language: 'en-US',
+          initialGreetingPrompt: 'Introduce yourself as Val, the voice assistant for vowel docs. Be brief.',
         }
       : {
           // vowel-prime provider configuration (default)
           provider: 'vowel-prime',
           vowelPrimeConfig: {
             environment: 'testing',
+            // environment: 'dev',
           },
-          llmProvider: 'groq',
-          model: 'openai/gpt-oss-120b',
+          llmProvider: 'openrouter',
+          model: 'google/gemini-3.1-flash-lite-preview',
+          // llmProvider: 'groq',
+          // model: 'openai/gpt-oss-120b',
           // model: 'moonshotai/kimi-k2-instruct-0905',
-          voice: 'vowel', // Vowel branded voice with OCR-A aesthetic
+          voice: 'Timothy', 
           language: 'en-US',
           // Server-side VAD configuration for more accurate speech detection
           turnDetection: {
             mode: 'server_vad',
           },
+          initialGreetingPrompt: 'Introduce yourself as Val, the voice assistant for vowel docs. Be brief.',
         },
 
     // Enable captions display for transcription visibility
