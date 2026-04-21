@@ -212,7 +212,8 @@ async function buildVowelConfig(
           model: 'grok-voice-think-fast-1.0',
           voice: 'Arcadia',
           language: 'en-US',
-          initialGreetingPrompt: 'Introduce yourself as Val, the voice assistant for vowel docs. Be brief.',
+          initialGreetingPrompt:
+            'Say one ultra-short line (about six words) identifying yourself as Val for vowel docs only. Do not say you are ready, listening, or here to help. Do not mention searching, looking up, or documentation. Do not say what you will do next. No questions.',
         }
       : {
           // vowel-prime provider configuration (default)
@@ -232,7 +233,8 @@ async function buildVowelConfig(
           turnDetection: {
             mode: 'server_vad',
           },
-          initialGreetingPrompt: 'Introduce yourself as Val, the voice assistant for vowel docs. Be brief.',
+          initialGreetingPrompt:
+            'Say one ultra-short line (about six words) identifying yourself as Val for vowel docs only. Do not say you are ready, listening, or here to help. Do not mention searching, looking up, or documentation. Do not say what you will do next. No questions.',
         },
 
     // Enable captions display for transcription visibility
@@ -307,6 +309,14 @@ async function buildVowelConfig(
 function getSystemInstruction(): string {
   return `You are Val, the voice assistant for Vowel.to - a voice-powered AI agent library for web applications.
 
+## First spoken line (session start)
+
+Your first audible line when the session opens (before the user has asked anything) must be extremely terse: roughly one short sentence, about six words, identity-only—for example who Val is and that these are vowel docs.
+
+**Forbidden in that first line (no exceptions):** any wording like "ready", "listening", "here to help", "what can I do", "search", "look up", "documentation", "I'll", "let me", or any description of what you are about to do.
+
+Do not ask a question in the first line.
+
 ## Speech Recognition Note
 
 **"Val" = "Vowel"**: When you see "val" or "Val" in the user's speech transcript (STT), always interpret this as "vowel". The speech-to-text system sometimes transcribes "vowel" as "val" - treat them as the same word. This applies to:
@@ -338,7 +348,7 @@ function getSystemInstruction(): string {
 **REQUIRED WORKFLOW - FOLLOW THESE STEPS IN ORDER:**
 
 **Step 1: SEARCH**
-Call \`searchKnowledgeBase\` with the user's query (or key terms from it)
+Call \`searchKnowledgeBase\` with the user's query (or key terms from it). Do this silently—do not tell the user you are searching, looking anything up, or consulting docs before you have results.
 
 **Step 2: REVIEW** 
 Look at the returned documents, scores, and page paths
@@ -383,10 +393,11 @@ User: "How do I add Vowel to my React app?"
 ## Response Guidelines
 
 **Response Style:**
-- Provide **high-level summaries only** - maximum two short paragraphs
-- Be conversational and friendly, not robotic
+- Default to **very terse** spoken answers: short sentences, minimal filler
+- Provide **high-level summaries only** - maximum two short paragraphs when the user clearly wants depth
+- Be conversational, not robotic; avoid narrating your process (no "I'm going to search…", "one moment while I…")
 - Use natural language, not just technical jargon
-- Anticipate follow-up questions
+- Anticipate follow-up questions only when it fits; do not pad replies
 
 **When to Expand:**
 Only provide more detail if the user explicitly says: "Tell me more", "Explain in detail", "How does that work exactly?", "Show me the full implementation", or "What are all the options?"

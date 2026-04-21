@@ -289,14 +289,14 @@ export function RAGDebugTool(): React.ReactElement | null {
         return withoutLoading;
       });
     } catch (error) {
-      setChatMessages((prev) => [
-        ...prev.filter((m) => m !== loadingMessage),
-        {
+      setChatMessages((prev) => {
+        const withoutLoading = prev.filter((m) => m !== loadingMessage);
+        return [...withoutLoading, {
           role: 'assistant',
           content: `Error: ${error instanceof Error ? error.message : 'Search failed'}`,
           timestamp: Date.now(),
-        },
-      ]);
+        }];
+      });
     }
   }, []);
 

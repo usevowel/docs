@@ -21,22 +21,41 @@ function configureTransformersEnv(): void {
 
 async function createExtractor(): Promise<FeatureExtractionPipeline> {
   const hasWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator
-  const options = { device: hasWebGPU ? 'webgpu' : 'wasm' } as const
+
+  // Try WebGPU first, then fall back to WASM
+  const options = { device: 'webgpu' } as const
 
   configureTransformersEnv()
 
+  console.log("try to createFeatureExtractionPipeline with WebGPU")
 
-  console.log("try to createFeatureExtractionPipeline", options)
+  try {
+    const pipeline = await createFeatureExtractionPipeline(
+      'feature-extraction',
+      EMBEDDING_MODEL,
+      options
+    )
 
-  const pipeline = await createFeatureExtractionPipeline(
-    'feature-extraction',
-    EMBEDDING_MODEL,
-    options
-  )
+    console.log('createFeatureExtractionPipeline success with WebGPU')
 
-  console.log('createFeatureExtractionPipeline success', options)
+    return pipeline
+  } catch (error) {
+    console.warn('WebGPU not available or failed, falling back to WASM:', error)
 
-  return pipeline;
+    const wasmOptions = { device: 'wasm' } as const
+
+    console.log("try to createFeatureExtractionPipeline with WASM", wasmOptions)
+
+    const pipeline = await createFeatureExtractionPipeline(
+      'feature-extraction',
+      EMBEDDING_MODEL,
+      wasmOptions
+    )
+
+    console.log('createFeatureExtractionPipeline success with WASM')
+
+    return pipeline
+  }
 }
 
 async function getExtractor(): Promise<FeatureExtractionPipeline> {

@@ -10,7 +10,6 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
 import * as Tabs from '@radix-ui/react-tabs';
 import { StatusBar } from './StatusBar';
 import { injectStyles } from './ui';
@@ -34,10 +33,10 @@ export interface RAGDebugDialogProps {
 }
 
 /**
- * Draggable dialog component for the RAG debug tool.
+ * Draggable floating component for the RAG debug tool.
  *
  * Features:
- * - Radix Dialog primitive for accessibility
+ * - Custom draggable floating div (no modal overlay)
  * - Radix Tabs primitive for Documents/Chat switching
  * - Draggable header for repositioning
  * - Fixed positioning at bottom-left of viewport
@@ -106,6 +105,10 @@ export function RAGDebugDialog({
     setIsDragging(false);
   }, []);
 
+  const handleClose = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
   useEffect(() => {
     injectStyles();
   }, []);
@@ -126,89 +129,86 @@ export function RAGDebugDialog({
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
+  if (!open) return null;
+
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Content
-          ref={dialogRef}
-          className="rag-debug-dialog"
-          style={{
-            bottom: position.bottom,
-            left: position.left,
-          }}
-          onMouseDown={(e) => e.stopPropagation()}
+    <div
+      ref={dialogRef}
+      className="rag-debug-dialog"
+      style={{
+        bottom: position.bottom,
+        left: position.left,
+      }}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      {/* Header - Draggable */}
+      <div
+        className="rag-debug-header"
+        onMouseDown={handleMouseDown}
+      >
+        <h3 className="rag-debug-title">Turso Browser RAG</h3>
+        <button
+          className="rag-debug-close"
+          aria-label="Close"
+          type="button"
+          onClick={handleClose}
         >
-          {/* Header - Draggable */}
-          <div
-            className="rag-debug-header"
-            onMouseDown={handleMouseDown}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <Dialog.Title className="rag-debug-title">Turso Browser RAG</Dialog.Title>
-            <Dialog.Close asChild>
-              <button
-                className="rag-debug-close"
-                aria-label="Close"
-                type="button"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M12 4L4 12M4 4L12 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            </Dialog.Close>
-          </div>
+            <path
+              d="M12 4L4 12M4 4L12 12"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
 
-          <Tabs.Root defaultValue="documents" className="rag-debug-tabs">
-            <Tabs.List className="rag-debug-tabs-list" aria-label="RAG Debug Tools">
-              <Tabs.Trigger
-                value="documents"
-                className="rag-debug-tab-trigger"
-              >
-                Documents
-              </Tabs.Trigger>
-              <Tabs.Trigger
-                value="chat"
-                className="rag-debug-tab-trigger"
-              >
-                Chat
-              </Tabs.Trigger>
-            </Tabs.List>
+      <Tabs.Root defaultValue="documents" className="rag-debug-tabs">
+        <Tabs.List className="rag-debug-tabs-list" aria-label="RAG Debug Tools">
+          <Tabs.Trigger
+            value="documents"
+            className="rag-debug-tab-trigger"
+          >
+            Documents
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="chat"
+            className="rag-debug-tab-trigger"
+          >
+            Chat
+          </Tabs.Trigger>
+        </Tabs.List>
 
-            <Tabs.Content
-              value="documents"
-              className="rag-debug-tab-content"
-            >
-              {children.documentsPanel}
-            </Tabs.Content>
+        <Tabs.Content
+          value="documents"
+          className="rag-debug-tab-content"
+        >
+          {children.documentsPanel}
+        </Tabs.Content>
 
-            <Tabs.Content
-              value="chat"
-              className="rag-debug-tab-content"
-            >
-              {children.chatPanel}
-            </Tabs.Content>
-          </Tabs.Root>
+        <Tabs.Content
+          value="chat"
+          className="rag-debug-tab-content"
+        >
+          {children.chatPanel}
+        </Tabs.Content>
+      </Tabs.Root>
 
-          <StatusBar
-            message={statusMessage}
-            type={statusType}
-            progress={progress}
-            chunkCount={chunkCount}
-          />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      <StatusBar
+        message={statusMessage}
+        type={statusType}
+        progress={progress}
+        chunkCount={chunkCount}
+      />
+    </div>
   );
 }
 

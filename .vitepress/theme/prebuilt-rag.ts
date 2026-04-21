@@ -9,7 +9,7 @@
  * - Instant initialization (no client-side embedding computation)
  * - Consistent chunking and embeddings (same model, same processing)
  * - Smaller bundle (no need to bundle all MDX files)
- * - Better performance (no WASM/WebGPU model loading for embedding generation)
+ * - WebGPU acceleration with WASM fallback for embedding generation
  *
  * @module prebuilt-rag
  */
