@@ -28,10 +28,15 @@ import type { DebugDocument, ChatMessage } from './types';
 import type { InitializationProgress } from '../prebuilt-rag';
 
 import { 
+  state,
   getPrebuiltRAG, 
   markAutoInitStarted, 
   autoInitStarted,
-  subscribeToChatMessages
+  setActiveTab,
+  setChatMessages,
+  setDialogOpen,
+  subscribeToChatMessages,
+  subscribeToUIState,
 } from './state';
 import { 
   refreshDocuments, 
@@ -93,16 +98,10 @@ export function RAGDebugTool(): React.ReactElement | null {
   }
 
   // State
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'documents' | 'chat'>('documents');
+  const [isOpen, setIsOpenState] = useState(state.isOpen);
+  const [activeTab, setActiveTabState] = useState<'documents' | 'chat'>(state.activeTab);
   const [documents, setDocuments] = useState<DebugDocument[]>([]);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      role: 'system',
-      content: 'Welcome to RAG Debug Chat! Type a query to test semantic search against the documentation.',
-      timestamp: Date.now(),
-    },
-  ]);
+  const [chatMessages, setChatMessagesState] = useState<ChatMessage[]>(state.chatMessages);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('Initializing...');
@@ -190,8 +189,17 @@ export function RAGDebugTool(): React.ReactElement | null {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = subscribeToUIState((uiState) => {
+      setIsOpenState(uiState.isOpen);
+      setActiveTabState(uiState.activeTab);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = subscribeToChatMessages((messages) => {
-      setChatMessages(messages);
+      setChatMessagesState(messages);
     });
     
     return unsubscribe;
@@ -201,21 +209,14 @@ export function RAGDebugTool(): React.ReactElement | null {
    * Handle FAB click
    */
   const handleFABClick = useCallback(() => {
-    setIsOpen((prev) => !prev);
+    setDialogOpen(!state.isOpen);
   }, []);
 
   /**
    * Handle dialog close
    */
   const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
-    
-    if (open) {
-      // Refresh data when opening
-      refreshDocuments().then((docs) => {
-        setDocuments(docs);
-      });
-    }
+    setDialogOpen(open);
   }, []);
 
   /**
@@ -224,6 +225,14 @@ export function RAGDebugTool(): React.ReactElement | null {
   const handleTabChange = useCallback((value: string) => {
     setActiveTab(value as 'documents' | 'chat');
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    refreshDocuments().then((docs) => {
+      setDocuments(docs);
+    });
+  }, [isOpen]);
 
   /**
    * Handle refresh documents
@@ -270,33 +279,32 @@ export function RAGDebugTool(): React.ReactElement | null {
       content: message,
       timestamp: Date.now(),
     };
-    setChatMessages((prev) => [...prev, userMessage]);
 
     const loadingMessage: ChatMessage = {
       role: 'system',
       content: 'Loading Turso Browser RAG and searching...',
       timestamp: Date.now() + 1,
     };
-    setChatMessages((prev) => [...prev, loadingMessage]);
+    setChatMessages([...state.chatMessages, userMessage, loadingMessage]);
 
     try {
       const response = await sendChatMessage(message);
-      setChatMessages((prev) => {
-        const withoutLoading = prev.filter((m) => m !== loadingMessage);
-        if (response) {
-          return [...withoutLoading, response];
-        }
-        return withoutLoading;
-      });
+      const withoutLoading = state.chatMessages.filter((m) => m !== loadingMessage);
+      if (response) {
+        setChatMessages([...withoutLoading, response]);
+      } else {
+        setChatMessages(withoutLoading);
+      }
     } catch (error) {
-      setChatMessages((prev) => {
-        const withoutLoading = prev.filter((m) => m !== loadingMessage);
-        return [...withoutLoading, {
+      const withoutLoading = state.chatMessages.filter((m) => m !== loadingMessage);
+      setChatMessages([
+        ...withoutLoading,
+        {
           role: 'assistant',
           content: `Error: ${error instanceof Error ? error.message : 'Search failed'}`,
           timestamp: Date.now(),
-        }];
-      });
+        },
+      ]);
     }
   }, []);
 
@@ -533,6 +541,8 @@ export function RAGDebugTool(): React.ReactElement | null {
       <RAGDebugDialog
         open={isOpen}
         onOpenChange={handleOpenChange}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         statusMessage={statusMessage}
         statusType={statusType}
         progress={progress}

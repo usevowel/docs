@@ -22,6 +22,8 @@ import { injectStyles } from './ui';
 export interface RAGDebugDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  activeTab: 'documents' | 'chat';
+  onTabChange: (tab: 'documents' | 'chat') => void;
   children: {
     documentsPanel: React.ReactNode;
     chatPanel: React.ReactNode;
@@ -58,6 +60,8 @@ export interface RAGDebugDialogProps {
 export function RAGDebugDialog({
   open,
   onOpenChange,
+  activeTab,
+  onTabChange,
   children,
   statusMessage,
   statusType,
@@ -171,7 +175,7 @@ export function RAGDebugDialog({
         </button>
       </div>
 
-      <Tabs.Root defaultValue="documents" className="rag-debug-tabs">
+      <Tabs.Root value={activeTab} onValueChange={(value) => onTabChange(value as 'documents' | 'chat')} className="rag-debug-tabs">
         <Tabs.List className="rag-debug-tabs-list" aria-label="RAG Debug Tools">
           <Tabs.Trigger
             value="documents"

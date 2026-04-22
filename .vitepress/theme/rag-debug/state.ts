@@ -8,6 +8,14 @@
 
 import type { DebugState, DebugDocument, ChatMessage } from './types';
 
+const DEFAULT_CHAT_MESSAGES: ChatMessage[] = [
+  {
+    role: 'system',
+    content: 'Welcome to RAG Debug Chat! Type a query to test semantic search against the documentation.',
+    timestamp: Date.now(),
+  },
+];
+
 /**
  * Global state for the debug tool
  * @public
@@ -16,9 +24,59 @@ export const state: DebugState = {
   isOpen: false,
   activeTab: 'documents',
   documents: [],
-  chatMessages: [],
+  chatMessages: DEFAULT_CHAT_MESSAGES,
   isLoading: false,
 };
+
+type UIStateListener = (uiState: Pick<DebugState, 'isOpen' | 'activeTab'>) => void;
+const uiStateListeners: Set<UIStateListener> = new Set();
+
+function getUIState(): Pick<DebugState, 'isOpen' | 'activeTab'> {
+  return {
+    isOpen: state.isOpen,
+    activeTab: state.activeTab,
+  };
+}
+
+export function subscribeToUIState(listener: UIStateListener): () => void {
+  uiStateListeners.add(listener);
+  listener(getUIState());
+
+  return () => {
+    uiStateListeners.delete(listener);
+  };
+}
+
+export function notifyUIStateListeners(): void {
+  const uiState = getUIState();
+  uiStateListeners.forEach((listener) => {
+    listener(uiState);
+  });
+}
+
+export function setDialogOpen(isOpen: boolean): void {
+  if (state.isOpen === isOpen) return;
+  state.isOpen = isOpen;
+  notifyUIStateListeners();
+}
+
+export function setActiveTab(activeTab: DebugState['activeTab']): void {
+  if (state.activeTab === activeTab) return;
+  state.activeTab = activeTab;
+  notifyUIStateListeners();
+}
+
+export function appendChatMessage(message: ChatMessage): ChatMessage[] {
+  state.chatMessages = [...state.chatMessages, message];
+  notifyChatMessageListeners();
+  return state.chatMessages;
+}
+
+export function setChatMessages(messages: ChatMessage[]): ChatMessage[] {
+  state.chatMessages = [...messages];
+  notifyChatMessageListeners();
+  return state.chatMessages;
+}
 
 /**
  * Subscription callbacks for chat message changes
@@ -34,7 +92,7 @@ const chatMessageListeners: Set<ChatMessageListener> = new Set();
  */
 export function subscribeToChatMessages(listener: ChatMessageListener): () => void {
   chatMessageListeners.add(listener);
-  listener(state.chatMessages);
+  listener([...state.chatMessages]);
   
   return () => {
     chatMessageListeners.delete(listener);
@@ -47,7 +105,7 @@ export function subscribeToChatMessages(listener: ChatMessageListener): () => vo
  */
 export function notifyChatMessageListeners(): void {
   chatMessageListeners.forEach(listener => {
-    listener(state.chatMessages);
+    listener([...state.chatMessages]);
   });
 }
 

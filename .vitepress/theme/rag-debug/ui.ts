@@ -9,7 +9,7 @@
  */
 
 import type { PrebuiltRAG, InitializationProgress } from '../prebuilt-rag.ts';
-import { state, debugDialog, floatingButton, setDebugDialog, setFloatingButton, getPrebuiltRAG, getLocalRAG, markAutoInitStarted, autoInitStarted } from './state';
+import { state, debugDialog, floatingButton, setActiveTab, setDebugDialog, setDialogOpen, setFloatingButton, getPrebuiltRAG, getLocalRAG, markAutoInitStarted, autoInitStarted } from './state';
 import { ICONS } from './icons';
 import { DEBUG_STYLES } from './styles';
 import { checkDebugEnabled } from './utils';
@@ -312,12 +312,16 @@ export function toggleDialog(): void {
  * Open the debug dialog
  * @public
  */
-export function openDialog(): void {
+export function openDialog(tab?: 'documents' | 'chat'): void {
   const btn = document.getElementById('rag-debug-fab') as HTMLButtonElement | null;
+  if (tab) {
+    setActiveTab(tab);
+  }
+  setDialogOpen(true);
+
   if (!debugDialog || btn?.disabled) return;
 
   debugDialog.classList.remove('hidden');
-  state.isOpen = true;
 
   // Refresh data
   void refreshDocuments();
@@ -337,10 +341,11 @@ export function openDialog(): void {
  * @public
  */
 export function closeDialog(): void {
+  setDialogOpen(false);
+
   if (!debugDialog) return;
 
   debugDialog.classList.add('hidden');
-  state.isOpen = false;
 }
 
 /**
@@ -350,7 +355,7 @@ export function closeDialog(): void {
  * @public
  */
 export function switchTab(tab: 'documents' | 'chat'): void {
-  state.activeTab = tab;
+  setActiveTab(tab);
 
   // Update tab buttons
   debugDialog?.querySelectorAll('.rag-debug-tab').forEach((btn) => {
