@@ -32,17 +32,17 @@ Use voweldocs when:
 
 ## Gitignore Setup
 
-When using the RAG prebuild feature, add these entries to `.gitignore` to exclude downloaded binaries and build state:
+When using the RAG prebuild feature, gitignore **local build inputs** (llama.cpp tree, GGUF model, Python venv). **Commit** the post-build YAML: `public/rag-index.yml`, `public/rag-documents.yml`, and `scripts/.rag-build-state.yml`.
 
 ```gitignore
-# RAG build artifacts - llama.cpp binaries and build state
+# RAG build inputs (heavy / reproducible via build-rag.py)
 scripts/llama-*/
-scripts/.rag-build-state.yml
-scripts/uv.lock
 scripts/*.gguf
+scripts/.venv/
+scripts/__pycache__/
 ```
 
-The generated `public/rag-index.yml` and `public/rag-documents.yml` should **not** be gitignored if you want pre-built embeddings in your repository. If you prefer to generate them during CI/CD, add:
+Commit `scripts/uv.lock` when using `uv` for reproducible deps. If you prefer to generate indices only in CI, you may exclude the YAML outputs in your own project:
 
 ```gitignore
 # Uncomment to exclude pre-built RAG indices (generate in CI instead)
