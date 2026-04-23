@@ -259,6 +259,7 @@ export default defineConfig({
             { text: 'Overview', link: '/recipes/' },
             { text: 'Event Notifications', link: '/recipes/event-notifications' },
             { text: 'Custom Actions', link: '/recipes/custom-actions' },
+            { text: 'WebMCP', link: '/recipes/webmcp' },
             { text: 'Navigation Control', link: '/recipes/navigation' },
             { text: 'Page Automation', link: '/recipes/page-automation' },
             { text: 'Speaking State Tracking', link: '/recipes/speaking-state' },

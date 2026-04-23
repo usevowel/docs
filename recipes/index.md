@@ -13,6 +13,7 @@ Practical examples and patterns for common use cases with Vowel.
 - [Page Automation](./page-automation) - Voice-controlled page interaction
 - [Speaking State Tracking](./speaking-state) - Track user and AI speaking states
 - [Connection Paradigms](./connection-paradigms) - Advanced connection patterns (API keys, server-side tokens, sidecar pattern)
+- [WebMCP](./webmcp) - Browser Model Context Protocol: expose Vowel actions to WebMCP and discover page tools
 
 ### Use Cases
 
