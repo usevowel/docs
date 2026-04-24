@@ -9,7 +9,7 @@
  * - Documents tab: view folder structure, add/remove adhoc docs, import/export, clear/reload
  * - Chat tab: interactive RAG query testing with results
  * 
- * Only enabled when PUBLIC_VOWEL_DEBUG_RAG=true in environment.
+ * Only enabled when VITE_VOWEL_DEBUG_RAG=true in environment.
  * 
  * @packageDocumentation
  */

@@ -133,7 +133,7 @@ Binary vectors provide extreme compression (~32x vs Float32) and fast distance c
 ```
 
 **File:** docs/manual.md (L714-849)
-```markdown
+````markdown
 **`vector32(value)`**
 
 Converts a text or blob value into a 32-bit dense vector.
@@ -270,10 +270,10 @@ SELECT vector_slice(vector32('[1.0, 2.0, 3.0, 4.0, 5.0]'), 1, 4);
 -- Results in: [2.0, 3.0, 4.0]
 ```
 
-```
+````
 
 **File:** docs/manual.md (L850-877)
-```markdown
+````markdown
 ### Example: Semantic search
 
 Here's a complete example of building a semantic search system:
@@ -302,10 +302,10 @@ FROM documents
 ORDER BY similarity
 LIMIT 5;
 ```
-```
+````
 
 **File:** docs/manual.md (L885-894)
-```markdown
+````markdown
 ### Creating an FTS Index
 
 Create an FTS index on text columns using the `USING fts` syntax:
@@ -316,10 +316,10 @@ CREATE INDEX idx_articles ON articles USING fts (title, body);
 
 You can index multiple columns in a single FTS index. The index automatically tracks inserts, updates, and deletes to the underlying table.
 
-```
+````
 
 **File:** docs/manual.md (L907-916)
-```markdown
+````markdown
 **Available tokenizers:**
 
 | Tokenizer | Description | Use Case |
@@ -330,10 +330,10 @@ You can index multiple columns in a single FTS index. The index automatically tr
 | `whitespace` | Split on whitespace only | Space-separated tokens |
 | `ngram` | 2-3 character n-grams | Autocomplete, substring matching |
 
-```
+````
 
 **File:** docs/manual.md (L917-929)
-```markdown
+````markdown
 ### Field Weights
 
 Configure relative importance of indexed columns for relevance scoring:
@@ -347,7 +347,7 @@ WITH (weights = 'title=2.0,body=1.0');
 CREATE INDEX idx_docs ON docs USING fts (name, description)
 WITH (tokenizer = 'simple', weights = 'name=3.0,description=1.0');
 ```
-```
+````
 
 **File:** README.md (L40-40)
 ```markdown
@@ -360,7 +360,7 @@ WITH (tokenizer = 'simple', weights = 'name=3.0,description=1.0');
 ```
 
 **File:** bindings/javascript/README.md (L36-58)
-```markdown
+````markdown
 ### In-Memory Database
 
 ```javascript
@@ -385,3 +385,4 @@ console.log(users);
 //   { id: 2, name: 'Bob', email: 'bob@example.com' }
 // ]
 ```
+````

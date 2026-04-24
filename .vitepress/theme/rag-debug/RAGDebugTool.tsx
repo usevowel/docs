@@ -93,7 +93,7 @@ export function RAGDebugTool(): React.ReactElement | null {
   // Check if debug mode is enabled
   const isDebugEnabled = checkDebugEnabled();
   if (!isDebugEnabled) {
-    console.log('[RAGDebug] Debug mode not enabled. Set PUBLIC_VOWEL_DEBUG_RAG=true to enable.');
+    console.log('[RAGDebug] Debug mode not enabled. Set VITE_VOWEL_DEBUG_RAG=true to enable.');
     return null;
   }
 

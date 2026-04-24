@@ -63,6 +63,12 @@ class Config:
     n_gpu_layers: int = 99  # Offload all layers to GPU
     n_parallel: int = 64  # Number of parallel slots for concurrent requests
 
+    # HTTP client: long read timeout for slow GPU batches; each worker thread
+    # uses its own request (parallelism is not blocked by other threads' waits).
+    embedding_connect_timeout: int = 30  # Seconds to establish connection
+    embedding_read_timeout: int = 200  # Seconds to read embedding response
+    embedding_max_retries: int = 3  # Retries after a failed attempt (4 tries total)
+
     # Paths
     base_dir: Path = Path(__file__).parent
     docs_dir: Path = None  # Set in __post_init__
@@ -517,25 +523,54 @@ class LlamaEmbeddingGenerator:
         self._progress = None
 
     def _embed_single(self, chunk_data: Dict[str, Any]) -> DocumentChunk:
-        """Generate embedding for a single chunk (thread-safe)."""
+        """
+        Generate embedding for a single chunk (thread-safe).
+
+        Uses a per-request (connect, read) timeout so one slow request does not
+        shorten the deadline for others; other threads keep running in parallel.
+        Transient failures are retried up to ``embedding_max_retries`` times.
+        """
+        cfg = get_config()
         text = chunk_data["text"]
+        http_timeout = (
+            cfg.embedding_connect_timeout,
+            cfg.embedding_read_timeout,
+        )
+        max_attempts = cfg.embedding_max_retries + 1
 
         # Truncate if too long (rough estimate: 4 chars per token)
         max_chars = 450  # Keep under 512 token limit
         if len(text) > max_chars:
             text = text[:max_chars]
 
-        response = self.session.post(
-            f"{self.server_url}/embedding",
-            headers={"Content-Type": "application/json"},
-            json={"content": text},
-            timeout=30,
-        )
-        response.raise_for_status()
+        embedding: Optional[List[float]] = None
+        for attempt in range(max_attempts):
+            try:
+                response = self.session.post(
+                    f"{self.server_url}/embedding",
+                    headers={"Content-Type": "application/json"},
+                    json={"content": text},
+                    timeout=http_timeout,
+                )
+                response.raise_for_status()
 
-        data = response.json()
-        # Response format: [{"index": 0, "embedding": [[...]]}]
-        embedding = data[0]["embedding"][0]
+                data = response.json()
+                # Response format: [{"index": 0, "embedding": [[...]]}]
+                embedding = data[0]["embedding"][0]
+                break
+            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+                if attempt + 1 < max_attempts:
+                    log(
+                        f"Embedding chunk {chunk_data['id'][:12]}... timed out or "
+                        f"connection error (attempt {attempt + 1}/{max_attempts}): {e}"
+                    )
+                    continue
+                raise
+            except requests.exceptions.RequestException:
+                # HTTP errors, invalid JSON, etc. — not retried
+                raise
+        if embedding is None:
+            raise RuntimeError("Embedding failed with no vector returned")
 
         # Update progress
         with self._lock:

@@ -11,7 +11,7 @@ dist/
 # Cloudflare
 .wrangler/
 .dev.vars
-.env
+.env*
 wrangler.toml.local
 
 # Auto-generated voice navigation routes

@@ -1,6 +1,8 @@
 # WebMCP integration
 
-This recipe explains how the vowel **client library** works with [WebMCP](https://github.com/webmachinelearning/webmcp) (Web Model Context Protocol) tooling: sharing tools between the browser’s Model Context surface and the voice session. See the [W3C Web Machine Learning community draft](https://webmachinelearning.github.io/webmcp) for the `navigator.modelContext` API.
+**Canonical Client documentation:** [WebMCP (Client)](/guide/webmcp) — configuration, discovery, action formats, and browser notes.
+
+This recipe is a short overview of how the vowel **client library** works with [WebMCP](https://github.com/webmachinelearning/webmcp) (Web Model Context Protocol) tooling: sharing tools between the browser’s Model Context surface and the voice session. See the [W3C Web Machine Learning community draft](https://webmachinelearning.github.io/webmcp) for the `navigator.modelContext` API.
 
 ## What you get
 
@@ -9,7 +11,7 @@ This recipe explains how the vowel **client library** works with [WebMCP](https:
 | **Vowel → WebMCP** | Each `registerAction` tool can be exposed to the browser via `navigator.modelContext.registerTool` so other on-page Model Context clients can call the same handler. |
 | **WebMCP → Vowel** | Optional discovery of tools already registered in the page (testing API or a global registry) and registration as Vowel actions so the voice model can call them. |
 
-The implementation lives in the client under the WebMCP module; configuration is on `VowelClient` via `webMCP` in your client config.
+Configuration is on the Vowel client via `webMCP` in your client config. See [WebMCP (Client)](/guide/webmcp) for the full feature set.
 
 ## Configuration
 
@@ -29,7 +31,7 @@ const vowel = new Vowel({
 ```
 
 - **`enableExposure`** (default `true`) — When the native API is available, Vowel registers each of your actions with the browser’s tool registry so non-voice Model Context clients can execute the same functions.
-- **`enableDiscovery`** (default `false`) — When `true`, the client looks for tools exposed via the WebMCP testing API (`navigator.modelContextTesting.getTools`) or, as a fallback, the page-level `window.__webmcp_tools` array used by some hosts (e.g. rooter), and registers them as Vowel actions before the session uses them.
+- **`enableDiscovery`** (default `false`) — When `true`, the client looks for tools exposed via the WebMCP testing API (`navigator.modelContextTesting.getTools`) or, as a fallback, the page-level `window.__webmcp_tools` array used by some hosts, and registers them as Vowel actions before the session uses them.
 
 ## Manual rediscovery
 
@@ -43,7 +45,7 @@ Discovery must remain enabled in config (`webMCP.enableDiscovery: true`).
 
 ## Action shape: legacy vs WebMCP
 
-The client accepts **legacy** parameter-style actions and **WebMCP-style** actions that use a JSON Schema-style `inputSchema`. Helpers and type guards (for example `isWebMCPAction` / `isWebMCPActionFormat`) let you support both in one app. For WebMCP-style definitions, the client converts schemas when registering tools with the browser.
+The client accepts **legacy** parameter-style actions and **WebMCP-style** actions that use a JSON Schema-style `inputSchema`. You can use `isLegacyAction` from `@vowel.to/client` to narrow definitions; WebMCP-style actions include `name` and `inputSchema`. For WebMCP-style definitions, the client converts schemas when registering tools with the browser. See [WebMCP (Client)](/guide/webmcp#action-shapes-legacy-and-webmcp-style) for detail.
 
 ## Browser support
 

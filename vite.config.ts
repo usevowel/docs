@@ -1,12 +1,15 @@
 /**
  * Vite configuration for Cloudflare Worker
- * 
+ *
  * This config is used by wrangler deploy to bundle the worker.
- * 
+ *
+ * Local documentation dev (VitePress, HTTPS, mkcert, `devbox.vowel.to`) is configured
+ * in `.vitepress/config.ts` — this root file is not used for `vitepress dev` / `vitepress preview`.
+ *
  * Based on Cloudflare Vite plugin best practices:
  * - The plugin automatically detects and bundles worker.ts from wrangler.toml
  * - Only enabled when building the worker (detected by WRANGLER environment or specific build)
- * - VitePress uses its own config in .vitepress/config.ts and shouldn't pick this up
+ * - VitePress uses its own config in .vitepress/config.ts and should not load this for doc dev
  */
 import { defineConfig } from 'vite'
 

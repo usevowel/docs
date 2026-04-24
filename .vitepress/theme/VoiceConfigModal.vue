@@ -85,8 +85,8 @@
               </div>
             </form>
 
-            <!-- Self-Hosted Mode Form -->
-            <form v-else @submit.prevent="saveSelfHostedConfig">
+            <!-- Self-Hosted Mode Form (custom URL / JWT) -->
+            <form v-else-if="mode === 'selfhosted'" @submit.prevent="saveSelfHostedConfig">
               <!-- JWT Mode: determined by VITE_VOWEL_USE_JWT env var -->
               <div v-if="useJwtFromEnv">
                 <div class="form-group">
@@ -149,10 +149,10 @@
                     id="selfhosted-url"
                     v-model="selfHostedConfig.url"
                     type="text"
-                    placeholder="wss://your-instance.com/realtime"
+                    :placeholder="DEFAULT_SELFHOSTED_URL"
                     required
                   />
-                  <span class="hint">Your self-hosted realtime endpoint</span>
+                  <span class="hint">Your self-hosted realtime endpoint (defaults to local Core at <code>{{ DEFAULT_SELFHOSTED_URL }}</code>)</span>
                 </div>
               </template>
 
@@ -214,11 +214,16 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import {
+  DEFAULT_SELFHOSTED_URL,
+  getVoiceConfig,
+  type StoredCredentials,
+} from './voice-client'
 
 /**
  * Configuration modes for vowel voice agent
  */
-type ConfigMode = 'hosted' | 'selfhosted'
+type ConfigMode = StoredCredentials['mode']
 
 /**
  * Hosted (SaaS) configuration - URL is hardcoded
@@ -234,22 +239,6 @@ interface SelfHostedConfig {
   appId: string
   url: string
   jwt: string
-}
-
-/**
- * Stored credentials format
- */
-interface StoredCredentials {
-  mode: ConfigMode
-  hosted?: {
-    appId: string
-  }
-  selfHosted?: {
-    appId?: string
-    url?: string
-    jwt?: string
-  }
-  timestamp: number
 }
 
 // Props
@@ -295,7 +284,7 @@ const hostedConfig = ref<HostedConfig>({
 
 const selfHostedConfig = ref<SelfHostedConfig>({
   appId: '',
-  url: '',
+  url: DEFAULT_SELFHOSTED_URL,
   jwt: ''
 })
 
@@ -364,6 +353,8 @@ function checkEnvConfig() {
   const envUrl = import.meta.env.VITE_VOWEL_URL
   if (envUrl) {
     selfHostedConfig.value.url = envUrl
+  } else if (!selfHostedConfig.value.url.trim()) {
+    selfHostedConfig.value.url = DEFAULT_SELFHOSTED_URL
   }
 }
 
@@ -374,22 +365,20 @@ function loadStoredConfig() {
   if (typeof window === 'undefined') return
   
   try {
-    const stored = localStorage.getItem('voweldoc-config')
-    if (stored) {
-      const parsed: StoredCredentials = JSON.parse(stored)
+    const normalized = getVoiceConfig()
+    if (normalized) {
       hasStoredConfig.value = true
-      
-      // Restore values
-      mode.value = parsed.mode
-      if (parsed.mode === 'hosted' && parsed.hosted) {
-        hostedConfig.value.appId = parsed.hosted.appId || ''
-      } else if (parsed.mode === 'selfhosted' && parsed.selfHosted) {
-        // Restore based on what's stored (JWT mode or appId+URL mode)
-        if (parsed.selfHosted.jwt) {
-          selfHostedConfig.value.jwt = parsed.selfHosted.jwt
+
+      mode.value = normalized.mode
+      if (normalized.mode === 'hosted' && normalized.hosted) {
+        hostedConfig.value.appId = normalized.hosted.appId || ''
+      } else if (normalized.mode === 'selfhosted' && normalized.selfHosted) {
+        if (normalized.selfHosted.jwt) {
+          selfHostedConfig.value.jwt = normalized.selfHosted.jwt
         } else {
-          selfHostedConfig.value.appId = parsed.selfHosted.appId || ''
-          selfHostedConfig.value.url = parsed.selfHosted.url || ''
+          selfHostedConfig.value.appId = normalized.selfHosted.appId || ''
+          selfHostedConfig.value.url =
+            normalized.selfHosted.url?.trim() || DEFAULT_SELFHOSTED_URL
         }
       }
     }
@@ -477,9 +466,20 @@ function saveToStorage(credentials: StoredCredentials) {
 /**
  * Show confirmation dialog for removing mode-specific configuration
  */
+function configModeLabel(modeToRemove: ConfigMode): string {
+  switch (modeToRemove) {
+    case 'hosted':
+      return 'Hosted (SaaS)'
+    case 'selfhosted':
+      return 'Self-Hosted'
+    default:
+      return 'voice'
+  }
+}
+
 function confirmRemoveModeConfig(modeToRemove: ConfigMode) {
   confirmTitle.value = 'Remove Configuration'
-  confirmMessage.value = `Are you sure you want to remove your saved ${modeToRemove === 'hosted' ? 'Hosted (SaaS)' : 'Self-Hosted'} configuration? This will clear the stored credentials from local storage.`
+  confirmMessage.value = `Are you sure you want to remove your saved ${configModeLabel(modeToRemove)} configuration? This will clear the stored credentials from local storage.`
   confirmButtonText.value = 'Remove'
   pendingConfirmAction.value = () => removeModeConfig(modeToRemove)
   showConfirmDialog.value = true
@@ -524,14 +524,14 @@ function removeModeConfig(modeToRemove: ConfigMode) {
     } else {
       // Stored mode is different from the one being removed
       // Just clear the form fields for current mode
-      successMessage.value = `${modeToRemove === 'hosted' ? 'Hosted' : 'Self-Hosted'} form cleared.`
+      successMessage.value = `${configModeLabel(modeToRemove)} form cleared.`
     }
 
     // Clear form fields for the removed mode
     if (modeToRemove === 'hosted') {
       hostedConfig.value = { appId: '' }
     } else {
-      selfHostedConfig.value = { appId: '', url: '', jwt: '' }
+      selfHostedConfig.value = { appId: '', url: DEFAULT_SELFHOSTED_URL, jwt: '' }
     }
 
     setTimeout(() => {
@@ -551,7 +551,7 @@ function clearConfig() {
     localStorage.removeItem('voweldoc-config')
     hasStoredConfig.value = false
     hostedConfig.value = { appId: '' }
-    selfHostedConfig.value = { appId: '', url: '', jwt: '' }
+    selfHostedConfig.value = { appId: '', url: DEFAULT_SELFHOSTED_URL, jwt: '' }
     successMessage.value = 'Configuration cleared. Voice agent disabled.'
     emit('cleared')
 

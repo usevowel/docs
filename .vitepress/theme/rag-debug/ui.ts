@@ -492,14 +492,14 @@ export async function updateStatus(): Promise<void> {
 
 /**
  * Initialize the RAG debug tool
- * Only runs if PUBLIC_VOWEL_DEBUG_RAG is enabled
+ * Only runs if VITE_VOWEL_DEBUG_RAG is enabled
  * @public
  */
 export function initializeRAGDebug(): void {
   // Check if debug mode is enabled
   const isDebugEnabled = checkDebugEnabled();
   if (!isDebugEnabled) {
-    console.log('[rag-debug] Debug mode not enabled. Set PUBLIC_VOWEL_DEBUG_RAG=true to enable.');
+    console.log('[rag-debug] Debug mode not enabled. Set VITE_VOWEL_DEBUG_RAG=true to enable.');
     return;
   }
 

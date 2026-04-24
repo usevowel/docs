@@ -447,6 +447,7 @@ unsubscribe();
 
 ## Related
 
+- [WebMCP](./webmcp) - Browser Model Context Protocol: expose actions and discover page tools
 - [Actions](./actions) - Custom action registration
 - [Event Notifications](./event-notifications) - Programmatic AI speech
 - [Dynamic Context](../recipes/dynamic-context) - Dynamic context management

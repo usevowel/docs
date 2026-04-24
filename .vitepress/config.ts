@@ -8,9 +8,10 @@ import { MermaidMarkdown, MermaidPlugin } from 'vitepress-plugin-mermaid'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-config()
-
 const docsRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+config({ path: resolve(docsRoot, '.env') })
+config({ path: resolve(docsRoot, '.env.local'), override: true })
 
 const CROSS_ORIGIN_ISOLATION_HEADERS = {
   'Cross-Origin-Opener-Policy': 'same-origin',
@@ -174,7 +175,8 @@ export default defineConfig({
             { text: 'Adapters', link: '/guide/adapters' },
             { text: 'Actions', link: '/guide/actions' },
             { text: 'Event Notifications', link: '/guide/event-notifications' },
-            { text: 'Connection Models', link: '/guide/connection-models' }
+            { text: 'Connection Models', link: '/guide/connection-models' },
+            { text: 'WebMCP', link: '/guide/webmcp' }
           ]
         },
         {
