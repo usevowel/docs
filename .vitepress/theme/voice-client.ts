@@ -4,7 +4,7 @@
  * This module initializes the Vowel voice client for the documentation site,
  * allowing users to navigate pages and interact with the docs using voice commands.
  *
- * Supports both hosted (SaaS) and self-hosted configurations via localStorage.
+ * Supports hosted (SaaS) and self-hosted (app ID + realtime URL) via localStorage.
  */
 
 import { Vowel, createDirectAdapters } from '@vowel.to/client'
@@ -23,6 +23,12 @@ const USE_GROK = import.meta.env.VITE_USE_GROK === 'true'
  * Configuration modes for vowel voice agent
  */
 type ConfigMode = 'hosted' | 'selfhosted'
+
+/**
+ * Default URL pre-filled for self-hosted docs setup (local Core default port).
+ * Override with `VITE_VOWEL_URL` or the modal field when your realtime endpoint differs.
+ */
+export const DEFAULT_SELFHOSTED_URL = 'http://localhost:3000'
 
 /**
  * SaaS realtime URL - can be overridden via env var but defaults to hosted endpoint
@@ -99,21 +105,38 @@ export interface StoredCredentials {
  * Check if voice configuration exists in localStorage
  */
 export function hasVoiceConfig(): boolean {
-  if (typeof window === 'undefined') return false
+  const config = getVoiceConfig()
+  if (!config) return false
+  const hasHosted = !!config.hosted?.appId
+  const hasSelfHostedJwt = !!config.selfHosted?.jwt
+  const hasSelfHostedAppUrl = !!(config.selfHosted?.appId && config.selfHosted?.url)
+  return hasHosted || hasSelfHostedJwt || hasSelfHostedAppUrl
+}
 
-  try {
-    const stored = localStorage.getItem('voweldoc-config')
-    if (!stored) return false
-
-    const config: StoredCredentials = JSON.parse(stored)
-    // Valid if: hosted has appId, OR self-hosted has jwt, OR self-hosted has appId+url
-    const hasHosted = !!config.hosted?.appId
-    const hasSelfHostedJwt = !!config.selfHosted?.jwt
-    const hasSelfHostedAppUrl = !!(config.selfHosted?.appId && config.selfHosted?.url)
-    return hasHosted || hasSelfHostedJwt || hasSelfHostedAppUrl
-  } catch {
-    return false
+/**
+ * Migrates legacy `selfhosted_local` (publishable key + Core base URL) to `selfhosted` (app ID + URL).
+ */
+function migrateSelfHostedLocalIfNeeded(parsed: StoredCredentials): StoredCredentials {
+  if (parsed.mode !== 'selfhosted_local' || !parsed.selfHostedLocal?.apiKey?.trim()) {
+    return parsed
   }
+  const url =
+    parsed.selfHostedLocal.coreBaseUrl?.trim().replace(/\/$/, '') || DEFAULT_SELFHOSTED_URL
+  const migrated: StoredCredentials = {
+    mode: 'selfhosted',
+    selfHosted: {
+      appId: parsed.selfHostedLocal.apiKey.trim(),
+      url,
+    },
+    timestamp: parsed.timestamp,
+  }
+  try {
+    localStorage.setItem('voweldoc-config', JSON.stringify(migrated))
+    console.log('📦 Migrated voweldoc-config from selfhosted_local to selfhosted')
+  } catch {
+    /* ignore */
+  }
+  return migrated
 }
 
 /**
@@ -126,7 +149,8 @@ export function getVoiceConfig(): StoredCredentials | null {
     const stored = localStorage.getItem('voweldoc-config')
     if (!stored) return null
 
-    return JSON.parse(stored) as StoredCredentials
+    const parsed = JSON.parse(stored) as StoredCredentials
+    return migrateSelfHostedLocalIfNeeded(parsed)
   } catch (error) {
     console.error('Error reading voice config:', error)
     return null
@@ -199,45 +223,52 @@ async function buildVowelConfig(
     enableAutomation: true, // Enable page automation for docs interaction
   })
 
-  // Base configuration common to both modes
+  /**
+   * Hidden voice/runtime overrides sent with token requests (hosted + self-hosted).
+   */
+  const hostedStyleVoiceConfig = USE_GROK
+    ? {
+        provider: 'grok' as const,
+        clientIdleHibernateTimeoutMs: 50000,
+        model: 'grok-voice-think-fast-1.0',
+        voice: 'Arcadia',
+        language: 'en-US',
+        initialGreetingPrompt:
+          'Speak exactly this phrase, "Welcome to Voweldocs. Let me know if I can help." Then stop',
+      }
+    : {
+        // Experimental config for vowel's SaaS Testing
+        // vowel-prime provider configuration (default)
+        provider: 'vowel-prime' as const,
+        vowelPrimeConfig: {
+          // environment: 'staging', // Use staging environment for testing; switch to 'production' for live
+          environment: 'testing' as const,
+          // environment: 'dev' as const,
+        },
+        // llmProvider: 'openrouter',
+        // model: 'google/gemini-3.1-flash-lite-preview',
+        llmProvider: 'groq' as const,
+        model: 'openai/gpt-oss-120b',
+        /** Engine JWT + client types expect `stt` / `tts` with `provider`, not flat sttProvider/ttsProvider. */
+        stt: { provider: 'groq-whisper' as const },
+        tts: { provider: 'grok' as const },
+        // model: 'moonshotai/kimi-k2-instruct-0905',
+        voice: 'ara',
+        language: 'en-US',
+        // Server-side VAD configuration for more accurate speech detection
+        turnDetection: {
+          mode: 'server_vad' as const,
+        },
+        initialGreetingPrompt:
+          'Speak exactly this phrase, "Welcome to Voweldocs. Let me know if I can help.". Then stop',
+      }
+
+  // Base configuration common to all modes
   const baseConfig: Partial<VowelConfig> = {
     navigationAdapter,
     // automationAdapter,
 
-    // Voice configuration - Use Grok when USE_GROK flag is enabled
-    _voiceConfig: USE_GROK
-      ? {
-          provider: 'grok',
-          clientIdleHibernateTimeoutMs: 50000,
-          model: 'grok-voice-think-fast-1.0',
-          voice: 'Arcadia',
-          language: 'en-US',
-          initialGreetingPrompt:
-            'Speak exactly this phrase, "Welcome to Voweldocs. Let me know if I can help." Then stop',
-        }
-      : {
-          // vowel-prime provider configuration (default)
-          provider: 'vowel-prime',
-          vowelPrimeConfig: {
-            // environment: 'staging', // Use staging environment for testing; switch to 'production' for live
-            environment: 'dev',
-          },
-          // llmProvider: 'openrouter',
-          // model: 'google/gemini-3.1-flash-lite-preview',
-          llmProvider: 'groq',
-          model: 'openai/gpt-oss-120b',
-          sttProvider: 'grok',
-          ttsProvider: 'grok',
-          // model: 'moonshotai/kimi-k2-instruct-0905',
-          voice: 'Timothy', 
-          language: 'en-US',
-          // Server-side VAD configuration for more accurate speech detection
-          turnDetection: {
-            mode: 'server_vad',
-          },
-          initialGreetingPrompt:
-            'Speak exactly this phrase, "Welcome to Voweldocs. Let me know if I can help.". Then stop',
-        },
+    _voiceConfig: hostedStyleVoiceConfig,
 
     // Enable captions display for transcription visibility
     _caption: {
@@ -315,7 +346,7 @@ function getSystemInstruction(): string {
 
 Act like a **capable secretary or executive assistant**: warm, efficient, and focused on outcomes for the **user**—not on narrating your own workflow.
 
-**What they should hear:** Clear, direct speech that answers their question or moves them forward (facts, steps, tradeoffs, pointers)—grounded in the knowledge base and docs.
+**What they should hear:** Clear, direct speech that answers their question or moves them forward (facts, steps, tradeoffs, pointers). When they are asking about Vowel, the product, or the documentation, ground your answer in the knowledge base; you do not need to search for unrelated small talk or purely UI actions.
 
 **What should feel invisible:** The machinery. Searching, tool calls, and bringing up the right page are **backstage work**—keep that layer transparent to the user so the conversation **flows** as if you simply knew the material and had already lined things up. They should not need a play-by-play of what you are doing moment to moment; speak as the helpful expert in the room, not as a system log.
 
@@ -328,57 +359,40 @@ Act like a **capable secretary or executive assistant**: warm, efficient, and fo
 - Questions about the product: "how does val work" means "how does vowel work"
 - References to this assistant: "val" referring to the product/assistant means "vowel"
 
-## CRITICAL: Always Search Knowledge Base First - NO EXCEPTIONS
+## When to search the knowledge base (RAG)
 
-**⚠️ MOST IMPORTANT RULE - MANDATORY**: You MUST call \`searchKnowledgeBase\` FIRST for EVERY user request, WITHOUT EXCEPTION. This is a hard requirement - do not skip this step ever.
+**Use \`searchKnowledgeBase\` whenever the user is asking something about Vowel**—the product, these docs, how to integrate or configure it, self-hosting, the Client SDK, recipes, the API, examples, or anything that needs an accurate, up-to-date answer from the documentation.
 
-**NO EXCEPTIONS - You MUST search even when:**
-- The question seems obvious or straightforward
-- You think you already know the answer
-- The user asks about navigation ("go to the React guide")
-- The user asks a simple question ("what is Vowel?")
-- The user asks about something you think is in your training data
-- The user wants to navigate somewhere specific
-- ANY other circumstance - there are zero exceptions
+**You do not need to call \`searchKnowledgeBase\` for every request.** Examples where it is usually unnecessary: brief greetings, thanks, or closing phrases; simple UI-only requests that use other tools (e.g. "copy the first code example", "list sections on this page", "scroll to this heading") with no need for product facts; or chit-chat that is not about Vowel or this site.
 
-**Why this is mandatory:**
-- The knowledge base contains the authoritative, up-to-date documentation
-- Product details change frequently - your training data may be outdated
-- Searching first ensures accurate, factual, current answers
-- The RAG system finds semantically relevant content even if keywords don't match
-- This demonstrates the RAG integration working in real-time
-- **NEVER rely on your training data for product-specific answers**
+**When the topic is Vowel or the docs, search before answering**—do this silently. Do not tell the user you are searching, looking anything up, or consulting docs before you have results. Don't say "Let me check the docs" or "Here's what I found in the documentation" up front. Your use of the documentation should be backstage so the conversation flows.
 
-**REQUIRED WORKFLOW - FOLLOW THESE STEPS IN ORDER:**
+**Why searching matters for Vowel questions:**
+- The knowledge base is authoritative and current; training data can be wrong or outdated
+- RAG finds semantically relevant content even when keywords do not match exactly
+- **Do not rely on training data alone** for product-specific or documentation-specific answers—search when the user is asking about Vowel or this documentation.
 
-**Step 1: SEARCH**
-Call \`searchKnowledgeBase\` with the user's query (or key terms from it). Do this silently—do not tell the user you are searching, looking anything up, or consulting docs before you have results. Don't say "Let me check the docs" or "Here's what I found in the documentation". Your interaction with the documentation should be hidden from the user and opaque.
+**Typical workflow for a Vowel-related question:**
 
-**Step 2: REVIEW** 
-Look at the returned documents, scores, and page paths
+**Step 1: SEARCH** — Call \`searchKnowledgeBase\` with the user's query (or key terms). Stay silent until you have what you need.
 
-**Step 3: NAVIGATE (if relevant)**
-Pick the most relevant result found with a specific page path, navigate to that page using \`navigate_to_page\` - this helps the user see the full documentation
+**Step 2: REVIEW** — Read returned documents, scores, and page paths
 
-**Step 4: ANSWER**
-Formulate your response based on the retrieved context.
+**Step 3: NAVIGATE (if relevant)** — If a result points to a specific doc page, use \`navigate_to_page\` so the user can see the full page
 
+**Step 4: ANSWER** — Respond in plain speech based on retrieved context. Give a substantive answer first; do not deliver a tour of headings unless they asked for an overview
 
-**⚠️ DO NOT SKIP STEP 1 - EVER**
-
-**Example:**
+**Example (Vowel-related):**
 User: "How do I add Vowel to my React app?"
-1. [Call searchKnowledgeBase with query "React installation setup". Dont say anything to the user here]
+1. [Call \`searchKnowledgeBase\` with e.g. "React installation setup"—do not announce this to the user]
 2. [Review results]
 3. [Navigate to /guide/react if highly relevant]
-4. [Answer based on the retrieved docs. THIS IS THE ONLY TIME YOU SHOULD SPEAK TO THE USER - after you have context from the search results to ensure accuracy and relevance. Answer the question, do not describe the guide]
-
-**⚠️ FAILURE TO SEARCH FIRST OR NAVIGATE to a relevant page IS A SYSTEM FAILURE - NEVER SKIP THIS STEP**
+4. [Answer from the docs—answer the question, not the structure of the guide]
 
 ## Available Actions
 
 **Knowledge Base (RAG):**
-- \`searchKnowledgeBase\` - **ALWAYS CALL THIS FIRST** for any user question. Performs semantic search over all documentation (guides, recipes, self-hosted, platform, API reference) using the local browser RAG database.
+- \`searchKnowledgeBase\` - Call this when the user asks something about Vowel, the docs, or anything that should be grounded in the site documentation. Semantic search over all documentation (guides, recipes, self-hosted, platform, API reference) using the local browser RAG database. Not required for every utterance (e.g. pure UI commands or off-topic chit-chat).
 
 **Navigation:**
 - \`navigate_to_page\` - Navigate to any documentation page (guides, recipes, self-hosted docs, platform docs, API reference)
@@ -452,7 +466,6 @@ export async function initVoiceAgent(
       return false
     }
   }
-
   console.log('🎤 Initializing voice agent for VitePress docs...')
   console.log(`   Mode: ${config.mode}`)
   if (USE_GROK) {
@@ -523,7 +536,7 @@ function registerDocsActions(vowel: VowelType) {
   vowel.registerAction(
     'searchKnowledgeBase',
     {
-      description: 'Search the local documentation knowledge base using semantic/vector search. ALWAYS call this FIRST when the user asks a question - before answering, search for relevant documentation to ground your response in facts.',
+      description: 'Search the local documentation knowledge base using semantic/vector search. Call this when the user asks something about Vowel, these docs, integration, configuration, or other topics that need authoritative documentation—before answering those questions, search to ground your response. Do not call this for every message (e.g. simple greetings or UI-only actions that do not need doc facts).',
       parameters: {
         query: {
           type: 'string',
