@@ -12,6 +12,8 @@ dist/
 .wrangler/
 .dev.vars
 .env*
+!.env.example
+!.env.sales.example
 wrangler.toml.local
 
 # Auto-generated voice navigation routes

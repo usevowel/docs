@@ -8,7 +8,7 @@
  */
 
 import { Vowel, createDirectAdapters } from '@vowel.to/client'
-import type { Vowel as VowelType, VowelConfig } from '@vowel.to/client'
+import type { Vowel as VowelType, VowelConfig, TurnDetectionConfig } from '@vowel.to/client'
 
 let vowelInstance: VowelType | null = null
 
@@ -102,9 +102,56 @@ export interface StoredCredentials {
 }
 
 /**
- * Check if voice configuration exists in localStorage
+ * Credentials baked in at build time via `.env` / `vite.config` `define` (e.g. `VITE_VOWEL_APP_ID`).
+ * Used for demos where visitors should not open the config modal.
+ *
+ * Precedence when initializing: explicit argument → localStorage → build-time env.
+ *
+ * @returns Hosted, self-hosted (appId+URL), or JWT-shaped credentials, or `null` if nothing is set at build time.
+ */
+export function getBuildTimeVoiceCredentials(): StoredCredentials | null {
+  const useJwt = import.meta.env.VITE_VOWEL_USE_JWT === 'true'
+  if (useJwt) {
+    const jwt = import.meta.env.VITE_VOWEL_JWT_TOKEN?.trim()
+    if (!jwt) return null
+    return {
+      mode: 'selfhosted',
+      selfHosted: { jwt },
+      timestamp: Date.now(),
+    }
+  }
+
+  const appId = import.meta.env.VITE_VOWEL_APP_ID?.trim()
+  if (!appId) return null
+
+  const url = import.meta.env.VITE_VOWEL_URL?.trim()
+  if (url) {
+    return {
+      mode: 'selfhosted',
+      selfHosted: { appId, url },
+      timestamp: Date.now(),
+    }
+  }
+
+  return {
+    mode: 'hosted',
+    hosted: { appId },
+    timestamp: Date.now(),
+  }
+}
+
+/**
+ * Whether the static bundle includes pre-configured voice credentials (no modal / localStorage required).
+ */
+export function hasBuildTimeVoiceCredentials(): boolean {
+  return getBuildTimeVoiceCredentials() !== null
+}
+
+/**
+ * Whether voice can run: build-time env, and/or valid credentials in localStorage.
  */
 export function hasVoiceConfig(): boolean {
+  if (hasBuildTimeVoiceCredentials()) return true
   const config = getVoiceConfig()
   if (!config) return false
   const hasHosted = !!config.hosted?.appId
@@ -258,7 +305,13 @@ async function buildVowelConfig(
         // Server-side VAD configuration for more accurate speech detection
         turnDetection: {
           mode: 'server_vad' as const,
-        },
+          cloudflareTurnDetection: {
+            enabled: true,
+            threshold: 0.7,
+            deferMs: 300,
+            maxDefers: 3,
+          },
+        } as TurnDetectionConfig & { cloudflareTurnDetection: { enabled: boolean; threshold: number; deferMs: number; maxDefers: number } },
         initialGreetingPrompt:
           'Speak exactly this phrase, "Welcome to Voweldocs. Let me know if I can help.". Then stop',
       }
@@ -446,8 +499,8 @@ export async function initVoiceAgent(
     return true
   }
 
-  // Get credentials from localStorage if not provided
-  const config = credentials || getVoiceConfig()
+  // Prefer explicit arg, then localStorage (visitor override), then build-time env (pre-filled deploys)
+  const config = credentials ?? getVoiceConfig() ?? getBuildTimeVoiceCredentials()
   if (!config) {
     console.warn('⚠️ No voice configuration found - voice functionality disabled')
     return false

@@ -16,8 +16,9 @@
       <RAGDebug />
     </template>
     <template #nav-bar-content-before>
-      <!-- Voice configuration button in navbar -->
+      <!-- Voice configuration button (hidden when credentials are baked in at build time) -->
       <button
+        v-if="showNavVoiceConfigButton"
         class="voice-config-btn"
         @click="openConfigModal"
         :class="{ 'has-config': hasStoredConfig, 'voice-active': voiceEnabled }"
@@ -66,6 +67,7 @@ import {
   cleanupVoiceAgent,
   hasVoiceConfig,
   getVoiceConfig,
+  hasBuildTimeVoiceCredentials,
   type StoredCredentials
 } from './voice-client'
 
@@ -77,6 +79,9 @@ const router = useRouter()
 // Modal state
 const showConfigModal = ref(false)
 const configModalRef = ref<InstanceType<typeof VoiceConfigModal> | null>(null)
+
+/** Navbar “voweldocs” control is only for BYO-credentials; pre-filled builds hide it. */
+const showNavVoiceConfigButton = computed(() => !hasBuildTimeVoiceCredentials())
 
 // Track if voice is configured
 const hasStoredConfig = ref(false)

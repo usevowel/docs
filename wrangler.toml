@@ -32,3 +32,19 @@ binding = "ASSETS"
 # Environment variables (if needed)
 [vars]
 NODE_ENV = "production"
+
+# ---------------------------------------------------------------------------
+# Sales docs demo — pre-built voice (VITE_* vars set at **build** time via
+# `.env.sales`; see `.env.sales.example`). Deploy: `bun run deploy:sales`
+# Cloudflare: attach custom hostname sales-docs-demo.vowel.to (DNS as for docs).
+# ---------------------------------------------------------------------------
+[env.sales]
+name = "vowel-docs-sales"
+workers_dev = false
+
+[[env.sales.routes]]
+pattern = "sales-docs-demo.vowel.to"
+custom_domain = true
+
+[env.sales.vars]
+NODE_ENV = "production"
